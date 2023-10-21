@@ -4,6 +4,7 @@
 %top{
     #include <stdarg.h>
     #include "common.h"
+    #include "parser.h"
 }
 %{
     extern dump_type_t dump_type;
@@ -24,76 +25,132 @@ DECIMIAL ([1-9][0-9]*|0)
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
 WHITE [\t ]
+
 /*  Your code here (lab3). */
+
+/* 这里解决行注释和块注释 */
+LINE_COMMENT "//".*[\r\n] 
+BLOCK_COMMENT "/*"((.|\n|\r)*?)"*/"
+
+/* 这里是自增自减   */
 
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);
+    dump_tokens("INT\t%s\n", yytext);//\t是tab。
+    return INT;
 }
 
 "void" {
     dump_tokens("VOID\t%s\n", yytext);
+    return VOID;
 }
 
 "if" {
     dump_tokens("IF\t%s\n", yytext);
+    return IF;
 }
 
 "else" {
     dump_tokens("ELSE\t%s\n", yytext);
+    return ELSE;
 }
+
+
+"while" {
+    dump_tokens("WHILE\t%s\n", yytext);
+    return WHILE;
+}
+
+
+
 
 "return" {
     dump_tokens("RETURN\t%s\n", yytext);
+    return RETURN;
 }
 
 "=" {
     dump_tokens("ASSIGN\t%s\n", yytext);
+    return ASSIGN;
 }
 
 "<" {
     dump_tokens("LESS\t%s\n", yytext);
+    return LESS;
 }
 
 "+" {
     dump_tokens("ADD\t%s\n", yytext);
+    return ADD;
 }
+
+"++" {
+    dump_tokens("ADD\t%s\n", yytext);
+    return INCREMENT;
+}
+
 
 ";" {
     dump_tokens("SEMICOLON\t%s\n", yytext);
+    return SEMICOLON;
 }
 
 "(" {
     dump_tokens("LPAREN\t%s\n", yytext);
+    return LPAREN;
 }
 
 ")" {
     dump_tokens("RPAREN\t%s\n", yytext);
+    return RPAREN;
 }
 
 "{" {
     dump_tokens("LBRACE\t%s\n", yytext);
+    return LBRACE;
 }
 
 "}" {
     dump_tokens("RBRACE\t%s\n", yytext);
+    return RBRACE;
 }
 
 {DECIMIAL} {
     int decimal;
     decimal = atoi(yytext);
     dump_tokens("DECIMAL\t%s\t%d\n", yytext, decimal);
+    yylval.itype = decimal;
+    return INTEGER;
 }
 
 {ID} {
+    char *lexeme;
     dump_tokens("ID\t%s\n", yytext);
+    lexeme = new char[strlen(yytext) + 1];
+    strcpy(lexeme, yytext);
+    yylval.strtype = lexeme;
+    return ID;
 }
+
 
 {EOL} yylineno++;
 
 {WHITE}
 
     /*  Your code here (lab3). */
+    {
+    }
+
+{LINE_COMMENT} 
+{
+}
+{BLOCK_COMMENT}
+{
+}
+
+
+
+
 %%
 /* user code section */
