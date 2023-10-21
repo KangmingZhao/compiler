@@ -8,14 +8,18 @@ int main()
     test block comment
     test block comment
     */
+    a = 1 + //*/
+    2;
     int b;
-    b = 0;
-    while(b < 2)
-    { 
-        b = b + 1;
-    }
-    
-    a = 1 + 2;
+    b = 0xb12a;
+    int c;
+    c = 0b123;
+    float d;
+    d = 12.21;
+    float e;
+    e = -.31;
+    float f;
+    f = -5.75E-3;
     if(a < 5)
         return 1;
     return 0;

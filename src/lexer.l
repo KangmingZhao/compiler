@@ -4,9 +4,10 @@
 %top{
     #include <stdarg.h>
     #include "common.h"
-    #include "parser.h"
 }
 %{
+
+
     extern dump_type_t dump_type;
 
     inline void dump_tokens(const char* format, ...){
@@ -20,136 +21,252 @@
     /* Your code here, if desired (lab3). */
 %}
 
+
+
+
+
 /* definitions section */
 DECIMIAL ([1-9][0-9]*|0)
+HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
+OCTAL "0b"([1-7][0-7]*|0)
+
+FLOAT [+-]?([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)([eE][+-]?([1-9][0-9]*|0))?
+
+/*
+    这里防止写多了人乱了记录一下。
+    [+-]?可选开头正负号
+    ([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)是正常的部分。
+    ([eE][+-]?([1-9][0-9]*|0))?是一个可选的幂，[eE]是计数法的分隔符，[+-]?可选的正负幂，([1-9][0-9]*|0)具体的幂次数。
+*/
+
+
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 EOL (\r\n|\n|\r)
 WHITE [\t ]
-
 /*  Your code here (lab3). */
 
-/* 这里解决行注释和块注释 */
-LINE_COMMENT "//".*[\r\n] 
-BLOCK_COMMENT "/*"((.|\n|\r)*?)"*/"
+block_commentbegin "/*" 
+block_commentelement .|\n
+block_commentend "*/"
+%x BLOCK_COMMENT
 
-/* 这里是自增自减   */
+line_commentbegin "//" 
+line_commentelement .
+line_commentend \n
+%x LINE_COMMENT
+
 
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);//\t是tab。
-    return INT;
+    dump_tokens("INT\t%s\n", yytext);
+}
+
+"float" {
+    dump_tokens("FLOAT\t%s\n", yytext);
 }
 
 "void" {
     dump_tokens("VOID\t%s\n", yytext);
-    return VOID;
 }
 
 "if" {
     dump_tokens("IF\t%s\n", yytext);
-    return IF;
 }
 
 "else" {
     dump_tokens("ELSE\t%s\n", yytext);
-    return ELSE;
 }
-
-
-"while" {
-    dump_tokens("WHILE\t%s\n", yytext);
-    return WHILE;
-}
-
-
-
 
 "return" {
     dump_tokens("RETURN\t%s\n", yytext);
-    return RETURN;
 }
 
 "=" {
     dump_tokens("ASSIGN\t%s\n", yytext);
-    return ASSIGN;
 }
 
 "<" {
     dump_tokens("LESS\t%s\n", yytext);
-    return LESS;
 }
 
 "+" {
     dump_tokens("ADD\t%s\n", yytext);
-    return ADD;
 }
-
-"++" {
-    dump_tokens("ADD\t%s\n", yytext);
-    return INCREMENT;
-}
-
 
 ";" {
     dump_tokens("SEMICOLON\t%s\n", yytext);
-    return SEMICOLON;
 }
 
 "(" {
     dump_tokens("LPAREN\t%s\n", yytext);
-    return LPAREN;
 }
 
 ")" {
     dump_tokens("RPAREN\t%s\n", yytext);
-    return RPAREN;
 }
 
 "{" {
     dump_tokens("LBRACE\t%s\n", yytext);
-    return LBRACE;
 }
 
 "}" {
     dump_tokens("RBRACE\t%s\n", yytext);
-    return RBRACE;
 }
 
 {DECIMIAL} {
     int decimal;
     decimal = atoi(yytext);
     dump_tokens("DECIMAL\t%s\t%d\n", yytext, decimal);
-    yylval.itype = decimal;
-    return INTEGER;
 }
+
+{OCTAL} {
+    int decmial = 0;
+    int i = 2;//别把"0b"也算进去
+    while(yytext[i] != '\0')
+    {
+        decmial *= 8;
+        decmial += yytext[i] - '0';
+        i++;
+    }
+    dump_tokens("OCTAL\t%s\t%d\n", yytext, decmial);
+}
+
+{HEXADECIMAL} {
+    //dump_tokens("HEXADECIMAL\t%s\n", yytext);
+    //int decimal;
+    //decimal = std::stoi(yytext, 0, 16);
+    //dump_tokens("HEXADECIMAL\t%s\t%d\n", yytext, decimal);
+    int decmial = 0;
+    int i = 2;//别把"0x"也算进去
+    while(yytext[i] != '\0')
+    {
+        decmial *= 16;
+        if(yytext[i] >= '0' && yytext[i] <= '9')
+        {
+            decmial += yytext[i] - '0';
+        }
+        else if(yytext[i] >= 'a' && yytext[i] <= 'z')
+        {
+            decmial += 10;
+            decmial += yytext[i] - 'a';
+        }
+        else
+        {
+            decmial += 10;
+            decmial += yytext[i] - 'A';
+        }
+        i++;
+    }
+    dump_tokens("HEXADECIMAL\t%s\t%d\n", yytext, decmial);
+}
+
+
+{FLOAT} {
+    float f_num = 0;
+    float int_part = 0;
+    float float_part = 0;//鄙人英语不好，这个是小数部分。
+    float div_reg = 10;
+    float power = 1;
+    int power_part = 0;
+    bool pow_mul = 1;
+
+    
+    int now_part = 0; //进来先处理整数部分
+    /*
+    0:整数部分
+    1：消暑部分
+    2:幂部分
+    */
+    int i = 0;
+
+    float minus = 1;
+
+    while(yytext[i] != '\0')
+    {
+        if(i == 0 && (yytext[i] == '+' || yytext[i] == '-'))
+        {
+            if(yytext[i] == '-')
+            {
+                minus = -1;
+            }
+            else
+            {
+                minus = 1;
+            }
+            i++;
+            continue;
+        }
+        if(yytext[i] >= '0' && yytext[i] <= '9')
+        {
+            switch(now_part)
+            {
+            case 0:
+                int_part *= 10.0;
+                int_part += (float)(yytext[i] - '0');
+                
+                break;
+            case 1:
+                float_part += (float)(yytext[i] - '0') / div_reg;
+                div_reg *= 10.0;
+                break;
+            case 2:
+                power_part *= 10;
+                power_part += (yytext[i] - '0');
+                break;
+            }
+        }
+        else if(yytext[i] == '.')
+        {
+            now_part = 1;
+        }
+        else if(yytext[i] == 'e' || yytext[i] == 'E')
+        {
+            now_part = 2;
+        }
+        else if(yytext[i] == '+')
+        {
+            pow_mul = 1;
+        }
+        else if(yytext[i] == '-')
+        {
+            pow_mul = 0;
+        }
+        i++;
+    }
+    if(pow_mul)
+        for(int i = 0; i < power_part; i++)
+        {
+            power *= 10.0;
+        }
+    else
+        for(int i = 0; i < power_part; i++)
+        {
+            power /= 10.0;
+        }
+    f_num = int_part + float_part;
+    f_num = f_num * minus * power;
+    dump_tokens("FLOAT\t%s\t%f\n", yytext, f_num);
+}
+
 
 {ID} {
-    char *lexeme;
     dump_tokens("ID\t%s\n", yytext);
-    lexeme = new char[strlen(yytext) + 1];
-    strcpy(lexeme, yytext);
-    yylval.strtype = lexeme;
-    return ID;
 }
-
 
 {EOL} yylineno++;
 
 {WHITE}
 
-    /*  Your code here (lab3). */
-    {
-    }
-
-{LINE_COMMENT} 
-{
-}
-{BLOCK_COMMENT}
-{
-}
 
 
+{block_commentbegin} {BEGIN BLOCK_COMMENT;}
+<BLOCK_COMMENT>{block_commentelement} {}
+<BLOCK_COMMENT>{block_commentend} {BEGIN INITIAL;}
+
+{line_commentbegin} {BEGIN LINE_COMMENT;}
+<LINE_COMMENT>{line_commentelement} {}
+<LINE_COMMENT>{line_commentend} {BEGIN INITIAL;}
 
 
 %%

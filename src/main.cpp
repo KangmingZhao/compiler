@@ -2,29 +2,24 @@
 #include <string.h>
 #include <unistd.h>
 #include "common.h"
-#include "Ast.h"
 
 extern FILE *yyin;
 extern FILE *yyout;
 
-int yyparse();
+int yylex();
 
-Ast ast;
 char outfile[256] = "a.out";
 dump_type_t dump_type = ASM;
 
 int main(int argc, char *argv[])
 {
     int opt;
-    while ((opt = getopt(argc, argv, "ato:")) != -1)
+    while ((opt = getopt(argc, argv, "to:")) != -1)
     {
         switch (opt)
         {
         case 'o':
             strcpy(outfile, optarg);
-            break;
-        case 'a':
-            dump_type = AST;
             break;
         case 't':
             dump_type = TOKENS;
@@ -50,8 +45,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: fail to open output file\n", outfile);
         exit(EXIT_FAILURE);
     }
-    yyparse();
-    if(dump_type == AST)
-        ast.output();
+    yylex();
     return 0;
 }
