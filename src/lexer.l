@@ -41,9 +41,14 @@ FLOAT [+-]?([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)([eE][+-]?([1-9][0-9]*|0))?
 
 
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
+ARRAY [[:alpha:]_][[:alpha:][:digit:]_]*("["([1-9][0-9]*|0)"]")*
+
 EOL (\r\n|\n|\r)
 WHITE [\t ]
 /*  Your code here (lab3). */
+
+ADD_type "+"?"+"
+MINUS_type "-"?"-"
 
 block_commentbegin "/*" 
 block_commentelement .|\n
@@ -78,6 +83,14 @@ line_commentend \n
     dump_tokens("ELSE\t%s\n", yytext);
 }
 
+"while" {
+    dump_tokens("WHILE\t%s\n", yytext);
+}
+
+"for" {
+    dump_tokens("FOR\t%s\n", yytext);
+}
+
 "return" {
     dump_tokens("RETURN\t%s\n", yytext);
 }
@@ -86,12 +99,85 @@ line_commentend \n
     dump_tokens("ASSIGN\t%s\n", yytext);
 }
 
+
 "<" {
     dump_tokens("LESS\t%s\n", yytext);
 }
 
-"+" {
-    dump_tokens("ADD\t%s\n", yytext);
+">" {
+    dump_tokens("MORE\t%s\n", yytext);
+}
+
+
+{ADD_type} {
+    int i = 0;
+    while(yytext[i] != '\0')
+    {
+        i++;
+    }
+    if(i == 1)
+    {
+        dump_tokens("ADD\t%s\n", yytext);
+    }
+    else if(i == 2)
+    {
+        dump_tokens("INCREMENT\t%s\n", yytext);
+    }
+}
+
+{MINUS_type} {
+    int i = 0;
+    while(yytext[i] != '\0')
+    {
+        i++;
+    }
+    if(i == 1)
+    {
+        dump_tokens("MINUS\t%s\n", yytext);
+    }
+    else if(i == 2)
+    {
+        dump_tokens("DECREMENT\t%s\n", yytext);
+    }
+}
+
+
+
+"*" {
+    dump_tokens("MUL\t%s\n", yytext);
+}
+
+"%" {
+    dump_tokens("MOD\t%s\n", yytext);
+}
+
+"/" {
+    dump_tokens("DIV\t%s\n", yytext);
+}
+
+
+"&&" {
+    dump_tokens("AND\t%s\n", yytext);
+}
+
+"||" {
+    dump_tokens("OR\t%s\n", yytext);
+}
+
+"!" {
+    dump_tokens("NOT\t%s\n", yytext);
+}
+
+"==" {
+    dump_tokens("EQUAL\t%s\n", yytext);
+}
+
+"!=" {
+    dump_tokens("NOT_EQUAL\t%s\n", yytext);
+}
+
+"," {
+    dump_tokens("COMMA\t%s\n", yytext);
 }
 
 ";" {
@@ -253,6 +339,46 @@ line_commentend \n
 {ID} {
     dump_tokens("ID\t%s\n", yytext);
 }
+
+{ARRAY} {
+    int i = 0;
+    char* name = new char[100];
+    int dimension_size[100];
+    int index = 0;
+    bool ID_over = 0;
+    int temp = 0;
+    while(yytext[i] != '\0')
+    {
+        if(yytext[i] == '[')
+        {
+            ID_over = 1;
+        }
+        if(!ID_over)
+        {
+            name[i] = yytext[i];
+        }
+        else
+        {
+            i++;
+            while(yytext[i] >= '0' && yytext[i] <= '9')
+            {
+                temp *= 10;
+                temp += yytext[i] - '0';
+                i++;
+            }
+            dimension_size[index] = temp;
+            index++;
+            temp = 0;
+        }
+        i++;
+    }
+    dump_tokens("ARRAY_ID\t%s\n", name);
+    for(int i = 0; i < index; i++)
+    {
+        dump_tokens("Dimension%d size\t%d\n", i,dimension_size[i]);
+    }
+}
+
 
 {EOL} yylineno++;
 
