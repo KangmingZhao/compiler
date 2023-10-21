@@ -4,6 +4,7 @@
 %top{
     #include <stdarg.h>
     #include "common.h"
+    #include <map>
 }
 %{
     extern dump_type_t dump_type;
