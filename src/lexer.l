@@ -3,11 +3,15 @@
 %option noinput
 %top{
     #include <stdarg.h>
+    #include "symbolTable.h"
     #include "common.h"
+    
+    symbolTable* identifiers = new symbolTable();
+    //这个就是编译时，整个项目的根符号表。也就是栈底
+
 }
 %{
-
-
+    
     extern dump_type_t dump_type;
 
     inline void dump_tokens(const char* format, ...){
@@ -19,6 +23,13 @@
     }
 
     /* Your code here, if desired (lab3). */
+    /*  
+    这里写一些注释。关于符号表，由于这里我们……emm，只是识别出token，并没有判断这个到底是不是一个block块，
+    所以暂时只能简单的根据"{"和"}"符号判断进入/退出作用域。更精确的做法是等到lab4可以判断block之后，进入/退出block时才
+    进行作用域的判断。
+    */
+
+
 %}
 
 
@@ -63,6 +74,9 @@ line_commentend \n
 
 %%
     /* rules section */
+
+
+
 "int" {
     dump_tokens("INT\t%s\n", yytext);
 }
@@ -193,10 +207,18 @@ line_commentend \n
 }
 
 "{" {
+    //遇到一个"{"时表示进入一个新的作用域
+    identifiers = new symbolTable(identifiers);
     dump_tokens("LBRACE\t%s\n", yytext);
 }
 
 "}" {
+    //遇到"}"时表示退出作用域
+    symbolTable *now_identifiers = identifiers;
+    //出栈
+    identifiers = identifiers->get_prev();
+    delete now_identifiers; //删除原栈顶
+
     dump_tokens("RBRACE\t%s\n", yytext);
 }
 
@@ -337,10 +359,28 @@ line_commentend \n
 
 
 {ID} {
-    dump_tokens("ID\t%s\n", yytext);
+    //遇到id我们先找找看符号表里有没有
+    //printf("%s\n",yytext);
+    symbolTableEntry* node = identifiers->find(yytext);
+    int value = 0;
+    if(node)
+    {
+        value = node->value;
+    }
+    else
+    {
+        symbolTableEntry* temp = new symbolTableEntry(yylineno,0,INT,0,nullptr);
+        identifiers->insert(yytext, temp);
+        value = temp->value;
+    }
+    dump_tokens("ID\t%s\t%d\n", yytext, value);
 }
 
 {ARRAY} {
+
+    
+
+
     int i = 0;
     char* name = new char[100];
     int dimension_size[100];
@@ -372,11 +412,32 @@ line_commentend \n
         }
         i++;
     }
-    dump_tokens("ARRAY_ID\t%s\n", name);
-    for(int i = 0; i < index; i++)
+
+    //遇到id我们先找找看符号表里有没有
+   
+    symbolTableEntry* node = identifiers->find(name);
+    int value = 0;
+    if(node)
     {
-        dump_tokens("Dimension%d size\t%d\n", i,dimension_size[i]);
+        value = node->value;
+        dump_tokens("ARRAY_ID\t%s\t%d\n", name, value);
+        for(int i = 0; i < index; i++)
+        {
+            dump_tokens("accessing_index\t%d\n", i,dimension_size[i]);
+        }
     }
+    else
+    {
+        symbolTableEntry* temp = new symbolTableEntry(yylineno,0,INT,0,nullptr);
+        identifiers->insert(yytext, temp);
+        value = temp->value;
+        dump_tokens("ARRAY_ID\t%s\t%d\n", name,value);
+        for(int i = 0; i < index; i++)
+        {
+            dump_tokens("Dimension%d size\t%d\n", i,dimension_size[i]);
+        }
+    }
+
 }
 
 
