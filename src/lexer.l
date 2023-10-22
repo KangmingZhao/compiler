@@ -8,7 +8,7 @@
     using namespace std;
 
     int offset=0;//偏移量
-    int scope=0;//作用域
+    int scope=0;//作用域 呃没什么用 
     symbolTable* identifiers = new symbolTable();
     //这个就是编译时，整个项目的根符号表。也就是栈底
 
