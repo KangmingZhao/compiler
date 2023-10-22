@@ -2,24 +2,39 @@
 #include<string>
 #include<map>
 using namespace std;
+enum TYPE
+{
+    INT,
+    INT_ARRAY
+};
 class symbolTableEntry
 {
 public:
     int value;
     int lineno; // 行号
     int offset; //列号
-    symbolTableEntry(int v,int l,int o)
+    TYPE IDENT_TYPE;
+    int* dimension_store;
+    symbolTableEntry(int l,int o, TYPE type,int dimension, int dimension_val[])
     {
-        value=v;
+        //value=v;
         lineno=l;
         offset=o;
+        IDENT_TYPE = type;
+        if (type == INT_ARRAY)
+        {
+            dimension_store = new int[dimension];
+            for (int i = 0; i < dimension; i++) {
+                dimension_store[i] = dimension_val[i];
+            }
+        }
     }
 };
 
 
 class symbolTable{
 public:
-
+    int value_count = 0;
 symbolTable(){
     prev=nullptr;
     scope=0;
@@ -35,18 +50,33 @@ symbolTable(symbolTable * prev){
 symbolTableEntry* find(const string name)
 {
 //查找到对应标识符在的符号表里
-    symbolTable *p;
-    do{
-        // 返回值为一符号表里的一条信息记录 
-        // 通过name去匹配 不同的作用域级均有一张表 通过prev指针串联
-        auto iter=p->sbt.find(name);
-        if(iter!=p->sbt.end())
-        {
-            return p->sbt[name];
-        }
+    //symbolTable *p = this;
+    //do{
+    //    //printf("fuck");
+    //    // 返回值为一符号表里的一条信息记录 
+    //    // 通过name去匹配 不同的作用域级均有一张表 通过prev指针串联
+    //    auto iter=p->sbt.find(name);
+    //    if(iter!=p->sbt.end())
+    //    {
+    //        return p->sbt[name];
+    //    }
 
-    }while(p!=nullptr);
-    // 没找到返回空
+    //}while(p!=nullptr);
+    //// 没找到返回空
+    //return nullptr;
+    symbolTable* temp = this;
+    while (temp)
+    {
+        std::map<std::string, symbolTableEntry*>::iterator it = temp->sbt.find(name);
+        if (it != temp->sbt.end()) {
+            // 找到了name
+            return temp->sbt[name];
+        }
+        else {
+            // name不存在
+            temp = temp->get_prev();
+        }
+    }
     return nullptr;
 }
 //插入
@@ -58,6 +88,10 @@ void insert(const string name,symbolTableEntry * entry)
         {
             return;
         }
+
+
+    entry->value = value_count;
+    value_count++;
     sbt[name]=entry;
 }
 //初始化信息
@@ -73,6 +107,10 @@ int setEntryVal(const string name,int value)
         entry->value=value;
         return 1;
     }
+}
+symbolTable* get_prev()
+{
+    return prev;
 }
 
 private:  
