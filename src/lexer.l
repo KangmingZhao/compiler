@@ -399,10 +399,10 @@ line_commentend \n
     //遇到id我们先找找看符号表里有没有
     //printf("%s\n",yytext);
     symbolTableEntry* node = identifiers->find(yytext);
-
+    //int value=0;
     if(node!=nullptr)
     {
- 
+        //value=node->value;
     }
     else
     {
@@ -410,7 +410,8 @@ line_commentend \n
         identifiers->insert(yytext, temp);
 
     }
-    dump_tokens("ID\t%s\t%d\t%d\tox%08x\n", yytext,yylineno,offset,&identifiers);
+    symbolTableEntry *node_2=identifiers->find(yytext);
+    dump_tokens("ID\t%s\t%d\t%d\tox%08x\n", yytext,yylineno,offset,node_2);
     offset+=strlen(yytext);
 }
 
@@ -455,9 +456,9 @@ line_commentend \n
     //int value = 0;
     if(node)
     {
-       // value = node->value;
+      // value = node->value;
         //dump_tokens("ARRAY_ID\t%s\t%d\t%d\t%d\n", name,yylineno,offset,value);
-        dump_tokens("ARRAY_ID\t%s\t%d\t%d\tox%08x\n", name,yylineno,offset,&identifiers);
+        dump_tokens("ARRAY_ID\t%s\t%d\t%d\tox%08x\n", name,yylineno,offset,node);
         for(int i = 0; i < index; i++)
         {
             dump_tokens("accessing_index\t%d\n", i,dimension_size[i]);

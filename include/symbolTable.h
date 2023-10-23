@@ -10,7 +10,7 @@ enum TYPE
 class symbolTableEntry
 {
 public:
-    int value;
+    int value; // 符号表项（？
     int lineno; // 行号
     int offset; //列号
     TYPE IDENT_TYPE;
