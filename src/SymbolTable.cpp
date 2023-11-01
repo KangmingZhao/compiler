@@ -70,6 +70,19 @@ SymbolTable::SymbolTable(SymbolTable *prev)
 SymbolEntry* SymbolTable::lookup(std::string name)
 {
     // Todo
+    SymbolTable *temp=this;
+    while (temp)
+    {
+        std::map<std::string, SymbolEntry*>::iterator it = temp->symbolTable.find(name);
+        if (it != temp->symbolTable.end()) {
+            // 找到了name
+            return temp->symbolTable[name];
+        }
+        else {
+            // name不存在
+            temp = temp->getPrev();
+        }
+    }
     return nullptr;
 }
 
