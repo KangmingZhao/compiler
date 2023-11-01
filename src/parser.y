@@ -3,6 +3,8 @@
     #include <assert.h>
     #include "parser.h"
     extern Ast ast;
+    ArrDimNode** now_arrdim;
+    int now_arrindex;
     int yylex();
     int yyerror( char const * );
 }
@@ -18,20 +20,26 @@
     char* strtype;
     StmtNode* stmttype;
     ExprNode* exprtype;
+    ArrDimNode * arrdimtype;
     Type* type;
 }
 
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
-%token IF ELSE
-%token INT VOID
-%token LPAREN RPAREN LBRACE RBRACE SEMICOLON
-%token ADD SUB OR AND LESS ASSIGN
+%token IF ELSE WHILE
+%token INT VOID FLOAT
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON 
+%token ADD SUB MUL DIV MOD OR AND LESS ASSIGN INCREMENT DECREMENT
 %token RETURN
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef
-%nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
+
+
+
+
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt DoNothingStmt
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp 
+%nterm <arrdimtype> ArrDimensions ArrDimension
 %nterm <type> Type
 
 %precedence THEN
@@ -55,18 +63,20 @@ Stmt
     | ReturnStmt {$$=$1;}
     | DeclStmt {$$=$1;}
     | FuncDef {$$=$1;}
+    | WhileStmt { $$ = $1; }
+    | DoNothingStmt { $$ = $1; }
     ;
 LVal
     : ID {
         SymbolEntry *se;
-        se = identifiers->lookup($1);
-        if(se == nullptr)
+        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
+        if(se == nullptr) //如果没有
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
             delete [](char*)$1;
-            assert(se != nullptr);
+            assert(se != nullptr);      //抛出一个断言错误
         }
-        $$ = new Id(se);
+        $$ = new Id(se);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
         delete []$1;
     }
     ;
@@ -95,6 +105,23 @@ IfStmt
         $$ = new IfElseStmt($3, $5, $7);
     }
     ;
+
+WhileStmt
+    : WHILE LPAREN Cond RPAREN Stmt 
+    {
+         $$ = new WhileStmt($3, $5);
+    }
+    ;
+
+DoNothingStmt
+    : Exp SEMICOLON {
+        
+    }
+    ;
+
+
+
+
 ReturnStmt
     :
     RETURN Exp SEMICOLON{
@@ -119,22 +146,54 @@ PrimaryExp
         $$ = new Constant(se);
     }
     ;
+
+MulExp
+    :
+    PrimaryExp { $$ = $1;}
+    |
+    MulExp MUL PrimaryExp {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
+    }
+    ;
+
 AddExp
     :
-    PrimaryExp {$$ = $1;}
+    Exp INCREMENT
+    {
+        //SymbolEntry *const_1 = new ConstantSymbolEntry(TypeSystem::intType, 1);
+        //ExprNode *const_1_node = new Constant(const_1);
+
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::INCREMENT_AFTER, $1);
+
+        //SymbolEntry *se;
+        //se = identifiers->lookup($1->get_name()); //在已有的符号表里找有没有这个Lval。
+        //$$ = new BinaryExpr(se, BinaryExpr::ADD, $1, const_1_node);
+    }
     |
-    AddExp ADD PrimaryExp
+    Exp DECREMENT
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::DECREMENT_AFTER, $1);
+    }
+    |
+    MulExp { $$ = $1; }
+    |
+    AddExp ADD MulExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::ADD, $1, $3);
     }
     |
-    AddExp SUB PrimaryExp
+    AddExp SUB MulExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::SUB, $1, $3);
     }
     ;
+
+
 RelExp
     :
     AddExp {$$ = $1;}
@@ -173,6 +232,27 @@ Type
         $$ = TypeSystem::voidType;
     }
     ;
+
+    
+ArrDimension
+    :
+    LBRACKET Exp RBRACKET
+    {
+        $$ = new ArrDimNode($2);
+    }
+    ;
+
+
+ArrDimensions
+    :
+    ArrDimension { $$ = $1; }
+    |
+    ArrDimensions ArrDimension
+    {
+        $$ = new ArrDimNode($1, $2);
+    }
+    ;
+
 DeclStmt
     :
     Type ID SEMICOLON {
@@ -182,7 +262,21 @@ DeclStmt
         $$ = new DeclStmt(new Id(se));
         delete []$2;
     }
+    |
+    Type ID ArrDimensions SEMICOLON {
+        INT_arrayType * temp = new INT_arrayType();
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+        identifiers->install($2, se);
+        $$ = new DeclStmt(new Id(se, $3));
+        delete []$2;
+    }
     ;
+
+
+
+
+
 FuncDef
     :
     Type ID {

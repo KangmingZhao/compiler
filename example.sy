@@ -3,6 +3,22 @@ int a;
 int main()
 {
     int a;
+    //test comment
+    /*test block comment
+    test block comment
+    test block comment
+    */
+    int b;
+    b = 0;
+    //b = -b;
+    b++;
+    b = b+++b;
+    b = b * 2;
+    int fuck[1][2][3][4][5];
+    while(b < 2)
+    { 
+        b = b + 1;
+    }
     a = 1 + 2;
     if(a < 5)
         return 1;

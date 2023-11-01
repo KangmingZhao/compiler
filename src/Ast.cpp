@@ -18,6 +18,11 @@ void Ast::output()
         root->output(4);
 }
 
+std::string ExprNode::get_name()
+{
+    return symbolEntry->toStr();
+}
+
 void BinaryExpr::output(int level)
 {
     std::string op_str;
@@ -29,6 +34,15 @@ void BinaryExpr::output(int level)
         case SUB:
             op_str = "sub";
             break;
+        case MUL:
+            op_str = "mul";
+            break;
+        case DIV:
+            op_str = "div";
+            break;
+        case MOD:
+            op_str = "mod";
+            break;
         case AND:
             op_str = "and";
             break;
@@ -38,10 +52,29 @@ void BinaryExpr::output(int level)
         case LESS:
             op_str = "less";
             break;
+        case INCREMENT_BEFORE:
+            op_str = "increment_before";
+            break;
+        case DECREMENT_AFTER:
+            op_str = "decrement_after";
+            break;
+        case INCREMENT_AFTER:
+            op_str = "increment_before";
+            break;
+        case DECREMENT_BEFORE:
+            op_str = "decrement_after";
+            break;
     }
     fprintf(yyout, "%*cBinaryExpr\top: %s\n", level, ' ', op_str.c_str());
-    expr1->output(level + 4);
-    expr2->output(level + 4);
+    if (is_crement)
+    {
+        ID->output(level + 4);
+    }
+    else
+    {
+        expr1->output(level + 4);
+        expr2->output(level + 4);
+    }
 }
 
 void Constant::output(int level)
@@ -53,6 +86,22 @@ void Constant::output(int level)
             value.c_str(), type.c_str());
 }
 
+
+
+void ArrDimNode::output(int level)
+{
+    if (is_link)
+    {
+        arr1->output(level);
+        arr2->output(level);
+    }
+    else
+    {
+        fprintf(yyout, "%*c\t\t\t\tdimension_size:\n", level, ' ');
+        dimension_size->output(level + 4);
+    }
+}
+
 void Id::output(int level)
 {
     std::string name, type;
@@ -62,6 +111,14 @@ void Id::output(int level)
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
             name.c_str(), scope, type.c_str());
+    if (id_type == INT_ARRAY)
+    {
+        Dimension->output(level + 4);
+    }
+    /*if (symbolEntry->getType()->isINT_ARRAY())
+    {
+        symbolEntry->get_expr()->output(level + 4);
+    }*/
 }
 
 void CompoundStmt::output(int level)
@@ -89,6 +146,21 @@ void IfStmt::output(int level)
     cond->output(level + 4);
     thenStmt->output(level + 4);
 }
+
+void WhileStmt::output(int level)
+{
+    //不用实现，只是单纯的翻译出来的话，和if是一样的捏。
+    fprintf(yyout, "%*cWhileStmt\n", level, ' ');
+    cond->output(level + 4);
+    doStmt->output(level + 4);
+}
+
+void DoNothingStmt::output(int level)
+{
+    fprintf(yyout, "%*cWhileStmt\n", level, ' ');
+    do_nothing_node->output(level + 4);
+}
+
 
 void IfElseStmt::output(int level)
 {
@@ -120,3 +192,5 @@ void FunctionDef::output(int level)
             name.c_str(), type.c_str());
     stmt->output(level + 4);
 }
+
+
