@@ -39,7 +39,7 @@
 
 
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt DoNothingStmt
+%nterm <stmttype> Stmts Stmt AssignStmt ExprStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt DoNothingStmt
 %nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
@@ -131,15 +131,11 @@ WhileStmt
          $$ = new WhileStmt($3, $5);
     }
     ;
-
 DoNothingStmt
     : Exp SEMICOLON {
         
     }
     ;
-
-
-
 
 ReturnStmt
     :
@@ -160,12 +156,21 @@ PrimaryExp
     LVal {
         $$ = $1;
     }
+    |
+    LPAREN Exp RPAREN{
+        $$=$2;
+    }
     | INTEGER {
         SymbolEntry *se = new ConstantSymbolEntry(TypeSystem::intType, $1);
         $$ = new Constant(se);
     }
     ;
-
+// ±Ì¥Ô Ω”Ôæ‰
+ExprStmt
+    :Exp SEMICOLON{
+        $$=new ExprStmt($1);
+    }
+    ;
 MulExp
     :
     PrimaryExp { $$ = $1;}
@@ -173,6 +178,18 @@ MulExp
     MulExp MUL PrimaryExp {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
+    }
+    |
+    MulExp DIV  PrimaryExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
+    }
+    |
+    MulExp MOD PrimaryExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
     }
     ;
 
@@ -350,6 +367,7 @@ FuncDef
         identifiers = new SymbolTable(identifiers);
     }
     LPAREN RPAREN
+
     BlockStmt
     {
         SymbolEntry *se;
@@ -369,3 +387,4 @@ int yyerror(char const* message)
     std::cerr<<message<<std::endl;
     return -1;
 }
+// 

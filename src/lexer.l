@@ -1,4 +1,4 @@
-%option noyywrap
+ï»¿%option noyywrap
 %option nounput
 %option noinput
 %top{
@@ -22,12 +22,11 @@
 
 /* definitions section */
 
-/* Êý¾ÝÀàÐÍ */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 DECIMIAL ([1-9][0-9]*|0)
 HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
 OCTAL "0b"([1-7][0-7]*|0)
 FLOAT [+-]?([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)([eE][+-]?([1-9][0-9]*|0))?
-
 
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 
@@ -40,12 +39,12 @@ WHITE [\t ]
 /*  Your code here (lab3). */
 
 
-/* ÕâÀïÊÇ×ÔÔö×Ô¼õ   */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½   */
 ADD_type "+"?"+"
 SUB_type "-"?"-"
 
 
-/* ÕâÀï½â¾öÐÐ×¢ÊÍºÍ¿é×¢ÊÍ */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ÍºÍ¿ï¿½×¢ï¿½ï¿½ */
 
 block_commentbegin "/*" 
 block_commentelement .|\n
@@ -63,7 +62,7 @@ line_commentend \n
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);//\tÊÇtab¡£
+    dump_tokens("INT\t%s\n", yytext);//\tï¿½ï¿½tabï¿½ï¿½
     return INT;
 }
 
