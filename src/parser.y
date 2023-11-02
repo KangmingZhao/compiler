@@ -3,8 +3,9 @@
     #include <assert.h>
     #include "parser.h"
     extern Ast ast;
-    ArrDimNode** now_arrdim;
-    int now_arrindex;
+
+    //ArrDimNode** now_arrdim;
+    //int now_arrindex;
     int yylex();
     int yyerror( char const * );
 }
@@ -21,6 +22,7 @@
     StmtNode* stmttype;
     ExprNode* exprtype;
     ArrDimNode * arrdimtype;
+    InitNode * inittype;
     Type* type;
 }
 
@@ -29,7 +31,7 @@
 %token <itype> INTEGER
 %token IF ELSE WHILE
 %token INT VOID FLOAT
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON 
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA
 %token ADD SUB MUL DIV MOD OR AND LESS ASSIGN INCREMENT DECREMENT
 %token RETURN
 
@@ -39,7 +41,8 @@
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt DoNothingStmt
 %nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp 
-%nterm <arrdimtype> ArrDimensions ArrDimension
+%nterm <arrdimtype> ArrDimensions ArrDimension 
+%nterm <inittype> ArrInit ArrInitLists ArrInitList
 %nterm <type> Type
 
 %precedence THEN
@@ -77,6 +80,22 @@ LVal
             assert(se != nullptr);      //抛出一个断言错误
         }
         $$ = new Id(se);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+        delete []$1;
+    }
+    |
+    ID ArrDimensions
+    {
+        //我们知道数组的访问是可以作为左值的。
+        
+        SymbolEntry *se;
+        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            delete [](char*)$1;
+            assert(se != nullptr);      //抛出一个断言错误
+        }
+        $$ = new Id(se, $2);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
         delete []$1;
     }
     ;
@@ -233,6 +252,49 @@ Type
     }
     ;
 
+
+
+
+
+ArrInitList
+    :
+    Exp
+    {
+        //这个是到头了，开始进入具体值了。
+        $$ = new InitNode($1);
+    }
+    |
+    LBRACE ArrInitLists RBRACE
+    {
+        //这个是说明还有至少一层
+        $$ = $2;
+        $$->i_m_checkpoint();
+    }
+    ;
+
+ArrInitLists
+    :
+    ArrInitLists COMMA ArrInitList
+    {
+        $$ = new InitNode($1, $3);
+    }
+    |
+    ArrInitList
+    {
+        $$ = $1;
+    }
+    ;
+
+ArrInit
+    :
+    ASSIGN LBRACE ArrInitLists RBRACE
+    {
+        $$ = $3;
+    }
+    |
+    %empty { $$ = nullptr ;}
+    ;
+
     
 ArrDimension
     :
@@ -263,15 +325,16 @@ DeclStmt
         delete []$2;
     }
     |
-    Type ID ArrDimensions SEMICOLON {
+    Type ID ArrDimensions ArrInit SEMICOLON {
         INT_arrayType * temp = new INT_arrayType();
         SymbolEntry *se;
         se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
         identifiers->install($2, se);
-        $$ = new DeclStmt(new Id(se, $3));
+        $$ = new DeclStmt(new Id(se, $3, $4));
         delete []$2;
     }
     ;
+
 
 
 

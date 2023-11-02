@@ -171,6 +171,12 @@ line_commentend \n
     return SEMICOLON;
 }
 
+"," {
+    dump_tokens("COMMA\t%s\n", yytext);
+    return COMMA;
+}
+
+
 "(" {
     dump_tokens("LPAREN\t%s\n", yytext);
     return LPAREN;

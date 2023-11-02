@@ -88,6 +88,51 @@ void Constant::output(int level)
 
 
 
+void InitNode::output(int level, int dim, int* dim_record)
+{
+    if (is_checkpoint)
+    {
+        for (int i = dim + 1; i < 10; i++)
+        {
+            dim_record[i] = -1;
+        }
+        dim_record[dim]++;
+        if (is_exp)
+        {
+            value_here->output(level);
+            fprintf(yyout, "\t\t\t\tposition in the arr: ");
+            for (int i = 0; i < 10 && dim_record[i] != -1; i++)
+            {
+                fprintf(yyout, " %d ", dim_record[i]);
+            }
+        }
+        else
+        {
+            node1->output(level, dim + 1, dim_record);
+            node2->output(level, dim + 1, dim_record);
+        }
+    }
+    else
+    {
+        if (is_exp)
+        {
+            value_here->output(level);
+            dim_record[dim]++;
+            fprintf(yyout, "\t\t\t\tposition in the arr: ");
+            for (int i = 0; i < 10 && dim_record[i] != -1; i++)
+            {
+                fprintf(yyout, " %d ", dim_record[i]);
+            }
+            fprintf(yyout, "\n");
+        }
+        else
+        {
+            node1->output(level, dim, dim_record);
+            node2->output(level, dim, dim_record);
+        }
+    }
+}
+
 void ArrDimNode::output(int level)
 {
     if (is_link)
@@ -97,8 +142,8 @@ void ArrDimNode::output(int level)
     }
     else
     {
-        fprintf(yyout, "%*c\t\t\t\tdimension_size:\n", level, ' ');
-        dimension_size->output(level + 4);
+        fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
+        dimension_size->output(level + 20);
     }
 }
 
@@ -114,6 +159,10 @@ void Id::output(int level)
     if (id_type == INT_ARRAY)
     {
         Dimension->output(level + 4);
+        if (Init != nullptr)
+        {
+            Init->output(level + 4, 0, dim_record);
+        }
     }
     /*if (symbolEntry->getType()->isINT_ARRAY())
     {

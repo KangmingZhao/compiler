@@ -51,7 +51,23 @@ public:
 };
 
 
+class InitNode
+{
+    bool is_exp;//很多initNode结点起到的是连接的作用，我们要输出的是存了表达式的结点。
+    InitNode *node1;
+    InitNode *node2;
+    ExprNode *value_here;
 
+    bool is_checkpoint;//这个东西是输出维度时用的，一个checkpoint结点代表着，这个结点是一个新的{}结点。
+public:
+    InitNode(ExprNode* value_here) :value_here(value_here) { is_exp = 1; is_checkpoint = 0; };
+    InitNode(InitNode* node1, InitNode* node2) :node1(node1), node2(node2) { is_exp = 0; is_checkpoint = 0; };
+    void output(int level,int dim, int *dim_record);
+    void i_m_checkpoint()
+    {
+        is_checkpoint = 1;
+    }
+};
 
 class ArrDimNode: public Node //: public ExprNode
 {
@@ -71,13 +87,16 @@ class Id : public ExprNode
     //ArrDimNode** Dimension;
     int id_type;
     ArrDimNode* Dimension;
+    InitNode* Init;
 public:
     enum { DEFAULT, INT_ARRAY };
     //我震惊，原来ExprNode(se),  Dimension(nullptr).id_type(DEFAULT) 这种初始化方式，初始化的顺序要和声明的一样……c++白学了
-    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr) { };
-    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension) {};
+    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { };
+    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) {};
+    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) {};
     ArrDimNode* getDimension() { return Dimension; };
     void output(int level);
+    int dim_record[10] = { -1 };
 };
 
 
