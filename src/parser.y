@@ -304,6 +304,7 @@ FuncDef
         identifiers = new SymbolTable(identifiers);
     }
     LPAREN RPAREN
+
     BlockStmt
     {
         SymbolEntry *se;
@@ -323,3 +324,4 @@ int yyerror(char const* message)
     std::cerr<<message<<std::endl;
     return -1;
 }
+// 
