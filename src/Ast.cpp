@@ -59,10 +59,24 @@ void BinaryExpr::output(int level)
             op_str = "decrement_after";
             break;
         case INCREMENT_AFTER:
-            op_str = "increment_before";
+            op_str = "increment_after";
             break;
         case DECREMENT_BEFORE:
             op_str = "decrement_after";
+         case GREATER:
+            op_str = "greater";
+            break;
+        case LESSEQUAL:
+            op_str = "less equal";
+            break;
+        case GREATEREQUAL:
+            op_str = "greater equal";
+            break;
+        case EQUAL:
+            op_str = "equal";
+            break;
+        case NOTEQUAL:
+            op_str = "not equal";
             break;
     }
     fprintf(yyout, "%*cBinaryExpr\top: %s\n", level, ' ', op_str.c_str());
@@ -77,6 +91,21 @@ void BinaryExpr::output(int level)
     }
 }
 
+void UnaryExpr::output(int level)
+{
+    std::string op_str;
+    switch(op)
+    {
+        case ADD:
+            op_str = "add";
+            break;
+        case SUB:
+            op_str = "sub";
+            break;
+    }
+    fprintf(yyout, "%*cUnaryExpr\top: %s\n", level, ' ', op_str.c_str());
+    expr->output(level + 4);
+}
 void Constant::output(int level)
 {
     std::string type, value;

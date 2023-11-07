@@ -32,15 +32,15 @@
 %token IF ELSE WHILE
 %token INT VOID FLOAT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA
-%token ADD SUB MUL DIV MOD OR AND LESS ASSIGN INCREMENT DECREMENT
+%token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN INCREMENT DECREMENT LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
 %token RETURN
 
 
 
 
 
-%nterm <stmttype> Stmts Stmt AssignStmt ExprStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt DoNothingStmt
-%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp 
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
 %nterm <type> Type
@@ -67,7 +67,7 @@ Stmt
     | DeclStmt {$$=$1;}
     | FuncDef {$$=$1;}
     | WhileStmt { $$ = $1; }
-    | DoNothingStmt { $$ = $1; }
+    | ExprStmt { $$ = $1; }
     ;
 LVal
     : ID {
@@ -131,9 +131,9 @@ WhileStmt
          $$ = new WhileStmt($3, $5);
     }
     ;
-DoNothingStmt
+ExprStmt
     : Exp SEMICOLON {
-        
+    
     }
     ;
 
@@ -143,6 +143,7 @@ ReturnStmt
         $$ = new ReturnStmt($2);
     }
     ;
+
 Exp
     :
     AddExp {$$ = $1;}
@@ -165,28 +166,38 @@ PrimaryExp
         $$ = new Constant(se);
     }
     ;
-// 表达式语句
-ExprStmt
-    :Exp SEMICOLON{
-        $$=new ExprStmt($1);
+// 单目运算
+UnaryExp
+    :
+    PrimaryExp {
+        $$ = $1;
+    }
+    | 
+    ADD UnaryExp {
+        $$ = $2;
+    }
+    |
+    SUB UnaryExp {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new UnaryExpr(se, UnaryExpr::SUB, $2);
     }
     ;
 MulExp
     :
-    PrimaryExp { $$ = $1;}
+    UnaryExp { $$ = $1;}
     |
-    MulExp MUL PrimaryExp {
+    MulExp MUL UnaryExp {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
     }
     |
-    MulExp DIV  PrimaryExp
+    MulExp DIV  UnaryExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
     }
     |
-    MulExp MOD PrimaryExp
+    MulExp MOD UnaryExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
@@ -238,6 +249,36 @@ RelExp
     {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::LESS, $1, $3);
+    }
+    |
+     RelExp GREATER AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::GREATER, $1, $3);
+    }
+    |
+    RelExp GREATEREQUAL AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::GREATEREQUAL, $1, $3);
+    }
+    |
+    RelExp LESSEQUAL AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::LESSEQUAL, $1, $3);
+    }
+    |
+    RelExp EQUAL AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::EQUAL, $1, $3);
+    }
+    |
+    RelExp NOTEQUAL AddExp
+    {
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::NOTEQUAL, $1, $3);
     }
     ;
 LAndExp

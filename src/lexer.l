@@ -1,4 +1,4 @@
-﻿%option noyywrap
+%option noyywrap
 %option nounput
 %option noinput
 %top{
@@ -22,7 +22,7 @@
 
 /* definitions section */
 
-/* �������� */
+/* 锟斤拷锟斤拷锟斤拷锟斤拷 */
 DECIMIAL ([1-9][0-9]*|0)
 HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
 OCTAL "0b"([1-7][0-7]*|0)
@@ -39,12 +39,12 @@ WHITE [\t ]
 /*  Your code here (lab3). */
 
 
-/* �����������Լ�   */
+/* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆硷�?   */
 ADD_type "+"?"+"
 SUB_type "-"?"-"
 
 
-/* ��������ע�ͺͿ�ע�� */
+/* 锟斤拷锟斤拷锟斤拷锟斤拷注锟酵和匡拷注锟斤拷 */
 
 block_commentbegin "/*" 
 block_commentelement .|\n
@@ -62,7 +62,7 @@ line_commentend \n
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);//\t��tab��
+    dump_tokens("INT\t%s\n", yytext);//\t锟斤拷tab锟斤�?
     return INT;
 }
 
@@ -110,7 +110,28 @@ line_commentend \n
     dump_tokens("LESS\t%s\n", yytext);
     return LESS;
 }
+">" {
+    dump_tokens("GREATER\t%s\t%d\t%d\n", yytext);
+    return GREATER;
+}
 
+"<=" {
+    dump_tokens("LESSEQUAL\t%s\n", yytext);
+    return LESSEQUAL;
+}
+
+">=" {
+   dump_tokens("GREATEREQUAL\t%s\n", yytext);
+    return GREATEREQUAL;
+}
+"==" {
+   dump_tokens("EQUAL\t%s\n", yytext);
+    return EQUAL;
+}
+"!=" {
+   dump_tokens("NOTEQUAL\t%s\n", yytext);
+    return NOTEQUAL;
+}
 
 
 {ADD_type} {
@@ -163,6 +184,21 @@ line_commentend \n
     dump_tokens("MOD\t%s\n", yytext);
     return MOD;
 }
+"&&" {
+    dump_tokens("AND\t%s\n", yytext);
+    return AND;
+}
+
+"||" {
+    dump_tokens("OR\t%s \n", yytext);
+    return OR;
+}
+
+"!" {
+    dump_tokens("NOTEQUAL\t%s \n", yytext);
+    return NOTEQUAL;
+}
+
 
 
 ";" {
@@ -205,6 +241,7 @@ line_commentend \n
     dump_tokens("RBRACKET\t%s\n", yytext);
     return RBRACKET;
 }
+
 
 {DECIMIAL} {
     int decimal;
