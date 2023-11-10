@@ -111,8 +111,17 @@ void Constant::output(int level)
     std::string type, value;
     type = symbolEntry->getType()->toStr();
     value = symbolEntry->toStr();
-    fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+    if (this->symbolEntry->getType()->isInt())
+    {
+        fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
+    }
+    else if (this->symbolEntry->getType()->isFLOAT())
+    {
+        //好就好在symbolentry里面已经把浮点数、整数都转化为字符串了，这里就直接%s就好了不用在管占位符了
+        fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+            value.c_str(), type.c_str());
+    }
 }
 
 

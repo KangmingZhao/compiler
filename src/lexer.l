@@ -23,10 +23,19 @@
 /* definitions section */
 
 /* 锟斤拷锟斤拷锟斤拷锟斤拷 */
+<<<<<<< HEAD
 DECIMIAL ([1-9][0-9]*|0)
 HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
 OCTAL "0b"([1-7][0-7]*|0)
 FLOAT [+-]?([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)([eE][+-]?([1-9][0-9]*|0))?
+=======
+
+/* 识别浮点数的时候发现了个严重的问题，如果连着正负号一起识别为一个token的话会无法处理加减法。所以还是得数字和符号分开识别 */
+DECIMIAL ([1-9][0-9]*|0)
+HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
+OCTAL "0b"([1-7][0-7]*|0)
+FLOAT ([1-9][0-9]*|0)?"."([0-9]*[1-9]|0)([eE][+-]?([1-9][0-9]*|0))?
+>>>>>>> ft
 
 ID [[:alpha:]_][[:alpha:][:digit:]_]*
 
@@ -249,6 +258,140 @@ line_commentend \n
     dump_tokens("DECIMAL\t%s\t%d\n", yytext, decimal);
     yylval.itype = decimal;
     return INTEGER;
+}
+
+
+{OCTAL} {
+    int decmial = 0;
+    int i = 2;//别把"0b"也算进去
+    while(yytext[i] != '\0')
+    {
+        decmial *= 8;
+        decmial += yytext[i] - '0';
+        i++;
+    }
+    dump_tokens("DECIMAL\t%s\t%d\n", yytext, decmial);
+    yylval.itype = decmial;
+    return INTEGER;
+}
+
+{HEXADECIMAL} {
+    //dump_tokens("HEXADECIMAL\t%s\n", yytext);
+    //int decimal;
+    //decimal = std::stoi(yytext, 0, 16);
+    //dump_tokens("HEXADECIMAL\t%s\t%d\n", yytext, decimal);
+    int decmial = 0;
+    int i = 2;//别把"0x"也算进去
+    while(yytext[i] != '\0')
+    {
+        decmial *= 16;
+        if(yytext[i] >= '0' && yytext[i] <= '9')
+        {
+            decmial += yytext[i] - '0';
+        }
+        else if(yytext[i] >= 'a' && yytext[i] <= 'z')
+        {
+            decmial += 10;
+            decmial += yytext[i] - 'a';
+        }
+        else
+        {
+            decmial += 10;
+            decmial += yytext[i] - 'A';
+        }
+        i++;
+    }
+    dump_tokens("DECIMAL\t%s\t%d\n", yytext, decmial);
+    yylval.itype = decmial;
+    return INTEGER;
+}
+
+{FLOAT} {
+    float f_num = 0;
+    float int_part = 0;
+    float float_part = 0;//鄙人英语不好，这个是小数部分。
+    float div_reg = 10;
+    float power = 1;
+    int power_part = 0;
+    bool pow_mul = 1;
+
+    
+    int now_part = 0; //进来先处理整数部分
+    /*
+    0:整数部分
+    1：消暑部分
+    2:幂部分
+    */
+    int i = 0;
+
+    float minus = 1;
+
+    while(yytext[i] != '\0')
+    {
+        if(i == 0 && (yytext[i] == '+' || yytext[i] == '-'))
+        {
+            if(yytext[i] == '-')
+            {
+                minus = -1;
+            }
+            else
+            {
+                minus = 1;
+            }
+            i++;
+            continue;
+        }
+        if(yytext[i] >= '0' && yytext[i] <= '9')
+        {
+            switch(now_part)
+            {
+            case 0:
+                int_part *= 10.0;
+                int_part += (float)(yytext[i] - '0');
+                
+                break;
+            case 1:
+                float_part += (float)(yytext[i] - '0') / div_reg;
+                div_reg *= 10.0;
+                break;
+            case 2:
+                power_part *= 10;
+                power_part += (yytext[i] - '0');
+                break;
+            }
+        }
+        else if(yytext[i] == '.')
+        {
+            now_part = 1;
+        }
+        else if(yytext[i] == 'e' || yytext[i] == 'E')
+        {
+            now_part = 2;
+        }
+        else if(yytext[i] == '+')
+        {
+            pow_mul = 1;
+        }
+        else if(yytext[i] == '-')
+        {
+            pow_mul = 0;
+        }
+        i++;
+    }
+    if(pow_mul)
+        for(int i = 0; i < power_part; i++)
+        {
+            power *= 10.0;
+        }
+    else
+        for(int i = 0; i < power_part; i++)
+        {
+            power /= 10.0;
+        }
+    f_num = int_part + float_part;
+    f_num = f_num * minus * power;
+    yylval.fltype = f_num;
+    return FLOATPOINT;
 }
 
 {ID} {

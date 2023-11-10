@@ -24,6 +24,7 @@ protected:
     SymbolEntry *symbolEntry;
 public:
     ExprNode(SymbolEntry *symbolEntry) : symbolEntry(symbolEntry){};
+    SymbolEntry* get_symbolEntry() { return symbolEntry; };
     std::string get_name();
 };
 
