@@ -8,7 +8,7 @@ class Type
 private:
     int kind;
 protected:
-    enum {INT, VOID, FUNC, INT_ARRAY};
+    enum {INT, VOID, FUNC, INT_ARRAY, FLOAT, FLOAT_ARRAY};
 public:
     Type(int kind) : kind(kind) {};
     virtual ~Type() {};
@@ -17,6 +17,8 @@ public:
     bool isVoid() const {return kind == VOID;};
     bool isFunc() const {return kind == FUNC;};
     bool isINT_ARRAY() const { return kind == INT_ARRAY; };
+    bool isFLOAT() const { return kind == FLOAT; };
+    bool isFLOAT_ARRAY() const { return kind == FLOAT_ARRAY; };
 
 };
 
@@ -35,6 +37,22 @@ public:
     INT_arrayType() : Type(Type::INT_ARRAY) {};
     std::string toStr();
 };
+class FloatType : public Type
+{
+private:
+    int size;
+public:
+    FloatType(int size) : Type(Type::FLOAT), size(size) {};
+    std::string toStr();
+};
+
+class FLOAT_arrayType : public Type
+{
+public:
+    FLOAT_arrayType() : Type(Type::FLOAT_ARRAY) {};
+    std::string toStr();
+};
+
 
 class VoidType : public Type
 {
@@ -59,10 +77,12 @@ class TypeSystem
 private:
     static IntType commonInt;
     static VoidType commonVoid;
+    static FloatType commonFloat;
 public:
     static Type *intType;
     static Type *voidType;
     static Type* int_arrayType;
+    static Type* floatType;
 };
 
 #endif

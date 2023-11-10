@@ -3,6 +3,13 @@ int a;
 int main()
 {
     int a;
+    -3.14159-1.1-1;
+    float test_1;
+    test_1 = 3.14 + 3.14 * 3.14 / 3.14 - 3.14++;
+    float fuck_float_test[2][2] = {{1.1,1.2},{1.3,1.4}};
+    //3.14<3.14;
+    //1<1;
+    0x114514;
     //test comment
     /*test block comment
     test block comment
@@ -19,6 +26,8 @@ int main()
     fuck[1][1][1][1][1] = 114514;
     int shit[2][3] = { {1, 2}, {3, 4}, {5, 6} };
     int shit2[2][3][3] = {{ {1, 2, 0}, {3, 4, 0}, {5, 6, 0} },{ {7,8, 0},{9, 10, 0},{11,12, 0} }};
+    float testfloat;
+    3.14158;
     while(b < 2)
     { 
         b = b + 1;

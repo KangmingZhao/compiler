@@ -24,7 +24,19 @@ protected:
     SymbolEntry *symbolEntry;
 public:
     ExprNode(SymbolEntry *symbolEntry) : symbolEntry(symbolEntry){};
+    SymbolEntry* get_symbolEntry() { return symbolEntry; };
     std::string get_name();
+};
+
+class UnaryExpr : public ExprNode
+{
+private:
+    int op;
+    ExprNode* expr;
+public:
+    enum {ADD, SUB};
+    UnaryExpr(SymbolEntry *se, int op, ExprNode* expr) : ExprNode(se), op(op), expr(expr){};
+    void output(int level);
 };
 
 class BinaryExpr : public ExprNode
@@ -35,7 +47,7 @@ private:
     ExprNode *expr1, *expr2;
     ExprNode* ID;
 public:
-    enum {ADD, SUB, MUL, DIV, MOD, AND, OR, LESS, INCREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_BEFORE, DECREMENT_AFTER};
+    enum {ADD, SUB, MUL, DIV, MOD, AND, OR, LESS,GREATER, INCREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_BEFORE, DECREMENT_AFTER,LESSEQUAL,GREATEREQUAL,EQUAL,NOTEQUAL};
     BinaryExpr(SymbolEntry* se, int op, ExprNode* expr1, ExprNode* expr2) : ExprNode(se), op(op), expr1(expr1), expr2(expr2) { is_crement = 0; };
     BinaryExpr(SymbolEntry* se, int op, ExprNode* ID) : ExprNode(se), op(op), ID(ID) { is_crement = 1; };
     void output(int level);

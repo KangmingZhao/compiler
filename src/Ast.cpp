@@ -59,10 +59,24 @@ void BinaryExpr::output(int level)
             op_str = "decrement_after";
             break;
         case INCREMENT_AFTER:
-            op_str = "increment_before";
+            op_str = "increment_after";
             break;
         case DECREMENT_BEFORE:
             op_str = "decrement_after";
+         case GREATER:
+            op_str = "greater";
+            break;
+        case LESSEQUAL:
+            op_str = "less equal";
+            break;
+        case GREATEREQUAL:
+            op_str = "greater equal";
+            break;
+        case EQUAL:
+            op_str = "equal";
+            break;
+        case NOTEQUAL:
+            op_str = "not equal";
             break;
     }
     fprintf(yyout, "%*cBinaryExpr\top: %s\n", level, ' ', op_str.c_str());
@@ -77,13 +91,37 @@ void BinaryExpr::output(int level)
     }
 }
 
+void UnaryExpr::output(int level)
+{
+    std::string op_str;
+    switch(op)
+    {
+        case ADD:
+            op_str = "add";
+            break;
+        case SUB:
+            op_str = "sub";
+            break;
+    }
+    fprintf(yyout, "%*cUnaryExpr\top: %s\n", level, ' ', op_str.c_str());
+    expr->output(level + 4);
+}
 void Constant::output(int level)
 {
     std::string type, value;
     type = symbolEntry->getType()->toStr();
     value = symbolEntry->toStr();
-    fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+    if (this->symbolEntry->getType()->isInt())
+    {
+        fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
+    }
+    else if (this->symbolEntry->getType()->isFLOAT())
+    {
+        //好就好在symbolentry里面已经把浮点数、整数都转化为字符串了，这里就直接%s就好了不用在管占位符了
+        fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+            value.c_str(), type.c_str());
+    }
 }
 
 
