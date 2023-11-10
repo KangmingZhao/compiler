@@ -102,6 +102,10 @@ line_commentend \n
     dump_tokens("RETURN\t%s\n", yytext);
     return RETURN;
 }
+"const" {
+    dump_tokens("CONST\t%s\n", yytext);
+    return CONST;
+}
 
 "=" {
     dump_tokens("ASSIGN\t%s\n", yytext);
@@ -197,8 +201,8 @@ line_commentend \n
 }
 
 "!" {
-    dump_tokens("NOTEQUAL\t%s \n", yytext);
-    return NOTEQUAL;
+    dump_tokens("NOT\t%s \n", yytext);
+    return NOT;
 }
 
 

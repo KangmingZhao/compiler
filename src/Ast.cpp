@@ -102,6 +102,9 @@ void UnaryExpr::output(int level)
         case SUB:
             op_str = "sub";
             break;
+        case NOT:
+            op_str = "NOT";
+            break;
     }
     fprintf(yyout, "%*cUnaryExpr\top: %s\n", level, ' ', op_str.c_str());
     expr->output(level + 4);
@@ -227,6 +230,34 @@ void DeclStmt::output(int level)
     id->output(level + 4);
 }
 
+
+void DeclInitStmt::output(int level)////////////////////////////////
+{
+    fprintf(yyout, "%*cDeclInitStmt\n", level, ' ');
+    id->output(level + 4);
+    initVal->output(level+4);
+}/////////////////////////////////////////////////////////////
+
+void ConstDeclInitStmt::output(int level)////////////////////////////////
+{
+    fprintf(yyout, "%*cConstDeclInitStmt\n", level, ' ');
+    id->output(level + 4);
+    initVal->output(level+4);
+}/////////////////////////////////////////////////////////////
+
+void DeclList::output(int level)
+{
+    fprintf(yyout, "%*cDeclList\n", level, ' ');
+    decl1->output(level+4);
+    decl2->output(level+4);
+}
+
+void ConstDeclList::output(int level)
+{
+    fprintf(yyout, "%*cConstDeclList\n", level, ' ');
+    decl1->output(level+4);
+    decl2->output(level+4);
+}
 void IfStmt::output(int level)
 {
     fprintf(yyout, "%*cIfStmt\n", level, ' ');

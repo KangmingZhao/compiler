@@ -2,7 +2,6 @@
 #define __AST_H__
 
 #include <fstream>
-
 class SymbolEntry;
 
 
@@ -34,7 +33,7 @@ private:
     int op;
     ExprNode* expr;
 public:
-    enum {ADD, SUB};
+    enum {ADD, SUB,NOT};
     UnaryExpr(SymbolEntry *se, int op, ExprNode* expr) : ExprNode(se), op(op), expr(expr){};
     void output(int level);
 };
@@ -54,7 +53,7 @@ public:
 };
 
 
-
+//³£Á¿
 class Constant : public ExprNode
 {
 public:
@@ -137,12 +136,47 @@ public:
 
 class DeclStmt : public StmtNode
 {
-private:
+protected:
     Id *id;
 public:
     DeclStmt(Id *id) : id(id){};
     void output(int level);
 };
+class DeclInitStmt : public DeclStmt//////////////////////////////////////////////////
+{
+private:
+    ExprNode *initVal;
+public:
+    DeclInitStmt(Id *id,ExprNode *initVal):DeclStmt(id),initVal(initVal){};
+    void output(int level);
+};
+
+class ConstDeclInitStmt : public DeclStmt
+{
+private:
+    ExprNode *initVal;
+public:
+    ConstDeclInitStmt(Id *id,ExprNode *initVal):DeclStmt(id),initVal(initVal){};
+    void output(int level);
+};
+
+class DeclList : public StmtNode
+{
+protected:
+    StmtNode *decl1,*decl2;
+public:
+    DeclList(StmtNode* decl1,StmtNode* decl2):decl1(decl1),decl2(decl2){};
+    void output(int level);
+};
+
+class ConstDeclList : public StmtNode
+{
+protected:
+    StmtNode *decl1,*decl2;
+public:
+    ConstDeclList(StmtNode* decl1,StmtNode* decl2):decl1(decl1),decl2(decl2){};
+    void output(int level);
+};///////
 
 class IfStmt : public StmtNode
 {

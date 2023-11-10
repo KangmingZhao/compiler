@@ -6,6 +6,7 @@
 
     //ArrDimNode** now_arrdim;
     //int now_arrindex;
+    Type  *declType;
     int yylex();
     int yyerror( char const * );
 }
@@ -36,16 +37,17 @@
 %token <fltype> FLOATPOINT
 %token IF ELSE WHILE
 %token INT VOID FLOAT
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA NOT
 %token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN INCREMENT DECREMENT LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
-%token RETURN
+%token RETURN CONST
 
 
 
 
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt
-%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal
+%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
 %nterm <type> Type
@@ -197,6 +199,20 @@ UnaryExp
             SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
             $$ = new UnaryExpr(se, UnaryExpr::SUB, $2);
         }
+    }
+    |
+    NOT UnaryExp{
+    if($2->get_symbolEntry()->getType()->isInt())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::NOT, $2);
+        }
+        else if($2->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::NOT, $2);
+        }
+
     }
     ;
 MulExp
@@ -446,13 +462,17 @@ LOrExp
 Type
     : INT {
         $$ = TypeSystem::intType;
+        declType=TypeSystem::intType;
     }
     | VOID {
         $$ = TypeSystem::voidType;
+        declType=TypeSystem::voidType;
     }
     |
     FLOAT {
         $$ = TypeSystem::floatType;
+        declType=TypeSystem::floatType;
+
     }
     ;
 
@@ -519,17 +539,19 @@ ArrDimensions
     }
     ;
 
+// 常量和变量的声明
 DeclStmt
-    :
-    Type ID SEMICOLON {
-        SymbolEntry *se;
-        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
-        identifiers->install($2, se);
-        $$ = new DeclStmt(new Id(se));
-        delete []$2;
-    }
+     :
+    VarDeclStmt {$$=$1;}
     |
-    Type ID ArrDimensions ArrInit SEMICOLON {
+    ConstDeclStmt {$$=$1;}
+    ;
+// 变量 变量+一堆
+VarDeclStmt
+    :
+    Type IdDeclLists SEMICOLON{$$=$2;}
+    |
+Type ID ArrDimensions ArrInit SEMICOLON {
         SymbolEntry *se;
         if($1->isInt())
         {
@@ -548,6 +570,86 @@ DeclStmt
     ;
 
 
+// 常量 const +一堆；
+ConstDeclStmt
+    :
+    CONST Type ConstDeclLists SEMICOLON{$$=$3;}
+    ;
+// 变量
+IdDeclLists 
+    :
+    IdDeclLists COMMA IdDeclList {$$=new DeclList($1,$3);}
+    | IdDeclList {$$=$1;}
+    ;
+IdDeclList
+    :
+    ID ASSIGN InitVal{
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new DeclInitStmt(new Id(se),$3);
+        delete []$1;
+    }
+    |
+    ID{
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new DeclStmt(new Id(se));
+        delete []$1;
+    }
+    ;
+
+// 常量
+ConstDeclLists 
+    :
+    ConstDeclLists COMMA ConstDeclList {$$=new ConstDeclList($1,$3);}
+    | ConstDeclList {$$=$1;}
+    ;
+
+ConstDeclList
+    :
+    ID ASSIGN InitVal {
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new ConstDeclInitStmt(new Id(se),$3);
+        delete []$1;
+    }
+    ;
+
+// ----------------------------------
+// DeclStmt
+//     :
+//     Type ID SEMICOLON {
+//         SymbolEntry *se;
+//         se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
+//         identifiers->install($2, se);
+//         $$ = new DeclStmt(new Id(se));
+//         delete []$2;
+//     }
+//     |
+//     Type ID ArrDimensions ArrInit SEMICOLON {
+//         SymbolEntry *se;
+//         if($1->isInt())
+//         {
+//             INT_arrayType * temp = new INT_arrayType();
+//             se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+//         }
+//         else
+//         {
+//             FLOAT_arrayType * temp = new FLOAT_arrayType();
+//             se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+//         }
+//         identifiers->install($2, se);
+//         $$ = new DeclStmt(new Id(se, $3, $4));
+//         delete []$2;
+//     }
+//     ;
+InitVal
+    :
+    Exp { $$=$1;}
+    ;
 
 
 
