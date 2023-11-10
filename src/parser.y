@@ -199,32 +199,11 @@ UnaryExp
         }
     }
     ;
-<<<<<<< HEAD
-// 单目运算
-UnaryExp
-    :
-    PrimaryExp {
-        $$ = $1;
-    }
-    | 
-    ADD UnaryExp {
-        $$ = $2;
-    }
-    |
-    SUB UnaryExp {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new UnaryExpr(se, UnaryExpr::SUB, $2);
-    }
-    ;
-=======
->>>>>>> ft
 MulExp
     :
     UnaryExp { $$ = $1;}
     |
     MulExp MUL UnaryExp {
-<<<<<<< HEAD
-=======
         //这里我们任务只要有一个是float那么就按float来算。
         if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
         {
@@ -255,19 +234,6 @@ MulExp
     MulExp MOD UnaryExp
     {
         //求余数是int的专利
->>>>>>> ft
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
-    }
-    |
-    MulExp DIV  UnaryExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
-    }
-    |
-    MulExp MOD UnaryExp
-    {
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
     }
@@ -437,36 +403,6 @@ RelExp
             SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
             $$ = new BinaryExpr(se, BinaryExpr::NOTEQUAL, $1, $3);
         }
-    }
-    |
-     RelExp GREATER AddExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::GREATER, $1, $3);
-    }
-    |
-    RelExp GREATEREQUAL AddExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::GREATEREQUAL, $1, $3);
-    }
-    |
-    RelExp LESSEQUAL AddExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::LESSEQUAL, $1, $3);
-    }
-    |
-    RelExp EQUAL AddExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::EQUAL, $1, $3);
-    }
-    |
-    RelExp NOTEQUAL AddExp
-    {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::NOTEQUAL, $1, $3);
     }
     ;
 LAndExp
