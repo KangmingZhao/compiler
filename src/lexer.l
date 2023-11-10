@@ -22,9 +22,9 @@
 
 /* definitions section */
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷 */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹 */
 
-/* 识别浮点数的时候发现了个严重的问题，如果连着正负号一起识别为一个token的话会无法处理加减法。所以还是得数字和符号分开识别 */
+/* 璇嗗埆娴偣鏁扮殑鏃跺€欏彂鐜颁簡涓弗閲嶇殑闂锛屽鏋滆繛鐫€姝ｈ礋鍙蜂竴璧疯瘑鍒负涓€涓猼oken鐨勮瘽浼氭棤娉曞鐞嗗姞鍑忔硶銆傛墍浠ヨ繕鏄緱鏁板瓧鍜岀鍙峰垎寮€璇嗗埆 */
 DECIMIAL ([1-9][0-9]*|0)
 HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
 OCTAL "0b"([1-7][0-7]*|0)
@@ -41,12 +41,12 @@ WHITE [\t ]
 /*  Your code here (lab3). */
 
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆硷�?   */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐨嗙》锟�?   */
 ADD_type "+"?"+"
 SUB_type "-"?"-"
 
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷注锟酵和匡拷注锟斤拷 */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹娉ㄩ敓閰靛拰鍖℃嫹娉ㄩ敓鏂ゆ嫹 */
 
 block_commentbegin "/*" 
 block_commentelement .|\n
@@ -64,7 +64,7 @@ line_commentend \n
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);//\t锟斤拷tab锟斤�?
+    dump_tokens("INT\t%s\n", yytext);//\t閿熸枻鎷穞ab閿熸枻锟�?
     return INT;
 }
 
@@ -256,7 +256,7 @@ line_commentend \n
 
 {OCTAL} {
     int decmial = 0;
-    int i = 2;//别把"0b"也算进去
+    int i = 2;//鍒妸"0b"涔熺畻杩涘幓
     while(yytext[i] != '\0')
     {
         decmial *= 8;
@@ -274,7 +274,7 @@ line_commentend \n
     //decimal = std::stoi(yytext, 0, 16);
     //dump_tokens("HEXADECIMAL\t%s\t%d\n", yytext, decimal);
     int decmial = 0;
-    int i = 2;//别把"0x"也算进去
+    int i = 2;//鍒妸"0x"涔熺畻杩涘幓
     while(yytext[i] != '\0')
     {
         decmial *= 16;
@@ -302,18 +302,18 @@ line_commentend \n
 {FLOAT} {
     float f_num = 0;
     float int_part = 0;
-    float float_part = 0;//鄙人英语不好，这个是小数部分。
+    float float_part = 0;//閯欎汉鑻辫涓嶅ソ锛岃繖涓槸灏忔暟閮ㄥ垎銆�
     float div_reg = 10;
     float power = 1;
     int power_part = 0;
     bool pow_mul = 1;
 
     
-    int now_part = 0; //进来先处理整数部分
+    int now_part = 0; //杩涙潵鍏堝鐞嗘暣鏁伴儴鍒�
     /*
-    0:整数部分
-    1：消暑部分
-    2:幂部分
+    0:鏁存暟閮ㄥ垎
+    1锛氭秷鏆戦儴鍒�
+    2:骞傞儴鍒�
     */
     int i = 0;
 
