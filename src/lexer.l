@@ -391,6 +391,56 @@ line_commentend \n
     return FLOATPOINT;
 }
 
+"getint" {
+        char *lexeme;
+        lexeme=new char[strlen(yytext) + 1];
+        strcpy(lexeme, yytext);
+        yylval.strtype = lexeme;
+        Type* funcType = new FunctionType(TypeSystem::intType, {});//返回类型int，无参数
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//插入当前符号表中 作用域为全局
+        globals->install(yytext, entry);
+        return ID;
+    
+}
+"getch" {
+
+        char *lexeme = new char[strlen(yytext) + 1];
+        strcpy(lexeme, yytext);
+        yylval.strtype = lexeme;
+        Type* funcType = new FunctionType(TypeSystem::intType, {});//返回类型int，无参数
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        globals->install(yytext, entry);
+        return ID;
+    
+}
+
+"putint" {
+
+        char *lexeme = new char[strlen(yytext) + 1];
+        strcpy(lexeme, yytext);
+        yylval.strtype = lexeme;
+	std::vector<Type*> vec; //形参类型表
+        vec.push_back(TypeSystem::intType);
+        FunctionType *funcType = new FunctionType(TypeSystem::voidType, vec);//返回类型void，参数表为int
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        globals->install(yytext, entry);
+        return ID;
+   
+}
+"putch" {
+
+        char *lexeme = new char[strlen(yytext) + 1];
+        strcpy(lexeme, yytext);
+        yylval.strtype = lexeme;
+	std::vector<Type*> vec; //形参类型表
+        vec.push_back(TypeSystem::intType);
+        Type* funcType = new FunctionType(TypeSystem::voidType, vec);//返回类型void，参数表为int 
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        globals->install(yytext, entry);
+        return ID;
+    
+}
+
 {ID} {
     char *lexeme;
     dump_tokens("ID\t%s\n", yytext);
@@ -399,7 +449,6 @@ line_commentend \n
     yylval.strtype = lexeme;
     return ID;
 }
-
 
 {EOL} yylineno++;
 
