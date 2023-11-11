@@ -22,9 +22,9 @@
 
 /* definitions section */
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷 */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ�? */
 
-/* 识别浮点数的时候发现了个严重的问题，如果连着正负号一起识别为一个token的话会无法处理加减法。所以还是得数字和符号分开识别 */
+/* 璇嗗埆娴偣鏁扮殑鏃跺€欏彂鐜�?簡涓弗閲嶇殑闂锛屽鏋滆繛鐫�??ｈ�?鍙蜂竴璧�?��鍒负涓�?��猼oken鐨勮瘽浼�?��娉曞鐞嗗�?鍑忔硶銆傛�?浠ヨ繕鏄緱鏁板瓧鍜岀鍙峰垎�?��璇嗗�? */
 DECIMIAL ([1-9][0-9]*|0)
 HEXADECIMAL "0x"([1-9a-eA-E][0-9a-eA-E]*|0)
 OCTAL "0b"([1-7][0-7]*|0)
@@ -41,12 +41,12 @@ WHITE [\t ]
 /*  Your code here (lab3). */
 
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆硷�?   */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ�?閿熸枻鎷烽敓鐨嗙》锟�??   */
 ADD_type "+"?"+"
 SUB_type "-"?"-"
 
 
-/* 锟斤拷锟斤拷锟斤拷锟斤拷注锟酵和匡拷注锟斤拷 */
+/* 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ�?娉ㄩ敓閰靛拰鍖℃嫹娉ㄩ敓鏂ゆ�? */
 
 block_commentbegin "/*" 
 block_commentelement .|\n
@@ -64,7 +64,7 @@ line_commentend \n
 %%
     /* rules section */
 "int" {
-    dump_tokens("INT\t%s\n", yytext);//\t锟斤拷tab锟斤�?
+    dump_tokens("INT\t%s\n", yytext);//\t閿熸枻鎷穞ab閿熸枻锟�??
     return INT;
 }
 
@@ -260,7 +260,7 @@ line_commentend \n
 
 {OCTAL} {
     int decmial = 0;
-    int i = 2;//别把"0b"也算进去
+    int i = 2;//鍒�?"0b"涔熺畻杩涘幓
     while(yytext[i] != '\0')
     {
         decmial *= 8;
@@ -278,7 +278,7 @@ line_commentend \n
     //decimal = std::stoi(yytext, 0, 16);
     //dump_tokens("HEXADECIMAL\t%s\t%d\n", yytext, decimal);
     int decmial = 0;
-    int i = 2;//别把"0x"也算进去
+    int i = 2;//鍒�?"0x"涔熺畻杩涘幓
     while(yytext[i] != '\0')
     {
         decmial *= 16;
@@ -306,18 +306,18 @@ line_commentend \n
 {FLOAT} {
     float f_num = 0;
     float int_part = 0;
-    float float_part = 0;//鄙人英语不好，这个是小数部分。
+    float float_part = 0;//�?��汉鑻�?��涓嶅ソ锛岃繖涓槸灏忔暟�?��垎銆�?
     float div_reg = 10;
     float power = 1;
     int power_part = 0;
     bool pow_mul = 1;
 
     
-    int now_part = 0; //进来先处理整数部分
+    int now_part = 0; //杩涙潵鍏堝鐞嗘暣鏁伴儴鍒�
     /*
-    0:整数部分
-    1：消暑部分
-    2:幂部分
+    0:鏁存暟閮ㄥ垎
+    1锛氭秷鏆戦儴鍒�
+    2:骞傞儴鍒�?
     */
     int i = 0;
 
@@ -396,8 +396,8 @@ line_commentend \n
         lexeme=new char[strlen(yytext) + 1];
         strcpy(lexeme, yytext);
         yylval.strtype = lexeme;
-        Type* funcType = new FunctionType(TypeSystem::intType, {});//返回类型int，无参数
-        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//插入当前符号表中 作用域为全局
+        Type* funcType = new FunctionType(TypeSystem::intType, {});//杩斿洖绫诲瀷int锛屾棤鍙傛暟
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//鎻掑叆褰撳�?绗﹀彿琛ㄤ腑 浣滅敤鍩熶负鍏ㄥ�?
         globals->install(yytext, entry);
         return ID;
     
@@ -407,8 +407,8 @@ line_commentend \n
         char *lexeme = new char[strlen(yytext) + 1];
         strcpy(lexeme, yytext);
         yylval.strtype = lexeme;
-        Type* funcType = new FunctionType(TypeSystem::intType, {});//返回类型int，无参数
-        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        Type* funcType = new FunctionType(TypeSystem::intType, {});//杩斿洖绫诲瀷int锛屾棤鍙傛暟
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//浣滅敤鍩�?OBAL 浣滅敤鍩熶负鍏ㄥ�?
         globals->install(yytext, entry);
         return ID;
     
@@ -419,10 +419,10 @@ line_commentend \n
         char *lexeme = new char[strlen(yytext) + 1];
         strcpy(lexeme, yytext);
         yylval.strtype = lexeme;
-	std::vector<Type*> vec; //形参类型表
+	std::vector<Type*> vec; //褰㈠�?��诲瀷琛�?
         vec.push_back(TypeSystem::intType);
-        FunctionType *funcType = new FunctionType(TypeSystem::voidType, vec);//返回类型void，参数表为int
-        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        FunctionType *funcType = new FunctionType(TypeSystem::voidType, vec);//杩斿洖绫诲瀷void锛屽�?��拌〃涓篿nt
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//浣滅敤鍩�?OBAL 浣滅敤鍩熶负鍏ㄥ�?
         globals->install(yytext, entry);
         return ID;
    
@@ -432,10 +432,10 @@ line_commentend \n
         char *lexeme = new char[strlen(yytext) + 1];
         strcpy(lexeme, yytext);
         yylval.strtype = lexeme;
-	std::vector<Type*> vec; //形参类型表
+	std::vector<Type*> vec; //褰㈠�?��诲瀷琛�?
         vec.push_back(TypeSystem::intType);
-        Type* funcType = new FunctionType(TypeSystem::voidType, vec);//返回类型void，参数表为int 
-        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//作用域GLOBAL 作用域为全局
+        Type* funcType = new FunctionType(TypeSystem::voidType, vec);//杩斿洖绫诲瀷void锛屽�?��拌〃涓篿nt 
+        SymbolEntry* entry = new IdentifierSymbolEntry(funcType, yytext, 0);//浣滅敤鍩�?OBAL 浣滅敤鍩熶负鍏ㄥ�?
         globals->install(yytext, entry);
         return ID;
     
