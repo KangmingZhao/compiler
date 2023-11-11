@@ -13,6 +13,7 @@
     ContinueStmt * now_continue_stmt = nullptr;
 
 
+
     void deal_continue(bool is_loop)
     {
         if(now_continue_stmt != nullptr)
@@ -51,12 +52,43 @@
     Type  *declType;
     int yylex();
     int yyerror( char const * );
+
+
+    
+    
+    
+    
+
 }
 
 %code requires {
     #include "Ast.h"
     #include "SymbolTable.h"
     #include "Type.h"
+
+}
+
+%initial-action {
+    //这里还有这种初始化方法，太爽啦
+    std::string getint = "getint";
+    Type* funcType1 = new FunctionType(TypeSystem::intType, {});
+    SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
+    identifiers->install(getint, entry1);
+    
+    std::string putint = "putint";
+    Type* funcType2 = new FunctionType(TypeSystem::voidType, {});
+    SymbolEntry* entry2 = new IdentifierSymbolEntry(funcType2, putint, 0);
+    identifiers->install(putint, entry2);
+
+    
+    std::string putch = "putch";
+    std::vector<Type*> vec; 
+    vec.push_back(TypeSystem::intType);
+    Type* funcType3 = new FunctionType(TypeSystem::voidType, vec); 
+    SymbolEntry* entry3 = new IdentifierSymbolEntry(funcType3, putch, 0);
+    identifiers->install(putch, entry3);
+
+
 }
 
 %union {
@@ -67,7 +99,9 @@
     ExprNode* exprtype;
     ArrDimNode * arrdimtype;
     InitNode * inittype;
+    ParaNode * paratype;
     Type* type;
+
 }
 
 
@@ -88,10 +122,11 @@
 
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt BreakStmt ContinueStmt
-%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall
 %nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
+%nterm <paratype> PARAMENT_LISTS PARAMENT_LIST
 %nterm <type> Type
 
 %precedence THEN
@@ -203,7 +238,7 @@ ContinueStmt
 
 ExprStmt
     : Exp SEMICOLON {
-    
+        
     }
     ;
 
@@ -239,7 +274,55 @@ PrimaryExp
         SymbolEntry *se = new ConstantSymbolEntry(TypeSystem::floatType, $1);
         $$ = new Constant(se);
     }
+    |
+    FunctCall 
+    {
+        $$ = $1;
+    }
     ;
+
+
+
+PARAMENT_LISTS
+    :
+    PARAMENT_LISTS COMMA PARAMENT_LIST
+    {
+        $$ = new ParaNode($1,$3);
+    }
+    |
+    PARAMENT_LIST
+    {
+        $$ = $1;
+    }
+    ;
+
+PARAMENT_LIST
+    :
+    Exp
+    {
+        $$ = new ParaNode($1);
+    }
+    |
+    %empty { $$ = nullptr ;}
+    ;
+
+
+FunctCall
+    :
+    ID LPAREN PARAMENT_LISTS RPAREN
+    {   
+        SymbolEntry *se;
+        se = identifiers->lookup($1); 
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            delete [](char*)$1;
+            assert(se != nullptr);      //抛出一个断言错误
+        }
+        $$ = new FunctCall(se, $3);
+    }
+    ;
+
 // 单目运算
 UnaryExp
     :

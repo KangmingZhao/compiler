@@ -1,6 +1,9 @@
 int a;
 int main()
 {
+    getint();
+    int try_para = 0;
+    putint(try_para);
     while(1)
         break;
     if(1)

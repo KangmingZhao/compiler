@@ -109,6 +109,17 @@ void UnaryExpr::output(int level)
     fprintf(yyout, "%*cUnaryExpr\top: %s\n", level, ' ', op_str.c_str());
     expr->output(level + 4);
 }
+
+
+void FunctCall::output(int level)
+{
+    fprintf(yyout, "%*ccall_funct %s\n", level, ' ', get_symbolEntry()->toStr().c_str());
+    if (para_node != nullptr)
+    {
+        para_node->output(level + 4);
+    }
+}
+
 void Constant::output(int level)
 {
     std::string type, value;
@@ -185,6 +196,20 @@ void ArrDimNode::output(int level)
     {
         fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
         dimension_size->output(level + 20);
+    }
+}
+
+void ParaNode::output(int level)
+{
+    if (is_link)
+    {
+        para1->output(level);
+        para2->output(level);
+    }
+    else
+    {
+        fprintf(yyout, "%*c\t\tpara expr:\n", level, ' ');
+        para_expr->output(level + 20);
     }
 }
 

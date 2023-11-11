@@ -38,6 +38,8 @@ public:
     void output(int level);
 };
 
+
+
 class BinaryExpr : public ExprNode
 {
 private:
@@ -51,6 +53,8 @@ public:
     BinaryExpr(SymbolEntry* se, int op, ExprNode* ID) : ExprNode(se), op(op), ID(ID) { is_crement = 1; };
     void output(int level);
 };
+
+
 
 
 //常量
@@ -92,6 +96,26 @@ public:
     void output(int level);
 };
 
+class ParaNode : public Node
+{
+    ParaNode* para1;
+    ParaNode* para2;
+    ExprNode* para_expr;
+    SymbolEntry* ID_se;
+    bool is_link;
+public:
+    ParaNode(ParaNode* para1, ParaNode* para2) : para1(para1), para2(para2), para_expr(nullptr) { is_link = 1; };
+    ParaNode(ExprNode* para_expr) : para_expr(para_expr) { is_link = 0; };
+    ParaNode(SymbolEntry* ID_se) : ID_se(ID_se) { is_link = 0; };
+    void output(int level);
+};
+class FunctCall : public ExprNode
+{
+    ParaNode* para_node;
+public:
+    FunctCall(SymbolEntry* se, ParaNode* para_node) : ExprNode(se), para_node(para_node) {};
+    void output(int level);
+};
 
 class Id : public ExprNode
 {
@@ -100,7 +124,7 @@ class Id : public ExprNode
     ArrDimNode* Dimension;
     InitNode* Init;
 public:
-    enum { DEFAULT, INT_ARRAY };
+    enum { DEFAULT, INT_ARRAY, FUNCT };
     //我震惊，原来ExprNode(se),  Dimension(nullptr).id_type(DEFAULT) 这种初始化方式，初始化的顺序要和声明的一样……c++白学了
     Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { };
     Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) {};
