@@ -94,6 +94,7 @@ public:
     std::string toStr();
     int getScope() const {return scope;};
     // You can add any function you need here.
+    void setFuncType(Type *t){type=t;}
 };
 
 
