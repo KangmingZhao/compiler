@@ -206,6 +206,11 @@ BlockStmt
             identifiers = identifiers->getPrev();
             delete top;
         }
+    |
+    LBRACE RBRACE
+    {
+        $$ = new EmptyStmt();
+    }
     ;
 IfStmt
     : IF LPAREN Cond RPAREN Stmt %prec THEN {
@@ -719,6 +724,11 @@ ArrDimension
     LBRACKET Exp RBRACKET
     {
         $$ = new ArrDimNode($2);
+    }
+    |
+    LBRACKET RBRACKET
+    {
+        $$ = nullptr;
     }
     ;
 
