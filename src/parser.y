@@ -6,6 +6,48 @@
 
     //ArrDimNode** now_arrdim;
     //int now_arrindex;
+    //我们会在stmt后面加上BREAK SEMICOLON的识别，然后只有在blockstmt中会处理某一个作用域是不是在while内部的。因为其他的表达式
+    //要么只能装表达式不能装break，要么自己就是break。
+    
+    BreakStmt * now_break_stmt = nullptr;
+    ContinueStmt * now_continue_stmt = nullptr;
+
+
+    void deal_continue(bool is_loop)
+    {
+        if(now_continue_stmt != nullptr)
+        {
+            if(is_loop)
+            {
+                now_continue_stmt -> i_m_loop();
+                now_continue_stmt -> need_interrupt = 1;
+            }
+            else
+            {
+                now_continue_stmt -> i_m_not_loop();
+                now_continue_stmt -> need_interrupt = 0;
+            }
+            now_continue_stmt = nullptr;
+        }
+    }
+    void deal_break(bool is_loop)
+    {
+        if(now_break_stmt != nullptr)
+        {
+            if(is_loop)
+            {
+                now_break_stmt -> i_m_loop();
+                now_break_stmt -> need_interrupt = 1;
+            }
+            else
+            {
+                now_break_stmt -> i_m_not_loop();
+                now_break_stmt -> need_interrupt = 0;
+            }
+            now_break_stmt = nullptr;
+        }
+    }
+
     Type  *declType;
     int yylex();
     int yyerror( char const * );
@@ -39,13 +81,13 @@
 %token INT VOID FLOAT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA NOT
 %token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN INCREMENT DECREMENT LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
-%token RETURN CONST
+%token RETURN CONST BREAK CONTINUE
 
 
 
 
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt BreakStmt ContinueStmt
 %nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal
 %nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
@@ -69,12 +111,14 @@ Stmts
 Stmt
     : AssignStmt {$$=$1;}
     | BlockStmt {$$=$1;}
-    | IfStmt {$$=$1;}
-    | ReturnStmt {$$=$1;}
-    | DeclStmt {$$=$1;}
-    | FuncDef {$$=$1;}
-    | WhileStmt { $$ = $1; }
-    | ExprStmt { $$ = $1; }
+    | IfStmt {$$=$1; deal_break(0); deal_continue(0); }
+    | ReturnStmt {$$=$1; }
+    | DeclStmt {$$=$1; }
+    | FuncDef {$$=$1; }
+    | WhileStmt { $$ = $1;  deal_break(1); deal_continue(1); }
+    | ExprStmt { $$ = $1;}
+    | BreakStmt { $$ = $1; }
+    | ContinueStmt { $$ = $1; }
     ;
 LVal
     : ID {
@@ -114,7 +158,8 @@ AssignStmt
     ;
 BlockStmt
     :   LBRACE 
-        {identifiers = new SymbolTable(identifiers);} 
+        {identifiers = new SymbolTable(identifiers); 
+        } 
         Stmts RBRACE 
         {
             $$ = new CompoundStmt($3);
@@ -138,6 +183,24 @@ WhileStmt
          $$ = new WhileStmt($3, $5);
     }
     ;
+BreakStmt 
+    :
+    BREAK SEMICOLON
+    {
+        BreakStmt* temp = new BreakStmt(0);
+        now_break_stmt = temp;
+        $$ = temp;
+    }
+
+ContinueStmt
+    :
+    CONTINUE SEMICOLON
+    {
+        ContinueStmt * temp = new ContinueStmt(0);
+        now_continue_stmt = temp;
+        $$ = temp;
+    }
+
 ExprStmt
     : Exp SEMICOLON {
     
@@ -551,23 +614,23 @@ VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
     |
-Type ID ArrDimensions ArrInit SEMICOLON {
-        SymbolEntry *se;
-        if($1->isInt())
-        {
-            INT_arrayType * temp = new INT_arrayType();
-            se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+    Type ID ArrDimensions ArrInit SEMICOLON {
+            SymbolEntry *se;
+            if($1->isInt())
+            {
+                INT_arrayType * temp = new INT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+            }
+            else
+            {
+                FLOAT_arrayType * temp = new FLOAT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+            }
+            identifiers->install($2, se);
+            $$ = new DeclStmt(new Id(se, $3, $4));
+            delete []$2;
         }
-        else
-        {
-            FLOAT_arrayType * temp = new FLOAT_arrayType();
-            se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
-        }
-        identifiers->install($2, se);
-        $$ = new DeclStmt(new Id(se, $3, $4));
-        delete []$2;
-    }
-    ;
+        ;
 
 
 // 常量 const +一堆；

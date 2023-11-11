@@ -113,7 +113,11 @@ public:
 
 
 class StmtNode : public Node
-{};
+{
+public:
+    StmtNode() :need_interrupt(0) {};
+    bool need_interrupt;
+};
 
 class CompoundStmt : public StmtNode
 {
@@ -132,6 +136,7 @@ public:
     SeqNode(StmtNode *stmt1, StmtNode *stmt2) : stmt1(stmt1), stmt2(stmt2){};
     //根据parser.y里的内容来看，这个是把表达式串和单个表达式拼到一起用的。
     void output(int level);
+
 };
 
 class DeclStmt : public StmtNode
@@ -239,6 +244,29 @@ public:
     //艹，忘记这里只是单纯的翻译不用我执行了，我这里只是把while表示出来即可不用真的判断条件然后循环。
     void output(int level);
 };
+
+class BreakStmt : public StmtNode
+{
+    bool is_loop;
+public:
+    BreakStmt(bool is_loop) : is_loop(is_loop) {};
+    void output(int level);
+    void i_m_loop() { is_loop = 1; }
+    void i_m_not_loop() { is_loop = 0; }
+    
+};
+
+class ContinueStmt : public StmtNode
+{
+    bool is_loop;
+public:
+    ContinueStmt(bool is_loop) : is_loop(is_loop) {};
+    void output(int level);
+    void i_m_loop() { is_loop = 1; }
+    void i_m_not_loop() { is_loop = 0; }
+
+};
+
 
 
 class DoNothingStmt : public StmtNode

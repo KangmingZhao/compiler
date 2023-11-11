@@ -273,6 +273,23 @@ void WhileStmt::output(int level)
     doStmt->output(level + 4);
 }
 
+void BreakStmt::output(int level)
+{
+    if(is_loop)
+        fprintf(yyout, "%*cBreak\n", level, ' ');
+    else
+        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+}
+
+void ContinueStmt::output(int level)
+{
+    if (is_loop)
+        fprintf(yyout, "%*cContinue\n", level, ' ');
+    else
+        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+}
+
+
 void DoNothingStmt::output(int level)
 {
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');

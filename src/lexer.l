@@ -95,6 +95,15 @@ line_commentend \n
     return WHILE;
 }
 
+"break" {
+    dump_tokens("BREAK\t%s\n", yytext);
+    return BREAK;
+}
+
+"continue" {
+    dump_tokens("CONTINUE\t%s\n", yytext);
+    return CONTINUE;
+}
 
 
 

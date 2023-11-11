@@ -140,9 +140,15 @@ private:
     */
     int level;//具体来说，这个东西的作用是在输出时搞好缩进！
     static int counter;//通常用于生成唯一的标签或名称。来一个就+1，这很合理。
+
+    bool is_loop_block = 0;
 public:
     SymbolTable();
-    SymbolTable(SymbolTable *prev);
+    SymbolTable(SymbolTable* prev);
+
+    void i_m_loop() { is_loop_block = 1; }
+    bool is_loop() { return is_loop_block; }
+
     void install(std::string name, SymbolEntry* entry);
     SymbolEntry* lookup(std::string name);
     SymbolTable* getPrev() {return prev;};
