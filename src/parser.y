@@ -125,7 +125,7 @@
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt  WhileStmt ExprStmt BreakStmt ContinueStmt
 %nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall 
-%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
+%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt  EmptyStmt
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
 %nterm <stmttype> FuncDef 
@@ -157,6 +157,7 @@ Stmt
     | ExprStmt { $$ = $1;}
     | BreakStmt { $$ = $1; }
     | ContinueStmt { $$ = $1; }
+    | EmptyStmt {$$=$1;}
     ;
 LVal
     : ID {
@@ -284,7 +285,13 @@ PrimaryExp
     }
     ;
 
-
+// Ê¶±ð;
+EmptyStmt
+    :
+     SEMICOLON{
+        $$ = new EmptyStmt();
+    }
+    ;
 
 PARAMENT_LISTS
     :

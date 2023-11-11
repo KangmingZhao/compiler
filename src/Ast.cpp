@@ -239,7 +239,10 @@ void Id::output(int level)
 void CompoundStmt::output(int level)
 {
     fprintf(yyout, "%*cCompoundStmt\n", level, ' ');
-    stmt->output(level + 4);
+    if(stmt!=nullptr)
+    {
+        stmt->output(level + 4);
+    }
 }
 
 void SeqNode::output(int level)
@@ -287,7 +290,8 @@ void IfStmt::output(int level)
 {
     fprintf(yyout, "%*cIfStmt\n", level, ' ');
     cond->output(level + 4);
-    thenStmt->output(level + 4);
+    if(thenStmt!=nullptr)
+        thenStmt->output(level + 4);
 }
 
 void WhileStmt::output(int level)
@@ -295,7 +299,10 @@ void WhileStmt::output(int level)
     //不用实现，只是单纯的翻译出来的话，和if是一样的捏。
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
     cond->output(level + 4);
-    doStmt->output(level + 4);
+    if(doStmt!=nullptr)
+        {
+            doStmt->output(level + 4);
+        }
 }
 
 void BreakStmt::output(int level)
@@ -314,7 +321,12 @@ void ContinueStmt::output(int level)
         fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
 }
 
+void EmptyStmt::output(int level)
+{
+   
+    
 
+}
 
 void FuncCall::output(int level)
 {
@@ -340,8 +352,14 @@ void IfElseStmt::output(int level)
 {
     fprintf(yyout, "%*cIfElseStmt\n", level, ' ');
     cond->output(level + 4);
-    thenStmt->output(level + 4);
+    if(thenStmt!=nullptr)
+    {
+        thenStmt->output(level + 4);
+    }
+    if(elseStmt!=nullptr)
+    {
     elseStmt->output(level + 4);
+    }
 }
 
 void ReturnStmt::output(int level)

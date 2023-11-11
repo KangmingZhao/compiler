@@ -253,6 +253,12 @@ public:
     AssignStmt(ExprNode *lval, ExprNode *expr) : lval(lval), expr(expr) {};
     void output(int level);
 };
+class EmptyStmt : public StmtNode{
+
+public:
+	EmptyStmt(){};
+	void output(int level);
+};
 // º¯ÊýÉùÃ÷
 class FunctionDef : public StmtNode
 {
