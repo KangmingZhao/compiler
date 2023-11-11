@@ -256,19 +256,19 @@ void DeclStmt::output(int level)
 }
 
 
-void DeclInitStmt::output(int level)////////////////////////////////
+void DeclInitStmt::output(int level)
 {
     fprintf(yyout, "%*cDeclInitStmt\n", level, ' ');
     id->output(level + 4);
     initVal->output(level+4);
-}/////////////////////////////////////////////////////////////
+}
 
-void ConstDeclInitStmt::output(int level)////////////////////////////////
+void ConstDeclInitStmt::output(int level)
 {
     fprintf(yyout, "%*cConstDeclInitStmt\n", level, ' ');
     id->output(level + 4);
     initVal->output(level+4);
-}/////////////////////////////////////////////////////////////
+}
 
 void DeclList::output(int level)
 {
@@ -315,6 +315,20 @@ void ContinueStmt::output(int level)
 }
 
 
+
+void FuncCall::output(int level)
+{
+    fprintf(yyout, "%*cFuncCall\n", level, ' ');
+    if(FuncName!=nullptr)
+        FuncName->output(level+4);
+    else 
+        fprintf(yyout, "%*cFunction not declare!\n", level+4, ' ');
+    if(FuncRParams!=nullptr)
+        FuncRParams->output(level+4);
+}
+
+
+
 void DoNothingStmt::output(int level)
 {
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
@@ -350,7 +364,10 @@ void FunctionDef::output(int level)
     type = se->getType()->toStr();
     fprintf(yyout, "%*cFunctionDefine function name: %s, type: %s\n", level, ' ', 
             name.c_str(), type.c_str());
-    stmt->output(level + 4);
+    if(paraStmt!=nullptr)
+        paraStmt->output(level+4);
+    blockStmt->output(level + 4);
 }
+
 
 

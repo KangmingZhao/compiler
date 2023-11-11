@@ -253,16 +253,50 @@ public:
     AssignStmt(ExprNode *lval, ExprNode *expr) : lval(lval), expr(expr) {};
     void output(int level);
 };
-
+// 函数声明
 class FunctionDef : public StmtNode
 {
 private:
     SymbolEntry *se;
-    StmtNode *stmt;
+    StmtNode *blockStmt;
+    ParaNode *paraStmt;
 public:
-    FunctionDef(SymbolEntry *se, StmtNode *stmt) : se(se), stmt(stmt){};
+    FunctionDef(SymbolEntry *se, StmtNode *blockStmt,ParaNode *paraStmt) : se(se), blockStmt(blockStmt),paraStmt(paraStmt){};
     void output(int level);
 };
+
+
+
+//函数调用
+class FuncCall : public ExprNode
+{
+private:
+    ExprNode* FuncName;
+    ExprNode* FuncRParams;
+public:
+    FuncCall(SymbolEntry *se, ExprNode* FuncName,ExprNode* FuncRParams):ExprNode(se),FuncName(FuncName),FuncRParams(FuncRParams){};
+    void output(int level);
+};
+
+//实参
+class FuncRParam : public ExprNode
+{
+private:
+    ExprNode *param1,*param2;
+public:
+    FuncRParam(SymbolEntry *se,ExprNode *param1,ExprNode *param2):ExprNode(se),param1(param1),param2(param2){};
+    void output(int level);
+};
+// 形参
+class FuncFParam : public StmtNode
+{
+private:
+    StmtNode *param1,*param2;
+public:
+    FuncFParam(StmtNode* param1,StmtNode* param2): param1(param1),param2(param2){};
+    void output(int level);
+};
+
 
 /*↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓自己加的↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
 class WhileStmt : public StmtNode

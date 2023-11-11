@@ -2,6 +2,7 @@
     #include <iostream>
     #include <assert.h>
     #include "parser.h"
+    #include <vector>
     extern Ast ast;
 
     //ArrDimNode** now_arrdim;
@@ -50,6 +51,7 @@
     }
 
     Type  *declType;
+    std::vector<Type*> FuncParamsVector;
     int yylex();
     int yyerror( char const * );
 
@@ -121,11 +123,12 @@
 
 
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef WhileStmt ExprStmt BreakStmt ContinueStmt
-%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt  WhileStmt ExprStmt BreakStmt ContinueStmt
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall 
 %nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
+%nterm <stmttype> FuncDef 
 %nterm <paratype> PARAMENT_LISTS PARAMENT_LIST
 %nterm <type> Type
 
@@ -304,6 +307,15 @@ PARAMENT_LIST
     }
     |
     %empty { $$ = nullptr ;}
+    |
+    Type ID {
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
+        identifiers->install($2, se);
+        $$ = new ParaNode(new Id(se));
+        delete []$2;
+        FuncParamsVector.push_back($1);
+    }
     ;
 
 
@@ -322,7 +334,36 @@ FunctCall
         $$ = new FunctCall(se, $3);
     }
     ;
+// 函数定义 Funcdef->
+FuncDef
+    :
+    Type ID{
+        SymbolEntry *se = new IdentifierSymbolEntry(nullptr, $2, identifiers->getLevel());
+        identifiers->install($2, se);
+        identifiers = new SymbolTable(identifiers);
+    }
+    LPAREN PARAMENT_LISTS RPAREN
+    {
+        FunctionType *funcType;
+        funcType=new FunctionType($1,{});
+        FuncParamsVector.swap(funcType->paramsType);
 
+        SymbolEntry *se;
+        se = identifiers->lookup($2);
+        IdentifierSymbolEntry* ss=(IdentifierSymbolEntry*)se;
+        ss->setFuncType(((Type*)funcType));
+    }
+    BlockStmt
+    {
+        SymbolEntry *se;
+        se = identifiers->lookup($2);
+        assert(se != nullptr);
+        $$ = new FunctionDef(se, $8,$5);
+        SymbolTable *top = identifiers;
+        identifiers = identifiers->getPrev();
+        delete top;
+        delete []$2;
+    }
 // 单目运算
 UnaryExp
     :
@@ -801,29 +842,31 @@ InitVal
 
 
 
-FuncDef
-    :
-    Type ID {
-        Type *funcType;
-        funcType = new FunctionType($1,{});
-        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
-        identifiers->install($2, se);
-        identifiers = new SymbolTable(identifiers);
-    }
-    LPAREN RPAREN
-
-    BlockStmt
-    {
-        SymbolEntry *se;
-        se = identifiers->lookup($2);
-        assert(se != nullptr);
-        $$ = new FunctionDef(se, $6);
-        SymbolTable *top = identifiers;
-        identifiers = identifiers->getPrev();
-        delete top;
-        delete []$2;
-    }
-    ;
+// FuncDef
+//     :
+//     Type ID {
+//         Type *funcType;
+//         funcType = new FunctionType($1,{});
+//         SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
+//         identifiers->install($2, se);
+//         identifiers = new SymbolTable(identifiers);
+//     }
+//     LPAREN RPAREN
+//     {
+      
+//     }
+//     BlockStmt
+//     {
+//         SymbolEntry *se;
+//         se = identifiers->lookup($2);
+//         assert(se != nullptr);
+//         $$ = new FunctionDef(se, $6);
+//         SymbolTable *top = identifiers;
+//         identifiers = identifiers->getPrev();
+//         delete top;
+//         delete []$2;
+//     }
+//     ;
 %%
 
 int yyerror(char const* message)

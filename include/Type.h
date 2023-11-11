@@ -63,7 +63,7 @@ public:
 
 class FunctionType : public Type
 {
-private:
+public:
     Type *returnType;
     std::vector<Type*> paramsType;
 public:
