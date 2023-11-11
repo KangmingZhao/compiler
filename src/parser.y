@@ -696,23 +696,7 @@ DeclStmt
 VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
-    |
-    Type ID ArrDimensions ArrInit SEMICOLON {
-            SymbolEntry *se;
-            if($1->isInt())
-            {
-                INT_arrayType * temp = new INT_arrayType();
-                se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
-            }
-            else
-            {
-                FLOAT_arrayType * temp = new FLOAT_arrayType();
-                se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
-            }
-            identifiers->install($2, se);
-            $$ = new DeclStmt(new Id(se, $3, $4));
-            delete []$2;
-        }
+    
         ;
 
 
@@ -744,6 +728,23 @@ IdDeclList
         $$ = new DeclStmt(new Id(se));
         delete []$1;
     }
+    |
+    ID ArrDimensions ArrInit  {
+            SymbolEntry *se;
+            if(declType->isInt())
+            {
+                INT_arrayType * temp = new INT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
+            }
+            else
+            {
+                FLOAT_arrayType * temp = new FLOAT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
+            }
+            identifiers->install($1, se);
+            $$ = new DeclStmt(new Id(se, $2, $3));
+            delete []$1;
+        }
     ;
 
 // ³£Á¿

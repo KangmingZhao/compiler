@@ -2,6 +2,7 @@ int a;
 int main()
 {
     getint();
+    float test_momre_arr[2] = {1,2}, saadsadsa,dsadsadsa = 312,safafasfas;
     int try_para = 0;
     putint(try_para);
     while(1)

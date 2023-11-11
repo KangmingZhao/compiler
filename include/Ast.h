@@ -127,11 +127,18 @@ public:
     enum { DEFAULT, INT_ARRAY, FUNCT };
     //我震惊，原来ExprNode(se),  Dimension(nullptr).id_type(DEFAULT) 这种初始化方式，初始化的顺序要和声明的一样……c++白学了
     Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { };
-    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) {};
-    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) {};
+    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) { reset_dim_record(); };
+    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) { reset_dim_record(); };
     ArrDimNode* getDimension() { return Dimension; };
     void output(int level);
-    int dim_record[10] = { -1 };
+    int dim_record[10];
+    void reset_dim_record()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            dim_record[i] = -1;
+        }
+    }
 };
 
 
