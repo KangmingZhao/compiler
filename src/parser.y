@@ -76,6 +76,11 @@
     Type* funcType1 = new FunctionType(TypeSystem::intType, {});
     SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
     identifiers->install(getint, entry1);
+
+    std::string getch = "getch";
+    Type* funcType4 = new FunctionType(TypeSystem::intType, {});
+    SymbolEntry* entry4 = new IdentifierSymbolEntry(funcType4, getch, 0);
+    identifiers->install(getch, entry4);
     
     std::string putint = "putint";
     Type* funcType2 = new FunctionType(TypeSystem::voidType, {});
