@@ -253,31 +253,421 @@ void AssignStmt::typeCheck()
     // Todo
 }
 
+
+
+
+
+//重灾区。尊都是橡树。
+/*战犯名单
+
+UnaryExpr 
+InitNode
+ArrDimNode
+ParaNode
+FunctCall
+DeclInitStmt
+ConstDeclInitStmt
+DeclList
+ConstDeclList
+FuncCall
+FuncRParam
+FuncFParam
+WhileStmt
+BreakStmt
+ContinueStmt
+DoNothingStmt*/
+
+void ArrDimNode::typeCheck()
+{
+
+}
+void ArrDimNode::genCode()
+{
+
+}
+
+void DoNothingStmt::typeCheck()
+{
+
+}
+void DoNothingStmt::genCode()
+{
+
+}
+
+void ContinueStmt::typeCheck()
+{
+
+}
+void ContinueStmt::genCode()
+{
+
+}
+
+void BreakStmt::typeCheck()
+{
+
+}
+void BreakStmt::genCode()
+{
+
+}
+
+void WhileStmt::typeCheck()
+{
+
+}
+void WhileStmt::genCode()
+{
+
+}
+
+void FuncFParam::typeCheck()
+{
+
+}
+void FuncFParam::genCode()
+{
+
+}
+
+void FuncRParam::typeCheck()
+{
+
+}
+void FuncRParam::genCode()
+{
+
+}
+
+void FuncCall::typeCheck()
+{
+
+}
+void FuncCall::genCode()
+{
+
+}
+
+void ConstDeclList::typeCheck()
+{
+
+}
+void ConstDeclList::genCode()
+{
+
+}
+
+void DeclList::typeCheck()
+{
+
+}
+void DeclList::genCode()
+{
+
+}
+
+void ConstDeclInitStmt::typeCheck()
+{
+
+}
+void ConstDeclInitStmt::genCode()
+{
+
+}
+
+void DeclInitStmt::typeCheck()
+{
+
+}
+void DeclInitStmt::genCode()
+{
+
+}
+
+void FunctCall::typeCheck()
+{
+
+}
+void FunctCall::genCode()
+{
+
+}
+
+void ParaNode::typeCheck()
+{
+
+}
+void ParaNode::genCode()
+{
+
+}
+
+void InitNode::typeCheck()
+{
+
+}
+void InitNode::genCode()
+{
+
+}
+
+void UnaryExpr::typeCheck()
+{
+
+}
+void UnaryExpr::genCode()
+{
+
+}
+
+
+
+
+//上面是奇奇怪怪的东西。
+
+
+
+
+
+
+
+
+
+
+
 void BinaryExpr::output(int level)
 {
     std::string op_str;
-    switch(op)
+    switch (op)
     {
-        case ADD:
-            op_str = "add";
-            break;
-        case SUB:
-            op_str = "sub";
-            break;
-        case AND:
-            op_str = "and";
-            break;
-        case OR:
-            op_str = "or";
-            break;
-        case LESS:
-            op_str = "less";
-            break;
+    case ADD:
+        op_str = "add";
+        break;
+    case SUB:
+        op_str = "sub";
+        break;
+    case MUL:
+        op_str = "mul";
+        break;
+    case DIV:
+        op_str = "div";
+        break;
+    case MOD:
+        op_str = "mod";
+        break;
+    case AND:
+        op_str = "and";
+        break;
+    case OR:
+        op_str = "or";
+        break;
+    case LESS:
+        op_str = "less";
+        break;
+    case INCREMENT_BEFORE:
+        op_str = "increment_before";
+        break;
+    case DECREMENT_AFTER:
+        op_str = "decrement_after";
+        break;
+    case INCREMENT_AFTER:
+        op_str = "increment_after";
+        break;
+    case DECREMENT_BEFORE:
+        op_str = "decrement_after";
+    case GREATER:
+        op_str = "greater";
+        break;
+    case LESSEQUAL:
+        op_str = "less equal";
+        break;
+    case GREATEREQUAL:
+        op_str = "greater equal";
+        break;
+    case EQUAL:
+        op_str = "equal";
+        break;
+    case NOTEQUAL:
+        op_str = "not equal";
+        break;
     }
     fprintf(yyout, "%*cBinaryExpr\top: %s\n", level, ' ', op_str.c_str());
-    expr1->output(level + 4);
-    expr2->output(level + 4);
+    if (is_crement)
+    {
+        ID->output(level + 4);
+    }
+    else
+    {
+        expr1->output(level + 4);
+        expr2->output(level + 4);
+    }
 }
+void UnaryExpr::output(int level)
+{
+    std::string op_str;
+    switch (op)
+    {
+    case ADD:
+        op_str = "add";
+        break;
+    case SUB:
+        op_str = "sub";
+        break;
+    case NOT:
+        op_str = "NOT";
+        break;
+    }
+    fprintf(yyout, "%*cUnaryExpr\top: %s\n", level, ' ', op_str.c_str());
+    expr->output(level + 4);
+}
+void FunctCall::output(int level)
+{
+    fprintf(yyout, "%*ccall_funct %s\n", level, ' ', get_symbolEntry()->toStr().c_str());
+    if (para_node != nullptr)
+    {
+        para_node->output(level + 4);
+    }
+}
+void InitNode::output(int level, int dim, int* dim_record)
+{
+    if (is_checkpoint)
+    {
+        for (int i = dim + 1; i < 10; i++)
+        {
+            dim_record[i] = -1;
+        }
+        dim_record[dim]++;
+        if (is_exp)
+        {
+            value_here->output(level);
+            fprintf(yyout, "\t\t\t\tposition in the arr: ");
+            for (int i = 0; i < 10 && dim_record[i] != -1; i++)
+            {
+                fprintf(yyout, " %d ", dim_record[i]);
+            }
+        }
+        else
+        {
+            node1->output(level, dim + 1, dim_record);
+            node2->output(level, dim + 1, dim_record);
+        }
+    }
+    else
+    {
+        if (is_exp)
+        {
+            value_here->output(level);
+            dim_record[dim]++;
+            fprintf(yyout, "\t\t\t\tposition in the arr: ");
+            for (int i = 0; i < 10 && dim_record[i] != -1; i++)
+            {
+                fprintf(yyout, " %d ", dim_record[i]);
+            }
+            fprintf(yyout, "\n");
+        }
+        else
+        {
+            node1->output(level, dim, dim_record);
+            node2->output(level, dim, dim_record);
+        }
+    }
+}
+void ArrDimNode::output(int level)
+{
+    if (is_link)
+    {
+        arr1->output(level);
+        arr2->output(level);
+    }
+    else
+    {
+        fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
+        dimension_size->output(level + 20);
+    }
+}
+void ParaNode::output(int level)
+{
+    if (is_link)
+    {
+        para1->output(level);
+        para2->output(level);
+    }
+    else
+    {
+        fprintf(yyout, "%*c\t\tpara expr:\n", level, ' ');
+        para_expr->output(level + 20);
+    }
+}
+void DeclInitStmt::output(int level)
+{
+    fprintf(yyout, "%*cDeclInitStmt\n", level, ' ');
+    id->output(level + 4);
+    initVal->output(level + 4);
+}
+void ConstDeclInitStmt::output(int level)
+{
+    fprintf(yyout, "%*cConstDeclInitStmt\n", level, ' ');
+    id->output(level + 4);
+    initVal->output(level + 4);
+}
+void DeclList::output(int level)
+{
+    fprintf(yyout, "%*cDeclList\n", level, ' ');
+    decl1->output(level + 4);
+    decl2->output(level + 4);
+}
+void ConstDeclList::output(int level)
+{
+    fprintf(yyout, "%*cConstDeclList\n", level, ' ');
+    decl1->output(level + 4);
+    decl2->output(level + 4);
+}
+void WhileStmt::output(int level)
+{
+    //不用实现，只是单纯的翻译出来的话，和if是一样的捏。
+    fprintf(yyout, "%*cWhileStmt\n", level, ' ');
+    cond->output(level + 4);
+    if (doStmt != nullptr)
+    {
+        doStmt->output(level + 4);
+    }
+}
+void BreakStmt::output(int level)
+{
+    if (is_loop)
+        fprintf(yyout, "%*cBreak\n", level, ' ');
+    else
+        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+}
+void ContinueStmt::output(int level)
+{
+    if (is_loop)
+        fprintf(yyout, "%*cContinue\n", level, ' ');
+    else
+        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+}
+void EmptyStmt::output(int level) 
+{
+
+}
+void FuncCall::output(int level)
+{
+    fprintf(yyout, "%*cFuncCall\n", level, ' ');
+    if (FuncName != nullptr)
+        FuncName->output(level + 4);
+    else
+        fprintf(yyout, "%*cFunction not declare!\n", level + 4, ' ');
+    if (FuncRParams != nullptr)
+        FuncRParams->output(level + 4);
+}
+void DoNothingStmt::output(int level)
+{
+    fprintf(yyout, "%*cWhileStmt\n", level, ' ');
+    do_nothing_node->output(level + 4);
+}
+
+
 
 void Ast::output()
 {
@@ -297,13 +687,28 @@ void Constant::output(int level)
 
 void Id::output(int level)
 {
+    /*std::string name, type;
+    int scope;
+    name = symbolEntry->toStr();
+    type = symbolEntry->getType()->toStr();
+    scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
+    fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
+            name.c_str(), scope, type.c_str());*/
     std::string name, type;
     int scope;
     name = symbolEntry->toStr();
     type = symbolEntry->getType()->toStr();
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
-            name.c_str(), scope, type.c_str());
+        name.c_str(), scope, type.c_str());
+    if (id_type == INT_ARRAY)
+    {
+        Dimension->output(level + 4);
+        if (Init != nullptr)
+        {
+            Init->output(level + 4, 0, dim_record);
+        }
+    }
 }
 
 void CompoundStmt::output(int level)
@@ -323,6 +728,7 @@ void DeclStmt::output(int level)
     fprintf(yyout, "%*cDeclStmt\n", level, ' ');
     id->output(level + 4);
 }
+
 
 void IfStmt::output(int level)
 {

@@ -39,11 +39,19 @@ class ConstantSymbolEntry : public SymbolEntry
 {
 private:
     int value;
+    float value_f;
+    int data_type;
 
 public:
     ConstantSymbolEntry(Type *type, int value);
+    ConstantSymbolEntry(Type* type, float value);
     virtual ~ConstantSymbolEntry() {};
-    int getValue() const {return value;};
+    int getValue() const {
+        if(data_type == 1)
+            return value;
+        if (data_type == 2)
+            return value_f;
+    };
     std::string toStr();
     // You can add any function you need here.
 };
@@ -89,8 +97,10 @@ public:
     bool isLocal() const {return scope >= LOCAL;};
     int getScope() const {return scope;};
     void setAddr(Operand *addr) {this->addr = addr;};
-    Operand* getAddr() {return addr;};
+    Operand* getAddr() {return addr;};    
+
     // You can add any function you need here.
+    void setFuncType(Type* t) { type = t; }
 };
 
 

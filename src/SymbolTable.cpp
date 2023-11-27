@@ -1,6 +1,8 @@
 #include "SymbolTable.h"
 #include <iostream>
 #include <sstream>
+#include "Type.h"
+
 
 SymbolEntry::SymbolEntry(Type *type, int kind) 
 {
@@ -11,12 +13,28 @@ SymbolEntry::SymbolEntry(Type *type, int kind)
 ConstantSymbolEntry::ConstantSymbolEntry(Type *type, int value) : SymbolEntry(type, SymbolEntry::CONSTANT)
 {
     this->value = value;
+    data_type = 1;
+}
+
+ConstantSymbolEntry::ConstantSymbolEntry(Type* type, float value) : SymbolEntry(type, SymbolEntry::CONSTANT)
+{
+    this->value_f = value;
+    data_type = 2;
 }
 
 std::string ConstantSymbolEntry::toStr()
 {
     std::ostringstream buffer;
-    buffer << value;
+
+    if (this->getType()->isInt())
+    {
+        buffer << value;
+    }
+    else if (this->getType()->isFLOAT())
+    {
+        buffer << value_f;
+    }
+
     return buffer.str();
 }
 
@@ -71,6 +89,19 @@ SymbolTable::SymbolTable(SymbolTable *prev)
 SymbolEntry* SymbolTable::lookup(std::string name)
 {
     // Todo
+    SymbolTable* temp = this;
+    while (temp)
+    {
+        std::map<std::string, SymbolEntry*>::iterator it = temp->symbolTable.find(name);
+        if (it != temp->symbolTable.end()) {
+            // 找到了name
+            return temp->symbolTable[name];
+        }
+        else {
+            // name不存在
+            temp = temp->getPrev();
+        }
+    }
     return nullptr;
 }
 

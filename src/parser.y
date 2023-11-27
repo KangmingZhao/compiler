@@ -2,9 +2,13 @@
     #include <iostream>
     #include <assert.h>
     #include "parser.h"
+    #include <vector>
     extern Ast ast;
     int yylex();
     int yyerror( char const * );
+
+    Type  *declType;
+    std::vector<Type*> FuncParamsVector;
 }
 
 %code requires {
@@ -13,25 +17,69 @@
     #include "Type.h"
 }
 
+%initial-action {
+    //这里还有这种初始化方法，太爽啦
+    std::string getint = "getint";
+    Type* funcType1 = new FunctionType(TypeSystem::intType, {});
+    SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
+    identifiers->install(getint, entry1);
+    
+    std::string putint = "putint";
+    Type* funcType2 = new FunctionType(TypeSystem::voidType, {});
+    SymbolEntry* entry2 = new IdentifierSymbolEntry(funcType2, putint, 0);
+    identifiers->install(putint, entry2);
+
+    
+    std::string putch = "putch";
+    std::vector<Type*> vec; 
+    vec.push_back(TypeSystem::intType);
+    Type* funcType3 = new FunctionType(TypeSystem::voidType, vec); 
+    SymbolEntry* entry3 = new IdentifierSymbolEntry(funcType3, putch, 0);
+    identifiers->install(putch, entry3);
+
+
+}
+
 %union {
     int itype;
+    float fltype;
     char* strtype;
     StmtNode* stmttype;
     ExprNode* exprtype;
+    ArrDimNode * arrdimtype;
+    InitNode * inittype;
+    ParaNode * paratype;
     Type* type;
+
 }
 
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
-%token IF ELSE
-%token INT VOID
-%token LPAREN RPAREN LBRACE RBRACE SEMICOLON
-%token ADD SUB OR AND LESS ASSIGN
-%token RETURN
+
+%token <fltype> FLOATPOINT
+
+%token IF ELSE WHILE
+%token INT VOID FLOAT
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA NOT
+%token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN INCREMENT DECREMENT LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
+%token RETURN CONST BREAK CONTINUE
+
+
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef
+
+
+%nterm <stmttype> WhileStmt ExprStmt BreakStmt ContinueStmt EmptyStmt
+%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
+%nterm <exprtype> InitVal FunctCall
+%nterm <arrdimtype> ArrDimensions ArrDimension 
+%nterm <inittype> ArrInit ArrInitLists ArrInitList
+%nterm <paratype> PARAMENT_LISTS PARAMENT_LIST
+
+
 %nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
+%nterm <exprtype> MulExp UnaryExp
 %nterm <type> Type
 
 %precedence THEN
@@ -55,6 +103,11 @@ Stmt
     | ReturnStmt {$$=$1;}
     | DeclStmt {$$=$1;}
     | FuncDef {$$=$1;}
+    | WhileStmt { $$ = $1;}
+    | ExprStmt { $$ = $1;}
+    | BreakStmt { $$ = $1; }
+    | ContinueStmt { $$ = $1; }
+    | EmptyStmt {$$=$1;}
     ;
 LVal
     : ID {
@@ -67,6 +120,22 @@ LVal
             assert(se != nullptr);
         }
         $$ = new Id(se);
+        delete []$1;
+    }
+    |
+    ID ArrDimensions
+    {
+        //我们知道数组的访问是可以作为左值的。
+        
+        SymbolEntry *se;
+        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            delete [](char*)$1;
+            assert(se != nullptr);      //抛出一个断言错误
+        }
+        $$ = new Id(se, $2);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
         delete []$1;
     }
     ;
@@ -101,6 +170,54 @@ ReturnStmt
         $$ = new ReturnStmt($2);
     }
     ;
+    
+WhileStmt
+    : WHILE LPAREN Cond RPAREN Stmt 
+    {
+         $$ = new WhileStmt($3, $5);
+    }
+    ;
+BreakStmt 
+    :
+    BREAK SEMICOLON
+    {
+        BreakStmt* temp = new BreakStmt(0);
+        $$ = temp;
+    }
+
+ContinueStmt
+    :
+    CONTINUE SEMICOLON
+    {
+        ContinueStmt * temp = new ContinueStmt(0);
+        $$ = temp;
+    }
+
+ExprStmt
+    : Exp SEMICOLON {
+        
+    }
+    ;
+EmptyStmt
+    :
+     SEMICOLON{
+        $$ = new EmptyStmt();
+    }
+    ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Exp
     :
     AddExp {$$ = $1;}
@@ -114,35 +231,268 @@ PrimaryExp
     LVal {
         $$ = $1;
     }
+    |
+    LPAREN Exp RPAREN{
+        $$=$2;
+    }
     | INTEGER {
         SymbolEntry *se = new ConstantSymbolEntry(TypeSystem::intType, $1);
         $$ = new Constant(se);
     }
+    | FLOATPOINT {
+        SymbolEntry *se = new ConstantSymbolEntry(TypeSystem::floatType, $1);
+        $$ = new Constant(se);
+    }
+    |
+    FunctCall 
+    {
+        $$ = $1;
+    }
     ;
+
+UnaryExp
+    :
+    PrimaryExp {
+        $$ = $1;
+    }
+    | 
+    ADD UnaryExp {
+        $$ = $2;
+    }
+    |
+    SUB UnaryExp {
+        if($2->get_symbolEntry()->getType()->isInt())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::SUB, $2);
+        }
+        else if($2->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::SUB, $2);
+        }
+    }
+    |
+    NOT UnaryExp{
+    if($2->get_symbolEntry()->getType()->isInt())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::NOT, $2);
+        }
+        else if($2->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new UnaryExpr(se, UnaryExpr::NOT, $2);
+        }
+
+    }
+    ;
+MulExp
+    :
+    UnaryExp { $$ = $1;}
+    |
+    MulExp MUL UnaryExp {
+        //这里我们任务只要有一个是float那么就按float来算。
+        if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::MUL, $1, $3);
+        }
+    }
+    |
+    MulExp DIV  UnaryExp
+    {
+        if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::DIV, $1, $3);
+        }
+    }
+    |
+    MulExp MOD UnaryExp
+    {
+        //求余数是int的专利
+        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
+    }
+    ;
+
+
 AddExp
     :
-    PrimaryExp {$$ = $1;}
-    |
-    AddExp ADD PrimaryExp
+    Exp INCREMENT
     {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::ADD, $1, $3);
+        //SymbolEntry *const_1 = new ConstantSymbolEntry(TypeSystem::intType, 1);
+        //ExprNode *const_1_node = new Constant(const_1);
+
+
+        if($1->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::INCREMENT_AFTER, $1);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::INCREMENT_AFTER, $1);
+        }
+
+        
+
+        //SymbolEntry *se;
+        //se = identifiers->lookup($1->get_name()); //在已有的符号表里找有没有这个Lval。
+        //$$ = new BinaryExpr(se, BinaryExpr::ADD, $1, const_1_node);
     }
     |
-    AddExp SUB PrimaryExp
+    Exp DECREMENT
     {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::SUB, $1, $3);
+        if($1->get_symbolEntry()->getType()->isFLOAT())
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::DECREMENT_AFTER, $1);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::DECREMENT_AFTER, $1);
+        }
+    }
+    |
+    MulExp { $$ = $1; }
+    |
+    AddExp ADD MulExp
+    {
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::ADD, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::ADD, $1, $3);
+        }
+    }
+    |
+    AddExp SUB MulExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::SUB, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::SUB, $1, $3);
+        }
     }
     ;
+
+
+
 RelExp
     :
     AddExp {$$ = $1;}
     |
     RelExp LESS AddExp
     {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::boolType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::LESS, $1, $3);
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::LESS, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::LESS, $1, $3);
+        }
+    }
+    |
+     RelExp GREATER AddExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::GREATER, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::GREATER, $1, $3);
+        }
+    }
+    |
+    RelExp GREATEREQUAL AddExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::GREATEREQUAL, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::GREATEREQUAL, $1, $3);
+        }
+    }
+    |
+    RelExp LESSEQUAL AddExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::LESSEQUAL, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::LESSEQUAL, $1, $3);
+        }
+    }
+    |
+    RelExp EQUAL AddExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::EQUAL, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::EQUAL, $1, $3);
+        }
+    }
+    |
+    RelExp NOTEQUAL AddExp
+    {
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::NOTEQUAL, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::NOTEQUAL, $1, $3);
+        }
     }
     ;
 LAndExp
@@ -151,8 +501,17 @@ LAndExp
     |
     LAndExp AND RelExp
     {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::boolType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::AND, $1, $3);
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::AND, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::AND, $1, $3);
+        }
     }
     ;
 LOrExp
@@ -161,28 +520,243 @@ LOrExp
     |
     LOrExp OR LAndExp
     {
-        SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::boolType, SymbolTable::getLabel());
-        $$ = new BinaryExpr(se, BinaryExpr::OR, $1, $3);
+        
+        if($1->get_symbolEntry()->getType()->isFLOAT() || $3->get_symbolEntry()->getType()->isFLOAT() )
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::OR, $1, $3);
+        }
+        else
+        {
+            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            $$ = new BinaryExpr(se, BinaryExpr::OR, $1, $3);
+        }
     }
     ;
+
+
+
+
+
 Type
     : INT {
         $$ = TypeSystem::intType;
+        declType=TypeSystem::intType;
     }
     | VOID {
         $$ = TypeSystem::voidType;
+        declType=TypeSystem::voidType;
+    }
+    |
+    FLOAT {
+        $$ = TypeSystem::floatType;
+        declType=TypeSystem::floatType;
+
     }
     ;
-DeclStmt
+
+
+
+
+ArrInitList
     :
-    Type ID SEMICOLON {
+    Exp
+    {
+        //这个是到头了，开始进入具体值了。
+        $$ = new InitNode($1);
+    }
+    |
+    LBRACE ArrInitLists RBRACE
+    {
+        //这个是说明还有至少一层
+        $$ = $2;
+        $$->i_m_checkpoint();
+    }
+    ;
+
+ArrInitLists
+    :
+    ArrInitLists COMMA ArrInitList
+    {
+        $$ = new InitNode($1, $3);
+    }
+    |
+    ArrInitList
+    {
+        $$ = $1;
+    }
+    ;
+
+ArrInit
+    :
+    ASSIGN LBRACE ArrInitLists RBRACE
+    {
+        $$ = $3;
+    }
+    |
+    %empty { $$ = nullptr ;}
+    ;
+
+    
+ArrDimension
+    :
+    LBRACKET Exp RBRACKET
+    {
+        $$ = new ArrDimNode($2);
+    }
+    |
+    LBRACKET RBRACKET
+    {
+        $$ = nullptr;
+    }
+    ;
+
+
+ArrDimensions
+    :
+    ArrDimension { $$ = $1; }
+    |
+    ArrDimensions ArrDimension
+    {
+        $$ = new ArrDimNode($1, $2);
+    }
+    ;
+
+// 常量和变量的声明
+DeclStmt
+     :
+    VarDeclStmt {$$=$1;}
+    |
+    ConstDeclStmt {$$=$1;}
+    ;
+// 变量 变量+一堆
+VarDeclStmt
+    :
+    Type IdDeclLists SEMICOLON{$$=$2;}
+    ;
+
+
+// 常量 const +一堆；
+ConstDeclStmt
+    :
+    CONST Type ConstDeclLists SEMICOLON{$$=$3;}
+    ;
+// 变量
+IdDeclLists 
+    :
+    IdDeclLists COMMA IdDeclList {$$=new DeclList($1,$3);}
+    | IdDeclList {$$=$1;}
+    ;
+IdDeclList
+    :
+    ID ASSIGN InitVal{
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new DeclInitStmt(new Id(se),$3);
+        delete []$1;
+    }
+    |
+    ID{
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new DeclStmt(new Id(se));
+        delete []$1;
+    }
+    |
+    ID ArrDimensions ArrInit  {
+            SymbolEntry *se;
+            if(declType->isInt())
+            {
+                INT_arrayType * temp = new INT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
+            }
+            else
+            {
+                FLOAT_arrayType * temp = new FLOAT_arrayType();
+                se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
+            }
+            identifiers->install($1, se);
+            $$ = new DeclStmt(new Id(se, $2, $3));
+            delete []$1;
+        }
+    ;
+
+// 常量
+ConstDeclLists 
+    :
+    ConstDeclLists COMMA ConstDeclList {$$=new ConstDeclList($1,$3);}
+    | ConstDeclList {$$=$1;}
+    ;
+
+ConstDeclList
+    :
+    ID ASSIGN InitVal {
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        identifiers->install($1, se);
+        $$ = new ConstDeclInitStmt(new Id(se),$3);
+        delete []$1;
+    }
+    ;
+
+InitVal
+    :
+    Exp { $$=$1;}
+    ;    
+
+
+
+PARAMENT_LISTS
+    :
+    PARAMENT_LISTS COMMA PARAMENT_LIST
+    {
+        $$ = new ParaNode($1,$3);
+    }
+    |
+    PARAMENT_LIST
+    {
+        $$ = $1;
+    }
+    ;
+
+PARAMENT_LIST
+    :
+    Exp
+    {
+        $$ = new ParaNode($1);
+    }
+    |
+    %empty { $$ = nullptr ;}
+    |
+    Type ID {
         SymbolEntry *se;
         se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
         identifiers->install($2, se);
-        $$ = new DeclStmt(new Id(se));
+        $$ = new ParaNode(new Id(se));
         delete []$2;
+        FuncParamsVector.push_back($1);
     }
     ;
+
+
+FunctCall
+    :
+    ID LPAREN PARAMENT_LISTS RPAREN
+    {   
+        SymbolEntry *se;
+        se = identifiers->lookup($1); 
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            delete [](char*)$1;
+            assert(se != nullptr);      //抛出一个断言错误
+        }
+        $$ = new FunctCall(se, $3);
+    }
+    ;
+
 FuncDef
     :
     Type ID {
