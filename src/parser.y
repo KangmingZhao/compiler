@@ -44,6 +44,7 @@
     #include "SymbolTable.h"
     #include "Type.h"
 
+
 }
 
 %initial-action {
@@ -139,32 +140,55 @@ Stmt
     ;
 LVal
     : ID {
-        SymbolEntry *se;
-        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
-        if(se == nullptr) //如果没有
-        {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
-            delete [](char*)$1;
-            assert(se != nullptr);      //抛出一个断言错误
-        }
-        $$ = new Id(se);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
-        delete []$1;
-    }
-    |
-    ID ArrDimensions
-    {
-        //我们知道数组的访问是可以作为左值的。
+        int state = 0;
         
         SymbolEntry *se;
         se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
         if(se == nullptr) //如果没有
         {
             fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
-            delete [](char*)$1;
-            assert(se != nullptr);      //抛出一个断言错误
+            state = NOT_DEFINED;
+            //delete [](char*)$1;
+            //assert(se != nullptr);      //抛出一个断言错误
+
+
+            SymbolEntry *error_se;
+            error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
+            $$ = new Id(error_se, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+            delete []$1;
+
         }
-        $$ = new Id(se, $2);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
-        delete []$1;
+        else
+        {
+            $$ = new Id(se, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+            delete []$1;
+        }
+    }
+    |
+    ID ArrDimensions
+    {
+        //我们知道数组的访问是可以作为左值的。
+        int state = 0;
+
+        SymbolEntry *se;
+        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            state = NOT_DEFINED;
+            //delete [](char*)$1;
+            //assert(se != nullptr);      //抛出一个断言错误
+
+            SymbolEntry *error_se;
+            error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
+            $$ = new Id(error_se, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+            delete []$1;
+        }
+        else
+        {
+            $$ = new Id(se, $2, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+            delete []$1;
+        }
     }
     ;
 AssignStmt
@@ -763,22 +787,57 @@ IdDeclLists
 IdDeclList
     :
     ID ASSIGN InitVal{
+        int state = LEGAL_VAR;
+        
+        SymbolEntry *check_redefination_se;
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID。
+        if(check_redefination_se != nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定义
+            state = REDEFINATION;
+        }
+
+        
+
         SymbolEntry *se;
         se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
         identifiers->install($1, se);
-        $$ = new DeclInitStmt(new Id(se),$3);
+        $$ = new DeclInitStmt(new Id(se, state),$3);
         delete []$1;
     }
     |
     ID{
+        int state = LEGAL_VAR;
+        
+        SymbolEntry *check_redefination_se;
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID。
+        if(check_redefination_se != nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定义
+            state = REDEFINATION;
+        }
+
         SymbolEntry *se;
         se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
         identifiers->install($1, se);
-        $$ = new DeclStmt(new Id(se));
+        $$ = new DeclStmt(new Id(se, state));
         delete []$1;
     }
     |
     ID ArrDimensions ArrInit  {
+
+            int state = LEGAL_VAR;
+        
+            SymbolEntry *check_redefination_se;
+            check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID。
+            if(check_redefination_se != nullptr) //如果没有
+            {
+                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定义
+                state = REDEFINATION;
+            }
+
+
+
             SymbolEntry *se;
             if(declType->isInt())
             {
@@ -791,7 +850,7 @@ IdDeclList
                 se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
             }
             identifiers->install($1, se);
-            $$ = new DeclStmt(new Id(se, $2, $3));
+            $$ = new DeclStmt(new Id(se, $2, $3, state));
             delete []$1;
         }
     ;

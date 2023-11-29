@@ -13,6 +13,16 @@ Type* TypeSystem::voidType = &commonVoid;
 Type* TypeSystem::boolType = &commonBool;
 Type* TypeSystem::floatType = &commonFloat;
 
+
+
+std::string ERROR_OCUPIER::toStr()
+{
+    std::ostringstream buffer;
+    buffer << "Oops!Something Wrong";
+    return buffer.str();
+}
+
+
 std::string IntType::toStr()
 {
     std::ostringstream buffer;

@@ -8,7 +8,9 @@ class Type
 private:
     int kind;
 protected:
-    enum {INT, VOID, FUNC, PTR, INT_ARRAY, FLOAT, FLOAT_ARRAY};
+    enum {INT, VOID, FUNC, PTR, INT_ARRAY, FLOAT, FLOAT_ARRAY,
+        ERROR
+    };
 public:
     Type(int kind) : kind(kind) {};
     virtual ~Type() {};
@@ -76,6 +78,13 @@ private:
     Type *valueType;
 public:
     PointerType(Type* valueType) : Type(Type::PTR) {this->valueType = valueType;};
+    std::string toStr();
+};
+
+class ERROR_OCUPIER : public Type
+{
+public:
+    ERROR_OCUPIER() :Type(Type::ERROR) {};
     std::string toStr();
 };
 

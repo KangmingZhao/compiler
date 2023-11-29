@@ -4,6 +4,10 @@
 #include <fstream>
 #include "Operand.h"
 
+#define LEGAL_VAR 0
+#define NOT_DEFINED 1
+#define REDEFINATION 2
+
 class SymbolEntry;
 class Unit;
 class Function;
@@ -156,6 +160,7 @@ class Id : public ExprNode
     int id_type;
     ArrDimNode* Dimension;
     InitNode* Init;
+    int define_state = LEGAL_VAR;
 public:
     enum { DEFAULT, INT_ARRAY, FUNCT };
 
@@ -166,6 +171,11 @@ public:
     //我震惊，原来ExprNode(se),  Dimension(nullptr).id_type(DEFAULT) 这种初始化方式，初始化的顺序要和声明的一样……c++白学了
     Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) { reset_dim_record(); };
     Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) { reset_dim_record(); };
+    
+    Id(SymbolEntry* se, int define_state) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr), define_state(define_state) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); };
+    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init), define_state(define_state) { reset_dim_record(); };
+    Id(SymbolEntry* se, ArrDimNode* Dimension, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr), define_state(define_state) { reset_dim_record(); };
+
     ArrDimNode* getDimension() { return Dimension; };
 
     void output(int level);

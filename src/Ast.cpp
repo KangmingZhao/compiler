@@ -676,11 +676,22 @@ void Id::output(int level)
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
             name.c_str(), scope, type.c_str());*/
+    
     std::string name, type;
     int scope;
     name = symbolEntry->toStr();
     type = symbolEntry->getType()->toStr();
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
+    if (define_state == NOT_DEFINED)
+    {
+        fprintf(yyout, "%*c\twarning,identifier %s is not defined\n", level, ' ',
+            name.c_str());
+    }
+    else if (define_state == REDEFINATION)
+    {
+        fprintf(yyout, "%*c\twarning,identifier %s is redefined\n", level, ' ',
+            name.c_str());
+    }
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
         name.c_str(), scope, type.c_str());
     if (id_type == INT_ARRAY)
