@@ -15,12 +15,28 @@
     int yylex();
     int yyerror( char const * );
 
+    std::vector<BreakStmt*> Break_stack;
+    bool Break_stack_ok_2_push_back = 0;
+    void loop_match_break(StmtNode* loopStmt)
+    {
+        if(Break_stack.size())
+        {
+            Break_stack[Break_stack.size() - 1]->match_with_loop(loopStmt);
+            Break_stack.pop_back();
+        }
+    }
 
     
-    
-    
-    
-
+    std::vector<ContinueStmt*> Continue_stack;
+    bool Continue_stack_ok_2_push_back = 0;
+    void loop_match_continue(StmtNode* loopStmt)
+    {
+        if(Continue_stack.size())
+        {
+            Continue_stack[Continue_stack.size() - 1]->match_with_loop(loopStmt);
+            Continue_stack.pop_back();
+        }
+    }
 }
 
 %code requires {
@@ -115,7 +131,7 @@ Stmt
     | ReturnStmt {$$=$1; }
     | DeclStmt {$$=$1; }
     | FuncDef {$$=$1; }
-    | WhileStmt { $$ = $1;}
+    | WhileStmt { $$ = $1; loop_match_break($1); loop_match_continue($1);}
     | ExprStmt { $$ = $1;}
     | BreakStmt { $$ = $1; }
     | ContinueStmt { $$ = $1; }
@@ -184,25 +200,40 @@ IfStmt
     ;
 
 WhileStmt
-    : WHILE LPAREN Cond RPAREN Stmt 
+    : WHILE
     {
-         $$ = new WhileStmt($3, $5);
+        Break_stack_ok_2_push_back = 1;
+        Continue_stack_ok_2_push_back = 1;
+    }
+    LPAREN Cond RPAREN Stmt 
+    {
+         $$ = new WhileStmt($4, $6);
     }
     ;
 BreakStmt 
     :
     BREAK SEMICOLON
     {
-        BreakStmt* temp = new BreakStmt(0);
+        BreakStmt* temp = new BreakStmt();
         $$ = temp;
+        if(Break_stack_ok_2_push_back)
+        {
+            Break_stack.push_back(temp);
+            Break_stack_ok_2_push_back = 0;
+        }
     }
 
 ContinueStmt
     :
     CONTINUE SEMICOLON
     {
-        ContinueStmt * temp = new ContinueStmt(0);
+        ContinueStmt * temp = new ContinueStmt();
         $$ = temp;
+        if(Continue_stack_ok_2_push_back)
+        {
+            Continue_stack.push_back(temp);
+            Continue_stack_ok_2_push_back = 0;
+        }
     }
 
 ExprStmt

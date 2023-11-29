@@ -1,3 +1,25 @@
 int main()
 {
+	break;
+	while(1)
+	{
+		break;
+		continue;
+		if(1)
+		{
+			continue;
+			break;
+			while(1)
+			{
+				if(1)
+				{
+					if(1)
+					{
+						break;
+					}
+					continue;
+				}
+			}
+		}
+	}
 }

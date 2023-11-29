@@ -353,24 +353,28 @@ public:
 };
 class BreakStmt : public StmtNode
 {
-    bool is_loop;
+    StmtNode* who_2_break;
+    bool whether_valid;
 public:
-    BreakStmt(bool is_loop) : is_loop(is_loop) {};
+    BreakStmt(StmtNode* who_2_break) : who_2_break(who_2_break) , whether_valid(1){};
+    BreakStmt() : who_2_break(nullptr), whether_valid(0) {};
     void output(int level);
-    void i_m_loop() { is_loop = 1; }
-    void i_m_not_loop() { is_loop = 0; }
+    void match_with_loop(StmtNode* who_2_break) { this->who_2_break = who_2_break; whether_valid = 1; }
     void typeCheck();
     void genCode();
 
 };
 class ContinueStmt : public StmtNode
 {
-    bool is_loop;
+    StmtNode* who_2_continue;
+    bool whether_valid;
 public:
-    ContinueStmt(bool is_loop) : is_loop(is_loop) {};
+    ContinueStmt(StmtNode* who_2_continue) : who_2_continue(who_2_continue), whether_valid(1) {};
+    ContinueStmt() : who_2_continue(nullptr), whether_valid(0) {};
+
     void output(int level);
-    void i_m_loop() { is_loop = 1; }
-    void i_m_not_loop() { is_loop = 0; }
+    void match_with_loop(StmtNode* who_2_continue) { this->who_2_continue = who_2_continue; whether_valid = 1; }
+
     void typeCheck();
     void genCode();
 

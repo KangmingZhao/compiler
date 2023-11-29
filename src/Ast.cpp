@@ -613,11 +613,17 @@ void WhileStmt::output(int level)
 }
 void BreakStmt::output(int level)
 {
-    fprintf(yyout, "%*cBreak\n", level, ' ');
+    if(whether_valid)
+        fprintf(yyout, "%*cBreak\n", level, ' ');
+    else
+        fprintf(yyout, "%*cerror,break not in loop\n", level, ' ');
 }
 void ContinueStmt::output(int level)
 {
-    fprintf(yyout, "%*cContinue\n", level, ' ');
+    if (whether_valid)
+        fprintf(yyout, "%*cContinue\n", level, ' ');
+    else
+        fprintf(yyout, "%*cerror,continue not in loop\n", level, ' ');
 }
 void EmptyStmt::output(int level) 
 {
