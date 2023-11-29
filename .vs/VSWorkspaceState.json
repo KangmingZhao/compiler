@@ -4,6 +4,6 @@
     "\\include",
     "\\src"
   ],
-  "SelectedNode": "\\src\\Type.cpp",
+  "SelectedNode": "\\src\\lexer.l",
   "PreviewInSolutionExplorer": false
 }

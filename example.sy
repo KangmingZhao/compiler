@@ -1,5 +1,14 @@
+int fuck()
+{
+	return 1;
+}
+void you()
+{
+	return;
+}
 int main()
 {
+	c = fuck() + you();
 	int a = 0;
 	int a;
 	b = 0;
@@ -14,7 +23,7 @@ int main()
 	{
 		break;
 		continue;
-		if(1)
+		if(1 + 1)
 		{
 			continue;
 			break;

@@ -208,6 +208,20 @@ void FunctionDef::typeCheck()
 void BinaryExpr::typeCheck()
 {
     // Todo
+    Type* type1 = expr1->getSymPtr()->getType();
+    Type * type2 = expr2->getSymPtr()->getType();
+    if (type1 != type2)
+    {
+        fprintf(stderr, "type %s and %s mismatch \n",
+          type1->toStr().c_str(), type2->toStr().c_str());
+        if (ERROR_MESSAGE_WRITE_INTO_AST)
+        {
+            fprintf(yyout, "type %s and %s mismatch \n",
+                type1->toStr().c_str(), type2->toStr().c_str());
+        }
+    }
+
+
 }
 
 void Constant::typeCheck()
@@ -416,6 +430,7 @@ std::string ExprNode::get_name()
 
 void BinaryExpr::output(int level)
 {
+    typeCheck();
     std::string op_str;
     switch (op)
     {
@@ -616,14 +631,20 @@ void BreakStmt::output(int level)
     if(whether_valid)
         fprintf(yyout, "%*cBreak\n", level, ' ');
     else
+    {
+        fprintf(stderr, "break not in loop \n");
         fprintf(yyout, "%*cerror,break not in loop\n", level, ' ');
+    }
 }
 void ContinueStmt::output(int level)
 {
     if (whether_valid)
         fprintf(yyout, "%*cContinue\n", level, ' ');
     else
+    {
+        fprintf(stderr, "continue not in loop \n");
         fprintf(yyout, "%*cerror,continue not in loop\n", level, ' ');
+    }
 }
 void EmptyStmt::output(int level) 
 {
@@ -682,15 +703,18 @@ void Id::output(int level)
     name = symbolEntry->toStr();
     type = symbolEntry->getType()->toStr();
     scope = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getScope();
-    if (define_state == NOT_DEFINED)
+    if (ERROR_MESSAGE_WRITE_INTO_AST)
     {
-        fprintf(yyout, "%*c\twarning,identifier %s is not defined\n", level, ' ',
-            name.c_str());
-    }
-    else if (define_state == REDEFINATION)
-    {
-        fprintf(yyout, "%*c\twarning,identifier %s is redefined\n", level, ' ',
-            name.c_str());
+        if (define_state == NOT_DEFINED)
+        {
+            fprintf(yyout, "%*c\twarning,identifier %s is not defined\n", level, ' ',
+                name.c_str());
+        }
+        else if (define_state == REDEFINATION)
+        {
+            fprintf(yyout, "%*c\twarning,identifier %s is redefined\n", level, ' ',
+                name.c_str());
+        }
     }
     fprintf(yyout, "%*cId\tname: %s\tscope: %d\ttype: %s\n", level, ' ',
         name.c_str(), scope, type.c_str());
@@ -750,7 +774,8 @@ void IfElseStmt::output(int level)
 void ReturnStmt::output(int level)
 {
     fprintf(yyout, "%*cReturnStmt\n", level, ' ');
-    retValue->output(level + 4);
+    if(retValue!=nullptr)
+        retValue->output(level + 4);
 }
 
 void AssignStmt::output(int level)

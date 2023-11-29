@@ -271,6 +271,10 @@ ReturnStmt
     RETURN Exp SEMICOLON{
         $$ = new ReturnStmt($2);
     }
+    |
+    RETURN SEMICOLON{
+        $$ = new ReturnStmt();
+    }
     ;
 
 Exp

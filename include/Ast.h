@@ -4,6 +4,8 @@
 #include <fstream>
 #include "Operand.h"
 
+#define ERROR_MESSAGE_WRITE_INTO_AST 1
+
 #define LEGAL_VAR 0
 #define NOT_DEFINED 1
 #define REDEFINATION 2
@@ -314,6 +316,7 @@ private:
     ExprNode *retValue;
 public:
     ReturnStmt(ExprNode*retValue) : retValue(retValue) {};
+    ReturnStmt() : retValue(nullptr) {};
     void output(int level);
     void typeCheck();
     void genCode();
