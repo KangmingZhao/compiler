@@ -5,6 +5,8 @@
 #include "IRBuilder.h"
 #include <string>
 #include "Type.h"
+#include <assert.h>
+
 
 extern FILE *yyout;
 int Node::counter = 0;
@@ -399,6 +401,10 @@ void UnaryExpr::genCode()
 //上面是奇奇怪怪的东西。
 
 
+std::string ExprNode::get_name()
+{
+    return symbolEntry->toStr();
+}
 
 
 
@@ -634,11 +640,25 @@ void Ast::output()
 
 void Constant::output(int level)
 {
+    //std::string type, value;
+    //type = symbolEntry->getType()->toStr();
+    //value = symbolEntry->toStr();
+    //fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+    //        value.c_str(), type.c_str());
     std::string type, value;
     type = symbolEntry->getType()->toStr();
     value = symbolEntry->toStr();
-    fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+    if (this->symbolEntry->getType()->isInt())
+    {
+        fprintf(yyout, "%*cIntegerLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
+    }
+    else if (this->symbolEntry->getType()->isFLOAT())
+    {
+        //好就好在symbolentry里面已经把浮点数、整数都转化为字符串了，这里就直接%s就好了不用在管占位符了
+        fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
+            value.c_str(), type.c_str());
+    }
 }
 
 void Id::output(int level)
@@ -697,8 +717,17 @@ void IfElseStmt::output(int level)
 {
     fprintf(yyout, "%*cIfElseStmt\n", level, ' ');
     cond->output(level + 4);
-    thenStmt->output(level + 4);
-    elseStmt->output(level + 4);
+ /* thenStmt->output(level + 4);
+    elseStmt->output(level + 4);*/
+
+    if (thenStmt != nullptr)
+    {
+        thenStmt->output(level + 4);
+    }
+    if (elseStmt != nullptr)
+    {
+        elseStmt->output(level + 4);
+    }
 }
 
 void ReturnStmt::output(int level)
@@ -724,12 +753,17 @@ void FunctionDef::output(int level)
     //stmt->output(level + 4);
 
     std::string name, type;
+    if (se == nullptr)
+    {
+        fprintf(stderr, "Oops!意外错误！\n");//打印这个变量没有定义
+        assert(se != nullptr);      //抛出一个断言错误
+    }
     name = se->toStr();
     type = se->getType()->toStr();
     fprintf(yyout, "%*cFunctionDefine function name: %s, type: %s\n", level, ' ',
         name.c_str(), type.c_str());
     if (paraStmt != nullptr)
         paraStmt->output(level + 4);
-    if (blockStmt != nullptr)
-        blockStmt->output(level + 4);
+    if (stmt != nullptr)
+        stmt->output(level + 4);
 }

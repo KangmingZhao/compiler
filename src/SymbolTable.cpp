@@ -105,6 +105,17 @@ SymbolEntry* SymbolTable::lookup(std::string name)
     return nullptr;
 }
 
+SymbolEntry* SymbolTable::lookup_in_present_domain(std::string name)
+{
+    SymbolTable* temp = this;
+    std::map<std::string, SymbolEntry*>::iterator it = temp->symbolTable.find(name);
+    if (it != temp->symbolTable.end()) {
+        // ÕÒµ½ÁËname
+        return temp->symbolTable[name];
+    }
+    return nullptr;
+}
+
 // install the entry into current symbol table.
 void SymbolTable::install(std::string name, SymbolEntry* entry)
 {

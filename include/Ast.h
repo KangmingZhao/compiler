@@ -41,6 +41,7 @@ protected:
     Operand *dst;   // The result of the subtree is stored into dst.
 public:
     ExprNode(SymbolEntry *symbolEntry) : symbolEntry(symbolEntry){};
+    std::string get_name();
     SymbolEntry* get_symbolEntry() { return symbolEntry; };
     Operand* getOperand() {return dst;};
     SymbolEntry* getSymPtr() {return symbolEntry;};
@@ -325,12 +326,10 @@ class FunctionDef : public StmtNode
 private:
     SymbolEntry *se;
     StmtNode *stmt;    
-
-    StmtNode* blockStmt;
     ParaNode* paraStmt;
 public:
     FunctionDef(SymbolEntry *se, StmtNode *stmt) : se(se), stmt(stmt){};
-    FunctionDef(SymbolEntry* se, StmtNode* blockStmt, ParaNode* paraStmt) : se(se), blockStmt(blockStmt), paraStmt(paraStmt) {};
+    FunctionDef(SymbolEntry* se, StmtNode* stmt, ParaNode* paraStmt) : se(se), stmt(stmt), paraStmt(paraStmt) {};
     void output(int level);
     void typeCheck();
     void genCode();

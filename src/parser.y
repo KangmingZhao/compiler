@@ -4,17 +4,30 @@
     #include "parser.h"
     #include <vector>
     extern Ast ast;
+
+    //ArrDimNode** now_arrdim;
+    //int now_arrindex;
+    //我们会在stmt后面加上BREAK SEMICOLON的识别，然后只有在blockstmt中会处理某一个作用域是不是在while内部的。因为其他的表达式
+    //要么只能装表达式不能装break，要么自己就是break。
+    
+    Type  *declType;
+    std::vector<Type*> FuncParamsVector;
     int yylex();
     int yyerror( char const * );
 
-    Type  *declType;
-    std::vector<Type*> FuncParamsVector;
+
+    
+    
+    
+    
+
 }
 
 %code requires {
     #include "Ast.h"
     #include "SymbolTable.h"
     #include "Type.h"
+
 }
 
 %initial-action {
@@ -53,12 +66,13 @@
 
 }
 
+
+/* 这里的INTEGER、FLOATPOINT是具体数据，INT和FLOAT是数据类型 */
+
 %start Program
 %token <strtype> ID 
 %token <itype> INTEGER
-
 %token <fltype> FLOATPOINT
-
 %token IF ELSE WHILE
 %token INT VOID FLOAT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA NOT
@@ -67,19 +81,17 @@
 
 
 
-%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt FuncDef
 
 
-%nterm <stmttype> WhileStmt ExprStmt BreakStmt ContinueStmt EmptyStmt
-%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt 
-%nterm <exprtype> InitVal FunctCall
+%nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt  WhileStmt ExprStmt BreakStmt ContinueStmt
+%nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall 
+%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt  EmptyStmt
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
+
+
+%nterm <stmttype> FuncDef 
 %nterm <paratype> PARAMENT_LISTS PARAMENT_LIST
-
-
-%nterm <exprtype> Exp AddExp Cond LOrExp PrimaryExp LVal RelExp LAndExp
-%nterm <exprtype> MulExp UnaryExp
 %nterm <type> Type
 
 %precedence THEN
@@ -100,9 +112,9 @@ Stmt
     : AssignStmt {$$=$1;}
     | BlockStmt {$$=$1;}
     | IfStmt {$$=$1;}
-    | ReturnStmt {$$=$1;}
-    | DeclStmt {$$=$1;}
-    | FuncDef {$$=$1;}
+    | ReturnStmt {$$=$1; }
+    | DeclStmt {$$=$1; }
+    | FuncDef {$$=$1; }
     | WhileStmt { $$ = $1;}
     | ExprStmt { $$ = $1;}
     | BreakStmt { $$ = $1; }
@@ -112,14 +124,14 @@ Stmt
 LVal
     : ID {
         SymbolEntry *se;
-        se = identifiers->lookup($1);
-        if(se == nullptr)
+        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID。
+        if(se == nullptr) //如果没有
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
             delete [](char*)$1;
-            assert(se != nullptr);
+            assert(se != nullptr);      //抛出一个断言错误
         }
-        $$ = new Id(se);
+        $$ = new Id(se);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
         delete []$1;
     }
     |
@@ -147,7 +159,8 @@ AssignStmt
     ;
 BlockStmt
     :   LBRACE 
-        {identifiers = new SymbolTable(identifiers);} 
+        {identifiers = new SymbolTable(identifiers); 
+        } 
         Stmts RBRACE 
         {
             $$ = new CompoundStmt($3);
@@ -155,6 +168,11 @@ BlockStmt
             identifiers = identifiers->getPrev();
             delete top;
         }
+    |
+    LBRACE RBRACE
+    {
+        $$ = new EmptyStmt();
+    }
     ;
 IfStmt
     : IF LPAREN Cond RPAREN Stmt %prec THEN {
@@ -164,13 +182,7 @@ IfStmt
         $$ = new IfElseStmt($3, $5, $7);
     }
     ;
-ReturnStmt
-    :
-    RETURN Exp SEMICOLON{
-        $$ = new ReturnStmt($2);
-    }
-    ;
-    
+
 WhileStmt
     : WHILE LPAREN Cond RPAREN Stmt 
     {
@@ -198,25 +210,13 @@ ExprStmt
         
     }
     ;
-EmptyStmt
+
+ReturnStmt
     :
-     SEMICOLON{
-        $$ = new EmptyStmt();
+    RETURN Exp SEMICOLON{
+        $$ = new ReturnStmt($2);
     }
     ;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Exp
     :
@@ -250,6 +250,93 @@ PrimaryExp
     }
     ;
 
+// 识别;
+EmptyStmt
+    :
+     SEMICOLON{
+        $$ = new EmptyStmt();
+    }
+    ;
+
+PARAMENT_LISTS
+    :
+    PARAMENT_LISTS COMMA PARAMENT_LIST
+    {
+        $$ = new ParaNode($1,$3);
+    }
+    |
+    PARAMENT_LIST
+    {
+        $$ = $1;
+    }
+    ;
+
+PARAMENT_LIST
+    :
+    Exp
+    {
+        $$ = new ParaNode($1);
+    }
+    |
+    %empty { $$ = nullptr ;}
+    |
+    Type ID {
+        SymbolEntry *se;
+        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
+        identifiers->install($2, se);
+        $$ = new ParaNode(new Id(se));
+        delete []$2;
+        FuncParamsVector.push_back($1);
+    }
+    ;
+
+
+FunctCall
+    :
+    ID LPAREN PARAMENT_LISTS RPAREN
+    {   
+        SymbolEntry *se;
+        se = identifiers->lookup($1); 
+        if(se == nullptr) //如果没有
+        {
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
+            delete [](char*)$1;
+            assert(se != nullptr);      //抛出一个断言错误
+        }
+        $$ = new FunctCall(se, $3);
+    }
+    ;
+// 函数定义 Funcdef->
+FuncDef
+    :
+    Type ID{
+        SymbolEntry *se = new IdentifierSymbolEntry(nullptr, $2, identifiers->getLevel());
+        identifiers->install($2, se);
+        identifiers = new SymbolTable(identifiers);
+    }
+    LPAREN PARAMENT_LISTS RPAREN
+    {
+        FunctionType *funcType;
+        funcType=new FunctionType($1,{});
+        FuncParamsVector.swap(funcType->paramsType);
+
+        SymbolEntry *se;
+        se = identifiers->lookup($2);
+        IdentifierSymbolEntry* ss=(IdentifierSymbolEntry*)se;
+        ss->setFuncType(((Type*)funcType));
+    }
+    BlockStmt
+    {
+        SymbolEntry *se;
+        se = identifiers->lookup($2);
+        assert(se != nullptr);
+        $$ = new FunctionDef(se, $8,$5);
+        SymbolTable *top = identifiers;
+        identifiers = identifiers->getPrev();
+        delete top;
+        delete []$2;
+    }
+// 单目运算
 UnaryExp
     :
     PrimaryExp {
@@ -327,7 +414,6 @@ MulExp
     }
     ;
 
-
 AddExp
     :
     Exp INCREMENT
@@ -399,7 +485,6 @@ AddExp
         }
     }
     ;
-
 
 
 RelExp
@@ -533,11 +618,6 @@ LOrExp
         }
     }
     ;
-
-
-
-
-
 Type
     : INT {
         $$ = TypeSystem::intType;
@@ -554,6 +634,7 @@ Type
 
     }
     ;
+
 
 
 
@@ -633,7 +714,8 @@ DeclStmt
 VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
-    ;
+    
+        ;
 
 
 // 常量 const +一堆；
@@ -701,92 +783,67 @@ ConstDeclList
     }
     ;
 
+// ----------------------------------
+// DeclStmt
+//     :
+//     Type ID SEMICOLON {
+//         SymbolEntry *se;
+//         se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
+//         identifiers->install($2, se);
+//         $$ = new DeclStmt(new Id(se));
+//         delete []$2;
+//     }
+//     |
+//     Type ID ArrDimensions ArrInit SEMICOLON {
+//         SymbolEntry *se;
+//         if($1->isInt())
+//         {
+//             INT_arrayType * temp = new INT_arrayType();
+//             se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+//         }
+//         else
+//         {
+//             FLOAT_arrayType * temp = new FLOAT_arrayType();
+//             se = new IdentifierSymbolEntry(temp, $2, identifiers->getLevel());
+//         }
+//         identifiers->install($2, se);
+//         $$ = new DeclStmt(new Id(se, $3, $4));
+//         delete []$2;
+//     }
+//     ;
 InitVal
     :
     Exp { $$=$1;}
-    ;    
-
-
-
-PARAMENT_LISTS
-    :
-    PARAMENT_LISTS COMMA PARAMENT_LIST
-    {
-        $$ = new ParaNode($1,$3);
-    }
-    |
-    PARAMENT_LIST
-    {
-        $$ = $1;
-    }
-    ;
-
-PARAMENT_LIST
-    :
-    Exp
-    {
-        $$ = new ParaNode($1);
-    }
-    |
-    %empty { $$ = nullptr ;}
-    |
-    Type ID {
-        SymbolEntry *se;
-        se = new IdentifierSymbolEntry($1, $2, identifiers->getLevel());
-        identifiers->install($2, se);
-        $$ = new ParaNode(new Id(se));
-        delete []$2;
-        FuncParamsVector.push_back($1);
-    }
     ;
 
 
-FunctCall
-    :
-    ID LPAREN PARAMENT_LISTS RPAREN
-    {   
-        SymbolEntry *se;
-        se = identifiers->lookup($1); 
-        if(se == nullptr) //如果没有
-        {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//打印这个变量没有定义
-            delete [](char*)$1;
-            assert(se != nullptr);      //抛出一个断言错误
-        }
-        $$ = new FunctCall(se, $3);
-    }
-    ;
 
-FuncDef
-    :
-    Type ID{
-        SymbolEntry *se = new IdentifierSymbolEntry(nullptr, $2, identifiers->getLevel());
-        identifiers->install($2, se);
-        identifiers = new SymbolTable(identifiers);
-    }
-    LPAREN PARAMENT_LISTS RPAREN
-    {
-        FunctionType *funcType;
-        funcType=new FunctionType($1,{});
-        FuncParamsVector.swap(funcType->paramsType);
 
-        SymbolEntry *se;
-        se = identifiers->lookup($2);
-        IdentifierSymbolEntry* ss=(IdentifierSymbolEntry*)se;
-        ss->setFuncType(((Type*)funcType));
-    }
-    BlockStmt
-    {
-        SymbolEntry *se;
-        se = identifiers->lookup($2);
-        assert(se != nullptr);
-        $$ = new FunctionDef(se, $8,$5);
-        SymbolTable *top = identifiers;
-        identifiers = identifiers->getPrev();
-        delete top;
-        delete []$2;
-    }
-    ;
+// FuncDef
+//     :
+//     Type ID {
+//         Type *funcType;
+//         funcType = new FunctionType($1,{});
+//         SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
+//         identifiers->install($2, se);
+//         identifiers = new SymbolTable(identifiers);
+//     }
+//     LPAREN RPAREN
+//     {
+      
+//     }
+//     BlockStmt
+//     {
+//         SymbolEntry *se;
+//         se = identifiers->lookup($2);
+//         assert(se != nullptr);
+//         $$ = new FunctionDef(se, $6);
+//         SymbolTable *top = identifiers;
+//         identifiers = identifiers->getPrev();
+//         delete top;
+//         delete []$2;
+//     }
+//     ;
 %%
 
 int yyerror(char const* message)
@@ -794,3 +851,4 @@ int yyerror(char const* message)
     std::cerr<<message<<std::endl;
     return -1;
 }
+// 
