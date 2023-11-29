@@ -4,6 +4,6 @@
     "\\include",
     "\\src"
   ],
-  "SelectedNode": "\\include\\Type.h",
+  "SelectedNode": "\\src\\Ast.cpp",
   "PreviewInSolutionExplorer": false
 }

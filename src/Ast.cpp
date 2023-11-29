@@ -269,9 +269,6 @@ DeclInitStmt
 ConstDeclInitStmt
 DeclList
 ConstDeclList
-FuncCall
-FuncRParam
-FuncFParam
 WhileStmt
 BreakStmt
 ContinueStmt
@@ -322,32 +319,7 @@ void WhileStmt::genCode()
 
 }
 
-void FuncFParam::typeCheck()
-{
 
-}
-void FuncFParam::genCode()
-{
-
-}
-
-void FuncRParam::typeCheck()
-{
-
-}
-void FuncRParam::genCode()
-{
-
-}
-
-void FuncCall::typeCheck()
-{
-
-}
-void FuncCall::genCode()
-{
-
-}
 
 void ConstDeclList::typeCheck()
 {
@@ -635,31 +607,15 @@ void WhileStmt::output(int level)
 }
 void BreakStmt::output(int level)
 {
-    if (is_loop)
-        fprintf(yyout, "%*cBreak\n", level, ' ');
-    else
-        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+    fprintf(yyout, "%*cBreak\n", level, ' ');
 }
 void ContinueStmt::output(int level)
 {
-    if (is_loop)
-        fprintf(yyout, "%*cContinue\n", level, ' ');
-    else
-        fprintf(yyout, "%*cERROR!this is not a loop baster!\n", level, ' ');
+    fprintf(yyout, "%*cContinue\n", level, ' ');
 }
 void EmptyStmt::output(int level) 
 {
 
-}
-void FuncCall::output(int level)
-{
-    fprintf(yyout, "%*cFuncCall\n", level, ' ');
-    if (FuncName != nullptr)
-        FuncName->output(level + 4);
-    else
-        fprintf(yyout, "%*cFunction not declare!\n", level + 4, ' ');
-    if (FuncRParams != nullptr)
-        FuncRParams->output(level + 4);
 }
 void DoNothingStmt::output(int level)
 {
@@ -760,10 +716,20 @@ void AssignStmt::output(int level)
 
 void FunctionDef::output(int level)
 {
+    //std::string name, type;
+    //name = se->toStr();
+    //type = se->getType()->toStr();
+    //fprintf(yyout, "%*cFunctionDefine function name: %s, type: %s\n", level, ' ', 
+    //        name.c_str(), type.c_str());
+    //stmt->output(level + 4);
+
     std::string name, type;
     name = se->toStr();
     type = se->getType()->toStr();
-    fprintf(yyout, "%*cFunctionDefine function name: %s, type: %s\n", level, ' ', 
-            name.c_str(), type.c_str());
-    stmt->output(level + 4);
+    fprintf(yyout, "%*cFunctionDefine function name: %s, type: %s\n", level, ' ',
+        name.c_str(), type.c_str());
+    if (paraStmt != nullptr)
+        paraStmt->output(level + 4);
+    if (blockStmt != nullptr)
+        blockStmt->output(level + 4);
 }

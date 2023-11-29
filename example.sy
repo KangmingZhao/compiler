@@ -1,4 +1,4 @@
-/*
+
 int dec2bin(int a)
 {
     int res;
@@ -18,7 +18,8 @@ int dec2bin(int a)
    return res;
 
 }
-*/
+
+
 
 int main()
 {

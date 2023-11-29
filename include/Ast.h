@@ -338,41 +338,6 @@ public:
 
 
 
-//函数调用
-class FuncCall : public ExprNode
-{
-private:
-    ExprNode* FuncName;
-    ExprNode* FuncRParams;
-public:
-    FuncCall(SymbolEntry* se, ExprNode* FuncName, ExprNode* FuncRParams) :ExprNode(se), FuncName(FuncName), FuncRParams(FuncRParams) {};
-    void output(int level);
-    void typeCheck();
-    void genCode();
-};
-
-//实参
-class FuncRParam : public ExprNode
-{
-private:
-    ExprNode* param1, * param2;
-public:
-    FuncRParam(SymbolEntry* se, ExprNode* param1, ExprNode* param2) :ExprNode(se), param1(param1), param2(param2) {};
-    void output(int level);
-    void typeCheck();
-    void genCode();
-};
-// 形参
-class FuncFParam : public StmtNode
-{
-private:
-    StmtNode* param1, * param2;
-public:
-    FuncFParam(StmtNode* param1, StmtNode* param2) : param1(param1), param2(param2) {};
-    void output(int level);
-    void typeCheck();
-    void genCode();
-};
 
 
 class WhileStmt : public StmtNode

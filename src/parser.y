@@ -759,20 +759,28 @@ FunctCall
 
 FuncDef
     :
-    Type ID {
-        Type *funcType;
-        funcType = new FunctionType($1,{});
-        SymbolEntry *se = new IdentifierSymbolEntry(funcType, $2, identifiers->getLevel());
+    Type ID{
+        SymbolEntry *se = new IdentifierSymbolEntry(nullptr, $2, identifiers->getLevel());
         identifiers->install($2, se);
         identifiers = new SymbolTable(identifiers);
     }
-    LPAREN RPAREN
+    LPAREN PARAMENT_LISTS RPAREN
+    {
+        FunctionType *funcType;
+        funcType=new FunctionType($1,{});
+        FuncParamsVector.swap(funcType->paramsType);
+
+        SymbolEntry *se;
+        se = identifiers->lookup($2);
+        IdentifierSymbolEntry* ss=(IdentifierSymbolEntry*)se;
+        ss->setFuncType(((Type*)funcType));
+    }
     BlockStmt
     {
         SymbolEntry *se;
         se = identifiers->lookup($2);
         assert(se != nullptr);
-        $$ = new FunctionDef(se, $6);
+        $$ = new FunctionDef(se, $8,$5);
         SymbolTable *top = identifiers;
         identifiers = identifiers->getPrev();
         delete top;
