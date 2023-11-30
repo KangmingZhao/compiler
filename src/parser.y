@@ -39,6 +39,8 @@
     }
 
     int arr_dimension_recorder = 0;
+
+    ArrDimNode::ArrDimNode_STATE arrDimNode_state;
 }
 
 %code requires {
@@ -167,7 +169,11 @@ LVal
         }
     }
     |
-    ID ArrDimensions
+    ID
+    {
+        arrDimNode_state = ArrDimNode::ACCESS;
+    }
+    ArrDimensions
     {
         //我们知道数组的访问是可以作为左值的。
         int state = 0;
@@ -188,7 +194,7 @@ LVal
         }
         else
         {
-            $$ = new Id(se, $2, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
+            $$ = new Id(se, $3, state);    //给这里$$赋一个ID子类的表达式结点。用来输出的/
             if(se->get_arr_dimension_recorder() < arr_dimension_recorder)
                 fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//打印这个访问超过了
             arr_dimension_recorder = 0;
@@ -750,7 +756,7 @@ ArrDimension
     LBRACKET Exp RBRACKET
     {
         arr_dimension_recorder++;
-        $$ = new ArrDimNode($2);
+        $$ = new ArrDimNode($2,arrDimNode_state);
     }
     |
     LBRACKET RBRACKET
@@ -836,7 +842,7 @@ IdDeclList
         delete []$1;
     }
     |
-    ID ArrDimensions ArrInit  {
+    ID { arrDimNode_state = ArrDimNode::INIT; } ArrDimensions ArrInit  {
 
             int state = LEGAL_VAR;
         
@@ -862,7 +868,7 @@ IdDeclList
                 se = new IdentifierSymbolEntry(temp, $1, identifiers->getLevel());
             }
             identifiers->install($1, se);
-            $$ = new DeclStmt(new Id(se, $2, $3, state, arr_dimension_recorder));
+            $$ = new DeclStmt(new Id(se, $3, $4, state, arr_dimension_recorder));
             arr_dimension_recorder = 0;
             delete []$1;
         }
@@ -879,7 +885,7 @@ ConstDeclList
     :
     ID ASSIGN InitVal {
         SymbolEntry *se;
-        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
+        se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel(), $3);
         identifiers->install($1, se);
         $$ = new ConstDeclInitStmt(new Id(se),$3);
         delete []$1;

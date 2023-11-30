@@ -184,11 +184,14 @@ class ArrDimNode : public Node //: public ExprNode
 
     enum ArrDimNode_TYPE {INT, FLOAT};
     ArrDimNode_TYPE node_type;
+
 public:
+    enum ArrDimNode_STATE { ACCESS, INIT };
+    ArrDimNode_STATE node_state;
     ArrDimNode(ArrDimNode* arr1, ArrDimNode* arr2) : arr1(arr1), arr2(arr2), dimension_size(nullptr) { 
         is_link = 1;
     };
-    ArrDimNode(ExprNode* dimension_size) : dimension_size(dimension_size) { 
+    ArrDimNode(ExprNode* dimension_size, ArrDimNode_STATE node_state) : dimension_size(dimension_size), node_state(node_state){
         is_link = 0;
         is_not_val = judge_is_not_val(dimension_size);
     };
@@ -268,27 +271,31 @@ class Id : public ExprNode
     int define_state = LEGAL_VAR;
     int dimension_size;
 
-    void init_val_state() {
-        is_not_val = 0;
+    void init_val_state(SymbolEntry* se) {
+        if (se->isConstIdentifer())
+            is_not_val = 1;
+        else
+            is_not_val = 0;
+            
     }
 public:
     enum { DEFAULT, INT_ARRAY, FUNCT };
 
-    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state(); };
+    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state(se); };
     
     
     
     //我震惊，原来ExprNode(se),  Dimension(nullptr).id_type(DEFAULT) 这种初始化方式，初始化的顺序要和声明的一样……c++白学了
-    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) { reset_dim_record();  init_val_state();};
-    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) { reset_dim_record(); init_val_state();};
+    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) { reset_dim_record();  init_val_state(se);};
+    Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) { reset_dim_record(); init_val_state(se);};
     
-    Id(SymbolEntry* se, int define_state) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr), define_state(define_state) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state();};
+    Id(SymbolEntry* se, int define_state) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr), define_state(define_state) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state(se);};
     
     
     //用于数组初始化
-    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init, int define_state, int dimension_size) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init), define_state(define_state), dimension_size(dimension_size) { reset_dim_record(); se->update_arr_dimension_recorder(dimension_size); init_val_state();};
+    Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init, int define_state, int dimension_size) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init), define_state(define_state), dimension_size(dimension_size) { reset_dim_record(); se->update_arr_dimension_recorder(dimension_size); init_val_state(se);};
     //用于读取数组下标
-    Id(SymbolEntry* se, ArrDimNode* Dimension, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr), define_state(define_state) { reset_dim_record();init_val_state(); };
+    Id(SymbolEntry* se, ArrDimNode* Dimension, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr), define_state(define_state) { reset_dim_record();init_val_state(se); };
 
     ArrDimNode* getDimension() { return Dimension; };
 
@@ -305,7 +312,15 @@ public:
         }
     }
 
-    float cal_expr_val() { return PRE_CAL_ERROR_MEETING_VAL; }//直接返回非法。先不考虑const
+    float cal_expr_val() { 
+        if (getSymPtr()->isConstIdentifer())
+        {
+            return ((IdentifierSymbolEntry*)getSymPtr())->getValueExpr()->cal_expr_val();
+        }
+        else
+            return PRE_CAL_ERROR_MEETING_VAL;
+            
+    }//直接返回非法。先不考虑const
 };
 
 class StmtNode : public Node

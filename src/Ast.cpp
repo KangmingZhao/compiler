@@ -207,7 +207,7 @@ void FunctionDef::typeCheck()
 void BinaryExpr::typeCheck()
 {
     // Todo
-    Type* type1 = expr1->getSymPtr()->getType();
+    /*Type* type1 = expr1->getSymPtr()->getType();
     Type * type2 = expr2->getSymPtr()->getType();
     if (type1 != type2)
     {
@@ -218,9 +218,39 @@ void BinaryExpr::typeCheck()
             fprintf(yyout, "type %s and %s mismatch \n",
                 type1->toStr().c_str(), type2->toStr().c_str());
         }
+    }*/
+
+    Type* type1 = expr1->getSymPtr()->getType();
+    Type* type2 = expr2->getSymPtr()->getType();
+
+    Type* Prior = type1->getKindValue() > type2->getKindValue() ? type1 : type2;
+    Type* later = type1->getKindValue() < type2->getKindValue() ? type1 : type2;
+
+
+    if (type1->get_range() != type2->get_range())
+    {
+        fprintf(stderr, "type %s and %s mismatch \n",
+            type1->toStr().c_str(), type2->toStr().c_str());
+        if (ERROR_MESSAGE_WRITE_INTO_AST)
+        {
+            fprintf(yyout, "type %s and %s mismatch \n",
+                type1->toStr().c_str(), type2->toStr().c_str());
+        }
     }
-
-
+    else
+    {
+        if (type1->getKindValue() != type2->getKindValue())
+        {
+            fprintf(stderr, "type %s and %s mismatch , but we convert %s to %s for you \n",
+                type1->toStr().c_str(), type2->toStr().c_str(),
+                later->toStr().c_str(), Prior->toStr().c_str());
+            if (ERROR_MESSAGE_WRITE_INTO_AST)
+            {
+                fprintf(yyout, "type %s and %s mismatch , but we convert %s to %s for you \n",
+                    type1->toStr().c_str(), type2->toStr().c_str(), later->toStr().c_str(), Prior->toStr().c_str());
+            }
+        }
+    }
 }
 
 void Constant::typeCheck()
@@ -266,10 +296,17 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
+    //首先检查复制对象是不是const。
+    if (lval->get_symbolEntry()->isConstIdentifer())
+    {
+        fprintf(stderr, "identifier \"%s\" is const\n", lval->get_name().c_str());
+    }
+
 
     Type* type1 = lval->getSymPtr()->getType();
     Type* type2 = expr->getSymPtr()->getType();
-    if (type1 != type2)
+
+    if (type1->get_range() != type2->get_range())
     {
         fprintf(stderr, "type %s and %s mismatch \n",
             type1->toStr().c_str(), type2->toStr().c_str());
@@ -279,6 +316,30 @@ void AssignStmt::typeCheck()
                 type1->toStr().c_str(), type2->toStr().c_str());
         }
     }
+    else
+    {
+        if (type1->getKindValue() != type2->getKindValue())
+        {
+            fprintf(stderr, "type %s and %s mismatch , but we convert %s to %s for you \n",
+                type1->toStr().c_str(), type2->toStr().c_str(), type2->toStr().c_str(), type1->toStr().c_str());
+            if (ERROR_MESSAGE_WRITE_INTO_AST)
+            {
+                fprintf(yyout, "type %s and %s mismatch , but we convert %s to %s for you \n",
+                    type1->toStr().c_str(), type2->toStr().c_str(), type2->toStr().c_str(), type1->toStr().c_str());
+            }
+        }
+    }
+
+    //if (type1 != type2)
+    //{
+    //    fprintf(stderr, "type %s and %s mismatch \n",
+    //        type1->toStr().c_str(), type2->toStr().c_str());
+    //    if (ERROR_MESSAGE_WRITE_INTO_AST)
+    //    {
+    //        fprintf(yyout, "type %s and %s mismatch \n",
+    //            type1->toStr().c_str(), type2->toStr().c_str());
+    //    }
+    //}
 }
 
 
@@ -304,7 +365,12 @@ DoNothingStmt*/
 
 void ArrDimNode::typeCheck()
 {
-
+    //这里要检查传进来的是不是i32。因为是访问下标，什么void和float都不行。
+    if (!dimension_size->get_symbolEntry()->getType()->isInt())
+    {
+        fprintf(stderr, "i32 is needed, but %s is given \n",
+            dimension_size->get_symbolEntry()->getType()->toStr().c_str());
+    }
 }
 void ArrDimNode::genCode()
 {
@@ -611,13 +677,22 @@ void ArrDimNode::output(int level)
     }
     else
     {
-        fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
+        typeCheck();
+        if(node_state == ACCESS)
+            fprintf(yyout, "%*c\t\taccessing_pos:\n", level, ' ');
+        else
+            fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
         if (is_not_val)
             fprintf(yyout, "%*c\t\t%d\n", level, ' ', (int)dimension_size->cal_expr_val());
             //std::cout << dimension_size->cal_expr_val() << std::endl;
         else
-            //报错
-            fprintf(stderr, "not a const \n");
+        {
+            if (node_state == ACCESS)
+                dimension_size->output(level + 20);
+            else
+                //报错
+                fprintf(stderr, "not a const \n");
+        }
         //dimension_size->output(level + 20);
     }
 }

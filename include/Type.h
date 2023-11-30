@@ -8,8 +8,22 @@ class Type
 private:
     int kind;
 protected:
-    enum {INT, VOID, FUNC, PTR, INT_ARRAY, FLOAT, FLOAT_ARRAY,
+    /*enum {INT, VOID, FUNC, PTR, INT_ARRAY, FLOAT, FLOAT_ARRAY,
         ERROR
+    };*/
+    //这里重新排序一下，数值的大小代表优先级，在隐式转换时，优先级低的会被转为优先级高的。
+    enum {
+        ERROR,
+        VOID, FUNC, PTR,
+
+        //警戒线一，不会被赋值，但是隐式转换时会判断是不是在同一个区间里面，如果不在那么拒绝隐式转换。
+        //在同一个区间内的转换，如果是赋值语句，那么根据要付给谁来隐士转换。否则优先级低的变为优先级高的。
+        from_now_on_is_array,
+        INT_ARRAY, FLOAT_ARRAY,
+
+        //警戒线二
+        from_now_on_is_single_data,
+        INT,FLOAT,  
     };
 public:
     Type(int kind) : kind(kind) {};
@@ -21,6 +35,17 @@ public:
     bool isINT_ARRAY() const { return kind == INT_ARRAY; };
     bool isFLOAT() const { return kind == FLOAT; };
     bool isFLOAT_ARRAY() const { return kind == FLOAT_ARRAY; };
+
+    int getKindValue() { return kind; };
+    int get_range()
+    {
+        if (kind < from_now_on_is_array)
+            return 0;
+        else if (kind < from_now_on_is_single_data)
+            return 1;
+        else
+            return 2;
+    }
 };
 
 class IntType : public Type

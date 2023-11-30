@@ -1,9 +1,30 @@
+void fuckyou()
+{
+}
 int main()
 {	
+
+	float test_binary_f = 11;
+	int test_binary_i = 1;
+	test_binary_f + test_binary_i;
+
+	const int test_const = 1+1+1+4;
+	float test_assign = 1;
+	test_assign = test_const;
+	test_const = test_assign;
+
+
+	
+
+	const int minx = 1 + 1 + 1;
+	int you_minx[minx];
+	int fuckme = minx + 1;
 	int test, fuck;
 	int b = -1 + 1 + 4 + 5 + 1 + 4;
 	int d = test + 1 + 1 + 1 + fuck;
 	int a[1+1+1+2][2+34];
 	int c[1 + 2 + 3 + b + 4];
+	a[fuckyou()];
+	
 	1 + 1+ 1;
 }

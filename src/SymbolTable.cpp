@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include "Type.h"
-
+#include "Ast.h"
 
 SymbolEntry::SymbolEntry(Type *type, int kind) 
 {
@@ -43,6 +43,13 @@ IdentifierSymbolEntry::IdentifierSymbolEntry(Type *type, std::string name, int s
     this->scope = scope;
     addr = nullptr;
 }
+
+IdentifierSymbolEntry::IdentifierSymbolEntry(Type* type, std::string name, int scope, ExprNode* valueExpr) : SymbolEntry(type, SymbolEntry::CONSTIDENTIFER), name(name), valueExpr(valueExpr)
+{
+    this->scope = scope;
+    addr = nullptr;
+}
+
 
 std::string IdentifierSymbolEntry::toStr()
 {
