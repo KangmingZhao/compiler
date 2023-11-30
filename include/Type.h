@@ -85,6 +85,7 @@ class ERROR_OCUPIER : public Type
 {
 public:
     ERROR_OCUPIER() :Type(Type::ERROR) {};
+    //这个类是用来给那些未定义的ID占位用的type，保证程序能继续执行下去
     std::string toStr();
 };
 

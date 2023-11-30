@@ -4,6 +4,6 @@
     "\\include",
     "\\src"
   ],
-  "SelectedNode": "\\src\\lexer.l",
+  "SelectedNode": "\\src\\SymbolTable.cpp",
   "PreviewInSolutionExplorer": false
 }

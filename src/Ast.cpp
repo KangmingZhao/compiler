@@ -4,7 +4,6 @@
 #include "Instruction.h"
 #include "IRBuilder.h"
 #include <string>
-#include "Type.h"
 #include <assert.h>
 
 
@@ -267,6 +266,19 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
+
+    Type* type1 = lval->getSymPtr()->getType();
+    Type* type2 = expr->getSymPtr()->getType();
+    if (type1 != type2)
+    {
+        fprintf(stderr, "type %s and %s mismatch \n",
+            type1->toStr().c_str(), type2->toStr().c_str());
+        if (ERROR_MESSAGE_WRITE_INTO_AST)
+        {
+            fprintf(yyout, "type %s and %s mismatch \n",
+                type1->toStr().c_str(), type2->toStr().c_str());
+        }
+    }
 }
 
 
@@ -430,6 +442,18 @@ std::string ExprNode::get_name()
 
 void BinaryExpr::output(int level)
 {
+    float temp_store = cal_expr_val();
+    if (temp_store != PRE_CAL_ERROR_MEETING_VAL)
+    {
+        if (getSymPtr()->getType()->isFLOAT())
+            fprintf(yyout, "%*c\tExprValue:\t%f\n", level, ' ', temp_store);
+        else if (getSymPtr()->getType()->isInt())
+            fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
+        return;
+    }
+    //测试直接输出。
+
+
     typeCheck();
     std::string op_str;
     switch (op)
@@ -498,6 +522,17 @@ void BinaryExpr::output(int level)
 }
 void UnaryExpr::output(int level)
 {
+    float temp_store = cal_expr_val();
+    if (temp_store != PRE_CAL_ERROR_MEETING_VAL)
+    {
+        if (getSymPtr()->getType()->isFLOAT())
+            fprintf(yyout, "%*c\tExprValue:\t%f\n", level, ' ', temp_store);
+        else if (getSymPtr()->getType()->isInt())
+            fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
+        return;
+    }
+
+
     std::string op_str;
     switch (op)
     {
@@ -566,6 +601,7 @@ void InitNode::output(int level, int dim, int* dim_record)
         }
     }
 }
+
 void ArrDimNode::output(int level)
 {
     if (is_link)
@@ -576,9 +612,18 @@ void ArrDimNode::output(int level)
     else
     {
         fprintf(yyout, "%*c\t\tdimension_size:\n", level, ' ');
-        dimension_size->output(level + 20);
+        if (is_not_val)
+            fprintf(yyout, "%*c\t\t%d\n", level, ' ', (int)dimension_size->cal_expr_val());
+            //std::cout << dimension_size->cal_expr_val() << std::endl;
+        else
+            //报错
+            fprintf(stderr, "not a const \n");
+        //dimension_size->output(level + 20);
     }
 }
+
+
+
 void ParaNode::output(int level)
 {
     if (is_link)
@@ -780,8 +825,11 @@ void ReturnStmt::output(int level)
 
 void AssignStmt::output(int level)
 {
+    typeCheck();
     fprintf(yyout, "%*cAssignStmt\n", level, ' ');
     lval->output(level + 4);
+
+    //std::cout << expr->cal_expr_val() << std::endl;
     expr->output(level + 4);
 }
 
