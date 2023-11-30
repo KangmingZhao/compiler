@@ -18,7 +18,7 @@ Type* TypeSystem::floatType = &commonFloat;
 std::string ERROR_OCUPIER::toStr()
 {
     std::ostringstream buffer;
-    buffer << "Oops!Something Wrong";
+    buffer << "PlaceHolder";
     return buffer.str();
 }
 

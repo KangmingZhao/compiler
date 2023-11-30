@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+class ExprNode;
 class Type;
 class Operand;
 
@@ -12,8 +13,10 @@ class SymbolEntry
 private:
     int kind;
 protected:
-    enum {CONSTANT, VARIABLE, TEMPORARY};
+    enum {CONSTANT, VARIABLE, TEMPORARY, CONSTIDENTIFER};
     Type *type;
+
+    int arr_dimension_recorder = 0;
 
 public:
     SymbolEntry(Type *type, int kind);
@@ -21,10 +24,16 @@ public:
     bool isConstant() const {return kind == CONSTANT;};
     bool isTemporary() const {return kind == TEMPORARY;};
     bool isVariable() const {return kind == VARIABLE;};
+    bool isConstIdentifer() const { return kind == CONSTIDENTIFER; };
     Type* getType() {return type;};
+    
     void setType(Type *type) {this->type = type;};
     virtual std::string toStr() = 0;
     // You can add any function you need here.
+
+
+    void update_arr_dimension_recorder(int n_arr_dimension_recorder) { arr_dimension_recorder = n_arr_dimension_recorder; };
+    int get_arr_dimension_recorder() { return arr_dimension_recorder; };
 };
 
 
@@ -42,14 +51,15 @@ private:
     float value_f;
     int data_type;
 
+
 public:
     ConstantSymbolEntry(Type *type, int value);
     ConstantSymbolEntry(Type* type, float value);
     virtual ~ConstantSymbolEntry() {};
-    int getValue() const {
+    float getValue() const {
         if(data_type == 1)
-            return value;
-        if (data_type == 2)
+            return (float)value;
+        else 
             return value_f;
     };
     std::string toStr();
@@ -88,8 +98,11 @@ private:
     Operand *addr;  // The address of the identifier.
     // You can add any field you need here.
 
+    ExprNode* valueExpr;
+
 public:
     IdentifierSymbolEntry(Type *type, std::string name, int scope);
+    IdentifierSymbolEntry(Type* type, std::string name, int scope, ExprNode* valueExpr);
     virtual ~IdentifierSymbolEntry() {};
     std::string toStr();
     bool isGlobal() const {return scope == GLOBAL;};
@@ -101,6 +114,7 @@ public:
 
     // You can add any function you need here.
     void setFuncType(Type* t) { type = t; }
+    ExprNode* getValueExpr() { return valueExpr; };
 };
 
 
@@ -142,6 +156,7 @@ private:
     SymbolTable *prev;
     int level;
     static int counter;
+
 public:
     SymbolTable();
     SymbolTable(SymbolTable *prev);
@@ -153,6 +168,7 @@ public:
     SymbolTable* getPrev() {return prev;};
     int getLevel() {return level;};
     static int getLabel() {return counter++;};
+
 };
 
 extern SymbolTable *identifiers;
