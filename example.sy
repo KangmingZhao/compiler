@@ -1,43 +1,5 @@
-int fuck()
-{
-	return 1;
-}
 void you()
 {
-	return;
-}
-int main()
-{
-	c = fuck() + you();
-	int a = 0;
 	int a;
-	b = 0;
-	break;
-
-	int arr[2] = {1,1};
-	int arr[2];
-
-	brr[1] = 1;
-
-	while(1)
-	{
-		break;
-		continue;
-		if(1 + 1)
-		{
-			continue;
-			break;
-			while(1)
-			{
-				if(1)
-				{
-					if(1)
-					{
-						break;
-					}
-					continue;
-				}
-			}
-		}
-	}
+	return a;
 }

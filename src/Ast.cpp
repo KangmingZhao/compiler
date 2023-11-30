@@ -11,7 +11,8 @@
 extern FILE *yyout;
 int Node::counter = 0;
 IRBuilder* Node::builder = nullptr;
-
+bool isreturn=false;
+Type *retVal;
 Node::Node()
 {
     seq = counter++;
@@ -203,7 +204,27 @@ void Ast::typeCheck()
 void FunctionDef::typeCheck()
 {
     // Todo
+     SymbolEntry *se = this->getSymbolEntry();
+    Type *ret = ((FunctionType *)(se->getType()))->getRetType();
+    if (stmt == nullptr&&ret != TypeSystem::voidType)
+    {
+        fprintf(stderr, "è¿”å›žå€¼ç±»åž‹ä¸ä¸ºç©ºçš„å‡½æ•°ç¼ºå°‘\'%s\'returnè¯­å¥\n",se->toStr().c_str());
+        // å‡½æ•°ä½“ç©ºäº† åˆ¤æ–­æ˜¯å¦ç¬¦åˆvoid
+    }
+    // å‡½æ•°ä½“ä¸ç©º åŽ»çœ‹çœ‹æ˜¯å¦ç¬¦åˆå£°æ˜Ž
+    else{
+        stmt->typeCheck();
+        if(!isreturn && ret != TypeSystem::voidType){//æ²¡æœ‰è¿”å›žå€¼ä¸”ä¸æ˜¯void
+            fprintf(stderr, "è¿”å›žå€¼ä¸ä¸ºç©ºçš„å‡½æ•°\'%s\'ç¼ºå°‘returnè¯­å¥\n",se->toStr().c_str());
+        }
+        // ä¸ç¼º ä½†æ˜¯ä¸å¯¹
+        if(ret!=retVal)
+        {
+            fprintf(stderr, "å‡½æ•°\'%s\'è¿”å›žå€¼ä¸åŒ¹é…\n",se->toStr().c_str());
+        }
+        }
 }
+
 
 void BinaryExpr::typeCheck()
 {
@@ -262,6 +283,12 @@ void DeclStmt::typeCheck()
 void ReturnStmt::typeCheck()
 {
     // Todo
+    if(retValue)
+    {
+       isreturn=true;//è¯´æ˜ŽçœŸæœ‰è¿”å›žçš„ä¸œè¥¿ 
+        retVal=retValue->getSymPtr()->getType(); //è¿”å›žå€¼ç±»åž‹
+    }
+   
 }
 
 void AssignStmt::typeCheck()
@@ -273,8 +300,8 @@ void AssignStmt::typeCheck()
 
 
 
-//ÖØÔÖÇø¡£×ð¶¼ÊÇÏðÊ÷¡£
-/*Õ½·¸Ãûµ¥
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+/*Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 UnaryExpr 
 InitNode
@@ -412,7 +439,7 @@ void UnaryExpr::genCode()
 
 
 
-//ÉÏÃæÊÇÆæÆæ¹Ö¹ÖµÄ¶«Î÷¡£
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ÖµÄ¶ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 std::string ExprNode::get_name()
@@ -618,7 +645,7 @@ void ConstDeclList::output(int level)
 }
 void WhileStmt::output(int level)
 {
-    //²»ÓÃÊµÏÖ£¬Ö»ÊÇµ¥´¿µÄ·­Òë³öÀ´µÄ»°£¬ºÍifÊÇÒ»ÑùµÄÄó¡£
+    //ï¿½ï¿½ï¿½ï¿½Êµï¿½Ö£ï¿½Ö»ï¿½Çµï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ifï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
     cond->output(level + 4);
     if (doStmt != nullptr)
@@ -682,7 +709,7 @@ void Constant::output(int level)
     }
     else if (this->symbolEntry->getType()->isFLOAT())
     {
-        //ºÃ¾ÍºÃÔÚsymbolentryÀïÃæÒÑ¾­°Ñ¸¡µãÊý¡¢ÕûÊý¶¼×ª»¯Îª×Ö·û´®ÁË£¬ÕâÀï¾ÍÖ±½Ó%s¾ÍºÃÁË²»ÓÃÔÚ¹ÜÕ¼Î»·ûÁË
+        //ï¿½Ã¾Íºï¿½ï¿½ï¿½symbolentryï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½Ñ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½Ö·ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½%sï¿½Íºï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½Õ¼Î»ï¿½ï¿½ï¿½ï¿½
         fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
     }
@@ -797,8 +824,8 @@ void FunctionDef::output(int level)
     std::string name, type;
     if (se == nullptr)
     {
-        fprintf(stderr, "Oops!ÒâÍâ´íÎó£¡\n");//´òÓ¡Õâ¸ö±äÁ¿Ã»ÓÐ¶¨Òå
-        assert(se != nullptr);      //Å×³öÒ»¸ö¶ÏÑÔ´íÎó
+        fprintf(stderr, "Oops!ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n");//ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿½
+        assert(se != nullptr);      //ï¿½×³ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½
     }
     name = se->toStr();
     type = se->getType()->toStr();

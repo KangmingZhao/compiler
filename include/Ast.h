@@ -346,6 +346,7 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+    SymbolEntry *getSymbolEntry() { return this->se; };
 };
 
 
