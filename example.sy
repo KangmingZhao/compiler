@@ -1,9 +1,19 @@
-void fuck(int a,int b)
+void test()
 {
 
 }
+int fuckyou(int a,int b)
+{
+	float c=1;
+	return c;
+
+}
+
 int main()
 {
 	int a;
-	fuck(a);
+	float b;
+	test();
+	fuckyou(a);
+	fuckyou(a,b);
 }

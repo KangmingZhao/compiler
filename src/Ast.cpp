@@ -61,7 +61,7 @@ void BinaryExpr::genCode()
     Function *func = bb->getParent();
     if (op < arithmeticEnd)
     {
-        //opÊÇËãÊýÔËËã·û
+        //opï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         expr1->genCode();
         expr2->genCode();
         Operand* src1 = expr1->getOperand();
@@ -92,7 +92,7 @@ void BinaryExpr::genCode()
     }
     else if (op > arithmeticEnd && op < logicEnd)
     {
-        //opÊÇÂß¼­ÔËËã·û
+        //opï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         switch (op)
         {
         case AND:
@@ -112,17 +112,17 @@ void BinaryExpr::genCode()
     }
     else if (op > logicEnd && op < relationEnd)
     {
-        //opÊÇ¹ØÏµÔËËã·û
+        //opï¿½Ç¹ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½
     }
     else
     {
-        //opÊÇÆæ¹ÖµÄ¶«Î÷¡£
+        //opï¿½ï¿½ï¿½ï¿½ÖµÄ¶ï¿½ï¿½ï¿½ï¿½ï¿½
     }
 
 
     //if (op == AND)
     //{
-    //    //ÈÃÎÒÀ´ÞÛÒ»ÏÂÕâ¡£
+    //    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½â¡£
     //    
     //}
     //else if(op == OR)
@@ -253,28 +253,29 @@ void FunctionDef::typeCheck()
     if (stmt == nullptr&&ret != TypeSystem::voidType)
     {   
          fprintf(stderr, "function\'%s\'misses return\n",se->toStr().c_str());
-        // å‡½æ•°ä½“ç©ºäº?åˆ¤æ–­æ˜¯å¦ç¬¦åˆvoid
- }
-
-    // å‡½æ•°ä½“ä¸ç©?åŽ»çœ‹çœ‹æ˜¯å¦ç¬¦åˆå£°æ˜?
+        // å‡½æ•°ä½“ç©ºï¿½?åˆ¤æ–­æ˜¯å¦ç¬¦åˆvoid
+    }
+    // å‡½æ•°ä½“ä¸ï¿½?åŽ»çœ‹çœ‹æ˜¯å¦ç¬¦åˆå£°ï¿½?
     else{
-         stmt->typeCheck();
+        isreturn=false;
+        stmt->typeCheck();
         if(!isreturn && ret != TypeSystem::voidType){//don't have return and not void
             fprintf(stderr, "function  \'%s\'misses return\n",se->toStr().c_str());
         }
         // has return  and wrong return  
-        else if(ret!=TypeSystem::voidType)
+        else if(isreturn&&ret!=TypeSystem::voidType)
         {
             if(ret!=retVal)
             {
             fprintf(stderr, "function \'%s\'has wrong return \n",se->toStr().c_str());
             }
         }
+
         }
 
     
-    if (stmt != nullptr)
-        stmt->typeCheck();
+    // if (stmt != nullptr)
+    //     stmt->typeCheck();
     if(paraStmt != nullptr)
         paraStmt->typeCheck();
 }
@@ -407,8 +408,8 @@ void ReturnStmt::typeCheck()
     // Todo
     if(retValue)
     {
-       isreturn=true;//è¯´æ˜ŽçœŸæœ‰è¿”å›žçš„ä¸œè¥?
-        retVal=retValue->getSymPtr()->getType(); //è¿”å›žå€¼ç±»åž?
+       isreturn=true;//è¯´æ˜ŽçœŸæœ‰è¿”å›žçš„ä¸œï¿½?
+        retVal=retValue->getSymPtr()->getType(); //è¿”å›žå€¼ç±»ï¿½?
     }
 
 
@@ -420,7 +421,7 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
-    //Ê×ÏÈ¼ì²é¸´ÖÆ¶ÔÏóÊÇ²»ÊÇconst¡£
+    //ï¿½ï¿½ï¿½È¼ï¿½é¸´ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½constï¿½ï¿½
     if (lval->get_symbolEntry()->isConstIdentifer())
     {
         fprintf(stderr, "identifier \"%s\" is const\n", lval->get_name().c_str());
@@ -494,7 +495,7 @@ DoNothingStmt*/
 
 void ArrDimNode::typeCheck()
 {
-    //ÕâÀïÒª¼ì²é´«½øÀ´µÄÊÇ²»ÊÇi32¡£ÒòÎªÊÇ·ÃÎÊÏÂ±ê£¬Ê²Ã´voidºÍfloat¶¼²»ÐÐ¡£
+    //ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½é´«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½i32ï¿½ï¿½ï¿½ï¿½Îªï¿½Ç·ï¿½ï¿½ï¿½ï¿½Â±ê£¬Ê²Ã´voidï¿½ï¿½floatï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½
     if (!dimension_size->get_symbolEntry()->getType()->isInt())
     {
         fprintf(stderr, "i32 is needed, but %s is given \n",
@@ -561,8 +562,6 @@ void WhileStmt::genCode()
 
 }
 
-
-
 void ConstDeclList::typeCheck()
 {
 
@@ -615,6 +614,7 @@ void DeclInitStmt::genCode()
 
 void FunctCall::typeCheck()
 {
+    paramVector.clear();
     if (para_node != nullptr)
         para_node->typeCheck();
   
@@ -624,8 +624,8 @@ void FunctCall::typeCheck()
     int paramF_num=type->paramsType.size();
      if(paramR_num!=paramF_num)
      {
-         printf("Fnum:%d,Rnum:%d\n",paramF_num,paramR_num);
-          fprintf(stderr, "function  \'%s\'has wrong params\n",symbolEntry->toStr().c_str());
+          //printf("Fnum:%d,Rnum:%d\n",paramF_num,paramR_num);
+          fprintf(stderr, "function  \'%s\'has wrong  params num!\n",symbolEntry->toStr().c_str());
     }
     std::vector<Type*> paramR = paramVector;
     std::vector<Type*> paramF = type->paramsType;
@@ -644,7 +644,7 @@ void FunctCall::typeCheck()
     }
     if(!equal)
     {
-         fprintf(stderr, "function  \'%s\'has wrong type\n",symbolEntry->toStr().c_str());
+         fprintf(stderr, "function  \'%s\'has wrong params type\n",symbolEntry->toStr().c_str());
     }
     
 }
@@ -655,6 +655,7 @@ void FunctCall::genCode()
 
 void ParaNode::typeCheck()
 {
+    
     if(!is_link)
     {
         Type *type=para_expr->getSymPtr()->getType();
@@ -699,7 +700,7 @@ void UnaryExpr::genCode()
 
 
 
-//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ÖµÄ¶ï¿½ï¿½ï¿½ï¿½ï¿?
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ÖµÄ¶ï¿½ï¿½ï¿½ï¿½ï¿½?
 
 
 std::string ExprNode::get_name()
@@ -726,7 +727,7 @@ void BinaryExpr::output(int level)
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
     }
-    //²âÊÔÖ±½ÓÊä³ö¡£
+    //ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
     //typeCheck();
@@ -899,7 +900,7 @@ void ArrDimNode::output(int level)
             if (node_state == ACCESS)
                 dimension_size->output(level + 20);
             else
-                //±¨´í
+                //ï¿½ï¿½ï¿½ï¿½
                 fprintf(stderr, "not a const \n");
         }
         //dimension_size->output(level + 20);
@@ -1011,7 +1012,7 @@ void Constant::output(int level)
     }
     else if (this->symbolEntry->getType()->isFLOAT())
     {
-        //ï¿½Ã¾Íºï¿½ï¿½ï¿½symbolentryï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½Ñ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½Ö·ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿?sï¿½Íºï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½Õ¼Î»ï¿½ï¿½ï¿½ï¿½
+        //ï¿½Ã¾Íºï¿½ï¿½ï¿½symbolentryï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½Ñ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½Ö·ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½?sï¿½Íºï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½Õ¼Î»ï¿½ï¿½ï¿½ï¿½
         fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
     }
@@ -1129,7 +1130,7 @@ void FunctionDef::output(int level)
     std::string name, type;
     if (se == nullptr)
     {
-        fprintf(stderr, "Oops!ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n");//ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿?
+        fprintf(stderr, "Oops!ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n");//ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð¶ï¿½ï¿½ï¿½?
         assert(se != nullptr);      //ï¿½×³ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½
     }
     name = se->toStr();
