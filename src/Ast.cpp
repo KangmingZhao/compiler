@@ -5,13 +5,14 @@
 #include "IRBuilder.h"
 #include <string>
 #include <assert.h>
-
+#include<algorithm>
 
 extern FILE *yyout;
 int Node::counter = 0;
 IRBuilder* Node::builder = nullptr;
 bool isreturn=false;
 Type *retVal;
+std::vector<Type*> paramVector;
 Node::Node()
 {
     seq = counter++;
@@ -247,23 +248,27 @@ void Ast::typeCheck()
 void FunctionDef::typeCheck()
 {
     // Todo
-     SymbolEntry *se = this->getSymbolEntry();
+    SymbolEntry *se = this->getSymbolEntry();
     Type *ret = ((FunctionType *)(se->getType()))->getRetType();
     if (stmt == nullptr&&ret != TypeSystem::voidType)
-    {
-        fprintf(stderr, "返回值类型不为空的函数缺少\'%s\'return语句\n",se->toStr().c_str());
+    {   
+         fprintf(stderr, "function\'%s\'misses return\n",se->toStr().c_str());
         // 函数体空�?判断是否符合void
-    }
+ }
+
     // 函数体不�?去看看是否符合声�?
     else{
-        stmt->typeCheck();
-        if(!isreturn && ret != TypeSystem::voidType){//没有返回值且不是void
-            fprintf(stderr, "返回值不为空的函数\'%s\'缺少return语句\n",se->toStr().c_str());
+         stmt->typeCheck();
+        if(!isreturn && ret != TypeSystem::voidType){//don't have return and not void
+            fprintf(stderr, "function  \'%s\'misses return\n",se->toStr().c_str());
         }
-        // 不缺 但是不对
-        if(ret!=retVal)
+        // has return  and wrong return  
+        else if(ret!=TypeSystem::voidType)
         {
-            fprintf(stderr, "函数\'%s\'返回值不匹配\n",se->toStr().c_str());
+            if(ret!=retVal)
+            {
+            fprintf(stderr, "function \'%s\'has wrong return \n",se->toStr().c_str());
+            }
         }
         }
 
@@ -612,6 +617,36 @@ void FunctCall::typeCheck()
 {
     if (para_node != nullptr)
         para_node->typeCheck();
+  
+     int paramR_num=paramVector.size();
+     SymbolEntry* s =this->symbolEntry;
+    FunctionType* type=(FunctionType*)s->getType();
+    int paramF_num=type->paramsType.size();
+     if(paramR_num!=paramF_num)
+     {
+         printf("Fnum:%d,Rnum:%d\n",paramF_num,paramR_num);
+          fprintf(stderr, "function  \'%s\'has wrong params\n",symbolEntry->toStr().c_str());
+    }
+    std::vector<Type*> paramR = paramVector;
+    std::vector<Type*> paramF = type->paramsType;
+    bool equal = true;
+    if (paramR.size() == paramF.size())
+    {
+    
+    for (size_t i = 0; i < paramR.size(); ++i)
+    {
+        if (paramR[i] != paramF[i])
+        {
+            equal = false;
+            break;
+        }
+    }
+    }
+    if(!equal)
+    {
+         fprintf(stderr, "function  \'%s\'has wrong type\n",symbolEntry->toStr().c_str());
+    }
+    
 }
 void FunctCall::genCode()
 {
@@ -620,6 +655,11 @@ void FunctCall::genCode()
 
 void ParaNode::typeCheck()
 {
+    if(!is_link)
+    {
+        Type *type=para_expr->getSymPtr()->getType();
+        paramVector.push_back(type);
+    }
     if (para1 != nullptr)
         para1->typeCheck();
     if (para2 != nullptr)

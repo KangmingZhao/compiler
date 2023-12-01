@@ -1,4 +1,9 @@
+void fuck(int a,int b)
+{
+
+}
 int main()
 {
 	int a;
+	fuck(a);
 }

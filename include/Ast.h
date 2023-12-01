@@ -266,6 +266,7 @@ class FunctCall : public ExprNode
 public:
     FunctCall(SymbolEntry* se, ParaNode* para_node) : ExprNode(se), para_node(para_node) {
         is_not_val = 0;
+;
     };
     void output(int level);
     void typeCheck();
