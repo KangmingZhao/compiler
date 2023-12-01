@@ -7,8 +7,8 @@
 
     //ArrDimNode** now_arrdim;
     //int now_arrindex;
-    //ÎÒÃÇ»áÔÚstmtºóÃæ¼ÓÉÏBREAK SEMICOLONµÄÊ¶±ğ£¬È»ºóÖ»ÓĞÔÚblockstmtÖĞ»á´¦ÀíÄ³Ò»¸ö×÷ÓÃÓòÊÇ²»ÊÇÔÚwhileÄÚ²¿µÄ¡£ÒòÎªÆäËûµÄ±í´ïÊ½
-    //ÒªÃ´Ö»ÄÜ×°±í´ïÊ½²»ÄÜ×°break£¬ÒªÃ´×Ô¼º¾ÍÊÇbreak¡£
+    //é´æˆœæ»‘æµ¼æ°¬æ¹ªstmtéšåº¨æ½°é”çŠ±ç¬‚BREAK SEMICOLONé¨å‹®ç˜‘é’î‚¬ç´é’è·ºæ‚—é™î…æ¹é¦â•lockstmtæ¶“î…ç´°æ¾¶å‹­æ‚ŠéŒæ„ªç«´æ¶“îƒç¶”é¢ã„¥ç…™é„îˆ™ç¬‰é„îˆšæ¹ªwhileéå‘´å„´é¨å‹©â‚¬å‚šæ´œæ¶“å“„å¾æµ æ «æ®‘ç›ã„¨æªå¯®ï¿½
+    //ç‘•ä½·ç®é™î‡å…˜ç‘å‘°ã€ƒæˆæƒ§ç´¡æ¶“å¶ˆå…˜ç‘å‹reaké”›å²ƒî›¦æ¶”å £åšœå®¸åæ°¨é„ç—“reakéŠ†ï¿½
     
     Type  *declType;
     std::vector<Type*> FuncParamsVector;
@@ -52,7 +52,7 @@
 }
 
 %initial-action {
-    //ÕâÀï»¹ÓĞÕâÖÖ³õÊ¼»¯·½·¨£¬Ì«Ë¬À²
+    //æ©æ¬“å™·æ©æ¨»æ¹æ©æ¬‘î’é’æ¿†îé–æ ¨æŸŸå¨‰æ›ªç´æ¾¶î†åŸ¥éŸï¿½
     std::string getint = "getint";
     Type* funcType1 = new FunctionType(TypeSystem::intType, {});
     SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
@@ -88,7 +88,7 @@
 }
 
 
-/* ÕâÀïµÄINTEGER¡¢FLOATPOINTÊÇ¾ßÌåÊı¾İ£¬INTºÍFLOATÊÇÊı¾İÀàĞÍ */
+/* æ©æ¬“å™·é¨å‡¦NTEGERéŠ†ä¸—LOATPOINTé„îˆšå¿æµ£æ’´æšŸé¹î‡†ç´INTéœå­LOATé„îˆ›æšŸé¹î†¾è¢«é¨ï¿½ */
 
 %start Program
 %token <strtype> ID 
@@ -147,24 +147,24 @@ LVal
         int state = 0;
         
         SymbolEntry *se;
-        se = identifiers->lookup($1); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öID¡£
-        if(se == nullptr) //Èç¹ûÃ»ÓĞ
+        se = identifiers->lookup($1); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œIDéŠ†ï¿½
+        if(se == nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿Ã»ÓĞ¶¨Òå
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºå¨Œâ„ƒæ¹ç€¹æ°«ç®Ÿ
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //Å×³öÒ»¸ö¶ÏÑÔ´íÎó
+            //assert(se != nullptr);      //é¶æ¶˜åš­æ¶“â‚¬æ¶“î…æŸ‡ç‘·â‚¬é–¿æ¬’î‡¤
 
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //¸øÕâÀï$$¸³Ò»¸öID×ÓÀàµÄ±í´ïÊ½½áµã¡£ÓÃÀ´Êä³öµÄ/
+            $$ = new Id(error_se, state);    //ç¼æ¬’ç¹–é–²ï¿½$$ç’§å¬©ç«´æ¶“ç‹ªDç€›æ„®è¢«é¨å‹®ã€ƒæˆæƒ§ç´¡ç¼æ’¶å£éŠ†å‚œæ•¤é‰ãƒ¨ç·­é‘è™¹æ®‘/
             delete []$1;
 
         }
         else
         {
-            $$ = new Id(se, state);    //¸øÕâÀï$$¸³Ò»¸öID×ÓÀàµÄ±í´ïÊ½½áµã¡£ÓÃÀ´Êä³öµÄ/
+            $$ = new Id(se, state);    //ç¼æ¬’ç¹–é–²ï¿½$$ç’§å¬©ç«´æ¶“ç‹ªDç€›æ„®è¢«é¨å‹®ã€ƒæˆæƒ§ç´¡ç¼æ’¶å£éŠ†å‚œæ•¤é‰ãƒ¨ç·­é‘è™¹æ®‘/
             delete []$1;
         }
     }
@@ -175,28 +175,28 @@ LVal
     }
     ArrDimensions
     {
-        //ÎÒÃÇÖªµÀÊı×éµÄ·ÃÎÊÊÇ¿ÉÒÔ×÷Îª×óÖµµÄ¡£
+        //é´æˆœæ»‘é­ãƒ©äº¾éæ‰®ç²é¨å‹®î†–é—‚î†½æ§¸é™îˆ™äº’æµ£æ»€è´Ÿå®¸ï¹€â‚¬è‚©æ®‘éŠ†ï¿½
         int state = 0;
 
         SymbolEntry *se;
-        se = identifiers->lookup($1); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öID¡£
-        if(se == nullptr) //Èç¹ûÃ»ÓĞ
+        se = identifiers->lookup($1); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œIDéŠ†ï¿½
+        if(se == nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿Ã»ÓĞ¶¨Òå
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºå¨Œâ„ƒæ¹ç€¹æ°«ç®Ÿ
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //Å×³öÒ»¸ö¶ÏÑÔ´íÎó
+            //assert(se != nullptr);      //é¶æ¶˜åš­æ¶“â‚¬æ¶“î…æŸ‡ç‘·â‚¬é–¿æ¬’î‡¤
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //¸øÕâÀï$$¸³Ò»¸öID×ÓÀàµÄ±í´ïÊ½½áµã¡£ÓÃÀ´Êä³öµÄ/
+            $$ = new Id(error_se, state);    //ç¼æ¬’ç¹–é–²ï¿½$$ç’§å¬©ç«´æ¶“ç‹ªDç€›æ„®è¢«é¨å‹®ã€ƒæˆæƒ§ç´¡ç¼æ’¶å£éŠ†å‚œæ•¤é‰ãƒ¨ç·­é‘è™¹æ®‘/
             delete []$1;
         }
         else
         {
-            $$ = new Id(se, $3, state);    //¸øÕâÀï$$¸³Ò»¸öID×ÓÀàµÄ±í´ïÊ½½áµã¡£ÓÃÀ´Êä³öµÄ/
+            $$ = new Id(se, $3, state);    //ç¼æ¬’ç¹–é–²ï¿½$$ç’§å¬©ç«´æ¶“ç‹ªDç€›æ„®è¢«é¨å‹®ã€ƒæˆæƒ§ç´¡ç¼æ’¶å£éŠ†å‚œæ•¤é‰ãƒ¨ç·­é‘è™¹æ®‘/
             if(se->get_arr_dimension_recorder() < arr_dimension_recorder)
-                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//´òÓ¡Õâ¸ö·ÃÎÊ³¬¹ıÁË
+                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//éµæ’³åµƒæ©æ¬é‡œç’å—æ£¶ç“’å‘°ç¹ƒæµœï¿½
             arr_dimension_recorder = 0;
             delete []$1;
         }
@@ -320,7 +320,7 @@ PrimaryExp
     }
     ;
 
-// Ê¶±ğ;
+// ç’‡å——åŸ†;
 EmptyStmt
     :
      SEMICOLON{
@@ -367,16 +367,16 @@ FunctCall
     {   
         SymbolEntry *se;
         se = identifiers->lookup($1); 
-        if(se == nullptr) //Èç¹ûÃ»ÓĞ
+        if(se == nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿Ã»ÓĞ¶¨Òå
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºå¨Œâ„ƒæ¹ç€¹æ°«ç®Ÿ
             delete [](char*)$1;
-            assert(se != nullptr);      //Å×³öÒ»¸ö¶ÏÑÔ´íÎó
+            assert(se != nullptr);      //é¶æ¶˜åš­æ¶“â‚¬æ¶“î…æŸ‡ç‘·â‚¬é–¿æ¬’î‡¤
         }
         $$ = new FunctCall(se, $3);
     }
     ;
-// º¯Êı¶¨Òå Funcdef->
+// é‘èŠ¥æšŸç€¹æ°«ç®Ÿ Funcdef->
 FuncDef
     :
     Type ID{
@@ -406,7 +406,7 @@ FuncDef
         delete top;
         delete []$2;
     }
-// µ¥Ä¿ÔËËã
+// é—æ› æ´°æ©æ„®ç•»
 UnaryExp
     :
     PrimaryExp {
@@ -449,7 +449,7 @@ MulExp
     UnaryExp { $$ = $1;}
     |
     MulExp MUL UnaryExp {
-        //ÕâÀïÎÒÃÇÈÎÎñÖ»ÒªÓĞÒ»¸öÊÇfloatÄÇÃ´¾Í°´floatÀ´Ëã¡£
+        //æ©æ¬“å™·é´æˆœæ»‘æµ è¯²å§Ÿé™î‡î›¦éˆå¤‰ç«´æ¶“î…æ§¸floaté–­ï½„ç®çè¾¨å¯œfloaté‰ãƒ§ç•»éŠ†ï¿½
         if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
         {
             SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
@@ -478,7 +478,7 @@ MulExp
     |
     MulExp MOD UnaryExp
     {
-        //ÇóÓàÊıÊÇintµÄ×¨Àû
+        //å§¹å‚™ç¶‘éç‰ˆæ§¸inté¨å‹ªç¬“é’ï¿½
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
     }
@@ -506,7 +506,7 @@ AddExp
         
 
         //SymbolEntry *se;
-        //se = identifiers->lookup($1->get_name()); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öLval¡£
+        //se = identifiers->lookup($1->get_name()); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œLvaléŠ†ï¿½
         //$$ = new BinaryExpr(se, BinaryExpr::ADD, $1, const_1_node);
     }
     |
@@ -713,7 +713,7 @@ ArrInitList
     :
     Exp
     {
-        //Õâ¸öÊÇµ½Í·ÁË£¬¿ªÊ¼½øÈë¾ßÌåÖµÁË¡£
+        //æ©æ¬é‡œé„îˆšåŸŒæ¾¶ç¿ ç°¡é”›å±½ç´‘æ¿®å¬­ç¹˜éãƒ¥å¿æµ£æ’³â‚¬é—´ç°¡éŠ†ï¿½
 
         $1->getSymPtr()->setType(declType);
         $$ = new InitNode($1);
@@ -721,7 +721,7 @@ ArrInitList
     |
     LBRACE ArrInitLists RBRACE
     {
-        //Õâ¸öÊÇËµÃ÷»¹ÓĞÖÁÉÙÒ»²ã
+        //æ©æ¬é‡œé„îˆî‡©é„åº¤ç¹•éˆå¤åš¦çæˆœç«´çï¿½
         $$ = $2;
         $$->i_m_checkpoint();
     }
@@ -776,14 +776,14 @@ ArrDimensions
     }
     ;
 
-// ³£Á¿ºÍ±äÁ¿µÄÉùÃ÷
+// ç”¯æå™ºéœå±½å½‰é–²å¿•æ®‘æ¾¹ç‰ˆæ§‘
 DeclStmt
      :
     VarDeclStmt {$$=$1;}
     |
     ConstDeclStmt {$$=$1;}
     ;
-// ±äÁ¿ ±äÁ¿+Ò»¶Ñ
+// é™æ©€å™º é™æ©€å™º+æ¶“â‚¬é«ï¿½
 VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
@@ -791,12 +791,12 @@ VarDeclStmt
         ;
 
 
-// ³£Á¿ const +Ò»¶Ñ£»
+// ç”¯æå™º const +æ¶“â‚¬é«å—­ç´±
 ConstDeclStmt
     :
     CONST Type ConstDeclLists SEMICOLON{$$=$3;}
     ;
-// ±äÁ¿
+// é™æ©€å™º
 IdDeclLists 
     :
     IdDeclLists COMMA IdDeclList {$$=new DeclList($1,$3);}
@@ -808,10 +808,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öID¡£
-        if(check_redefination_se != nullptr) //Èç¹ûÃ»ÓĞ
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œIDéŠ†ï¿½
+        if(check_redefination_se != nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿ÖØ¶¨Òå
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºé–²å¶…ç•¾æ¶”ï¿½
             state = REDEFINATION;
         }
 
@@ -828,10 +828,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öID¡£
-        if(check_redefination_se != nullptr) //Èç¹ûÃ»ÓĞ
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œIDéŠ†ï¿½
+        if(check_redefination_se != nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿ÖØ¶¨Òå
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºé–²å¶…ç•¾æ¶”ï¿½
             state = REDEFINATION;
         }
 
@@ -847,10 +847,10 @@ IdDeclList
             int state = LEGAL_VAR;
         
             SymbolEntry *check_redefination_se;
-            check_redefination_se = identifiers->lookup_in_present_domain($1); //ÔÚÒÑÓĞµÄ·ûºÅ±íÀïÕÒÓĞÃ»ÓĞÕâ¸öID¡£
-            if(check_redefination_se != nullptr) //Èç¹ûÃ»ÓĞ
+            check_redefination_se = identifiers->lookup_in_present_domain($1); //é¦ã„¥å‡¡éˆå¤Œæ®‘ç»—ï¹€å½¿ç›ã„©å™·éµç‚¬æ¹å¨Œâ„ƒæ¹æ©æ¬é‡œIDéŠ†ï¿½
+            if(check_redefination_se != nullptr) //æ¿¡å‚›ç‰å¨Œâ„ƒæ¹
             {
-                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//´òÓ¡Õâ¸ö±äÁ¿ÖØ¶¨Òå
+                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//éµæ’³åµƒæ©æ¬é‡œé™æ©€å™ºé–²å¶…ç•¾æ¶”ï¿½
                 state = REDEFINATION;
             }
 
@@ -874,7 +874,7 @@ IdDeclList
         }
     ;
 
-// ³£Á¿
+// ç”¯æå™º
 ConstDeclLists 
     :
     ConstDeclLists COMMA ConstDeclList {$$=new ConstDeclList($1,$3);}
