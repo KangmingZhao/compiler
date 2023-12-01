@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
     yyparse();
     if(dump_type == AST)
         ast.output();
+
+    
     ast.typeCheck();
     ast.genCode(&unit);
     if(dump_type == IR)

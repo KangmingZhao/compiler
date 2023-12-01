@@ -16,7 +16,7 @@
     int yyerror( char const * );
 
     std::vector<BreakStmt*> Break_stack;
-    bool Break_stack_ok_2_push_back = 0;
+    int Break_stack_ok_2_push_back = 0;
     void loop_match_break(StmtNode* loopStmt)
     {
         if(Break_stack.size())
@@ -28,7 +28,7 @@
 
     
     std::vector<ContinueStmt*> Continue_stack;
-    bool Continue_stack_ok_2_push_back = 0;
+    int Continue_stack_ok_2_push_back = 0;
     void loop_match_continue(StmtNode* loopStmt)
     {
         if(Continue_stack.size())
@@ -237,8 +237,8 @@ IfStmt
 WhileStmt
     : WHILE
     {
-        Break_stack_ok_2_push_back = 1;
-        Continue_stack_ok_2_push_back = 1;
+        Break_stack_ok_2_push_back++;
+        Continue_stack_ok_2_push_back++;
     }
     LPAREN Cond RPAREN Stmt 
     {
@@ -254,7 +254,7 @@ BreakStmt
         if(Break_stack_ok_2_push_back)
         {
             Break_stack.push_back(temp);
-            Break_stack_ok_2_push_back = 0;
+            Break_stack_ok_2_push_back--;
         }
     }
 
@@ -267,7 +267,7 @@ ContinueStmt
         if(Continue_stack_ok_2_push_back)
         {
             Continue_stack.push_back(temp);
-            Continue_stack_ok_2_push_back = 0;
+            Continue_stack_ok_2_push_back--;
         }
     }
 

@@ -6,7 +6,7 @@
 #include "Type.h"
 
 
-#define ERROR_MESSAGE_WRITE_INTO_AST 1
+#define ERROR_MESSAGE_WRITE_INTO_AST 0
 #define PRE_CAL_ERROR_MEETING_VAL -1145141919
 
 #define LEGAL_VAR 0
@@ -101,7 +101,22 @@ private:
     ExprNode* expr1, * expr2;
     ExprNode* ID;
 public:
-    enum { ADD, SUB, MUL, DIV, MOD, AND, OR, LESS, GREATER, INCREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_BEFORE, DECREMENT_AFTER, LESSEQUAL, GREATEREQUAL, EQUAL, NOTEQUAL };
+    enum {
+        //arithmetic
+        ADD, SUB, MUL, DIV, MOD,
+        arithmeticEnd,
+
+        //logic
+        AND, OR, 
+        logicEnd,
+
+        //relation
+        LESS, GREATER, LESSEQUAL, GREATEREQUAL, EQUAL, NOTEQUAL,
+        relationEnd,
+
+        //else
+        INCREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_BEFORE, DECREMENT_AFTER };
+
     BinaryExpr(SymbolEntry* se, int op, ExprNode* expr1, ExprNode* expr2) : ExprNode(se), op(op), expr1(expr1), expr2(expr2) { 
         is_crement = 0; 
         is_not_val = (judge_is_not_val(expr1) && judge_is_not_val(expr2));

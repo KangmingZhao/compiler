@@ -77,7 +77,18 @@ public:
     BinaryInstruction(unsigned opcode, Operand *dst, Operand *src1, Operand *src2, BasicBlock *insert_bb = nullptr);
     ~BinaryInstruction();
     void output() const;
-    enum {SUB, ADD, AND, OR};
+    //enum {SUB, ADD, AND, OR};
+    enum {
+        //arithmetic
+        ADD, SUB, MUL, DIV, MOD,
+
+        //logic
+        AND, OR,
+
+        //else
+        INCREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_BEFORE, DECREMENT_AFTER
+    };
+
     Operand *getDef() { return operands[0]; }
     std::vector<Operand *> getUse() { return {operands[1], operands[2]}; }
 };
