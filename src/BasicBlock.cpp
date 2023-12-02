@@ -20,6 +20,10 @@ void BasicBlock::insertBack(Instruction *inst)
 void BasicBlock::insertBefore(Instruction *dst, Instruction *src)
 {
     // Todo
+    src->getPrev()->setNext(dst); 
+    dst->setPrev(src->getPrev()); 
+    src->setPrev(dst); 
+    dst->setNext(src);
 
     dst->setParent(this);
 }

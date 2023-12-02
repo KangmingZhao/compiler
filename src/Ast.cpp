@@ -61,7 +61,7 @@ void BinaryExpr::genCode()
     Function *func = bb->getParent();
     if (op < arithmeticEnd)
     {
-        //op�����������
+        //arithmetic op
         expr1->genCode();
         expr2->genCode();
         Operand* src1 = expr1->getOperand();
@@ -92,7 +92,7 @@ void BinaryExpr::genCode()
     }
     else if (op > arithmeticEnd && op < logicEnd)
     {
-        //op���߼������
+        //logical op
         switch (op)
         {
         case AND:
@@ -112,11 +112,11 @@ void BinaryExpr::genCode()
     }
     else if (op > logicEnd && op < relationEnd)
     {
-        //op�ǹ�ϵ�����
+        //relation op
     }
     else
     {
-        //op����ֵĶ�����
+        //else
     }
 
 
@@ -179,11 +179,17 @@ void IfElseStmt::genCode()
 void CompoundStmt::genCode()
 {
     // Todo
+    if(stmt != nullptr)
+        stmt->genCode();
 }
 
 void SeqNode::genCode()
 {
     // Todo
+    if (stmt1 != nullptr)
+        stmt1->genCode();
+    if (stmt2 != nullptr)
+        stmt2->genCode();
 }
 
 void DeclStmt::genCode()
@@ -191,7 +197,7 @@ void DeclStmt::genCode()
     IdentifierSymbolEntry *se = dynamic_cast<IdentifierSymbolEntry *>(id->getSymPtr());
     if(se->isGlobal())
     {
-        std::cout << "fuck" << std::endl;
+        //std::cout << "fuck" << std::endl;
         Operand *addr;
         SymbolEntry *addr_se;
         addr_se = new IdentifierSymbolEntry(*se);
@@ -201,7 +207,7 @@ void DeclStmt::genCode()
     }
     else if(se->isLocal())
     {
-        std::cout << "you" << std::endl;
+        //std::cout << "you" << std::endl;
         Function *func = builder->getInsertBB()->getParent();
         BasicBlock *entry = func->getEntry();
         Instruction *alloca;
@@ -217,13 +223,14 @@ void DeclStmt::genCode()
     }
     else
     {
-        std::cout << "fuckyou!" << std::endl;
+        std::cout << "what the hell are you trying to decl?!" << std::endl;
     }
 }
 
 void ReturnStmt::genCode()
 {
     // Todo
+    retValue->genCode();
 }
 
 void AssignStmt::genCode()

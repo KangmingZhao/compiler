@@ -71,7 +71,8 @@ private:
 public:
     enum { ADD, SUB, NOT };
     UnaryExpr(SymbolEntry* se, int op, ExprNode* expr) : ExprNode(se), op(op), expr(expr) {
-        is_not_val = judge_is_not_val(expr);
+        is_not_val = judge_is_not_val(expr); 
+        dst = new Operand(se);
     };
     void output(int level);
     void typeCheck();
@@ -120,8 +121,12 @@ public:
     BinaryExpr(SymbolEntry* se, int op, ExprNode* expr1, ExprNode* expr2) : ExprNode(se), op(op), expr1(expr1), expr2(expr2) { 
         is_crement = 0; 
         is_not_val = (judge_is_not_val(expr1) && judge_is_not_val(expr2));
+        dst = new Operand(se);
     };
-    BinaryExpr(SymbolEntry* se, int op, ExprNode* ID) : ExprNode(se), op(op), ID(ID) { is_crement = 1; };
+    BinaryExpr(SymbolEntry* se, int op, ExprNode* ID) : ExprNode(se), op(op), ID(ID) { 
+        is_crement = 1; 
+        dst = new Operand(se);
+    };
     void output(int level);
     void typeCheck();
     void genCode();
@@ -266,7 +271,7 @@ class FunctCall : public ExprNode
 public:
     FunctCall(SymbolEntry* se, ParaNode* para_node) : ExprNode(se), para_node(para_node) {
         is_not_val = 0;
-;
+        dst = new Operand(se);
     };
     void output(int level);
     void typeCheck();
@@ -292,7 +297,7 @@ class Id : public ExprNode
             is_not_val = 1;
         else
             is_not_val = 0;
-            
+        dst = new Operand(se);
     }
 public:
     enum { DEFAULT, INT_ARRAY, FUNCT };
