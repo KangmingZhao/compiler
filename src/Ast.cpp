@@ -158,7 +158,7 @@ void BinaryExpr::genCode()
 
     //if (op == AND)
     //{
-    //    //��������һ���⡣
+    //    //锟斤拷锟斤拷锟斤拷锟斤拷一锟斤拷锟解。
     //    
     //}
     //else if(op == OR)
@@ -212,10 +212,10 @@ void IfStmt::genCode()
     thenStmt->genCode();
     then_bb = builder->getInsertBB();
 
-    //虽然这个鬼地方很操蛋直接写了个意义不明的new了一个莫名其妙的东西，但是事实上在指令类的构造函数中，
-    //这个写法会直接把一个新new出来的指令插到insert_bb里面。
-    //在这里，insert_bb就是then_bb。
-    //且这个指令的branch变量就是end_bb。
+    //铏界劧杩欎釜楝煎湴鏂瑰緢鎿嶈泲鐩存帴鍐欎簡涓剰涔変笉鏄庣殑new浜嗕竴涓帿鍚嶅叾濡欑殑涓滆タ锛屼絾鏄簨瀹炰笂鍦ㄦ寚浠ょ被鐨勬瀯閫犲嚱鏁颁腑锛�
+    //杩欎釜鍐欐硶浼氱洿鎺ユ妸涓€涓柊new鍑烘潵鐨勬寚浠ゆ彃鍒癷nsert_bb閲岄潰銆�
+    //鍦ㄨ繖閲岋紝insert_bb灏辨槸then_bb銆�
+    //涓旇繖涓寚浠ょ殑branch鍙橀噺灏辨槸end_bb銆�
     new UncondBrInstruction(end_bb, then_bb);
 
     //end_bb->output();
@@ -236,8 +236,8 @@ void IfElseStmt::genCode()
     BasicBlock* then_bb, * else_bb, * end_bb;
 
     BasicBlock* now_bb = builder->getInsertBB();
-    //大概思路是，当前运行到的要插入的块是then、else和end的前驱，然后条件语句是需要在当前要插入的块进行的。
-    //接着要逐步把当前要插入的块设置为then啥的，设好后genCode
+    //澶ф鎬濊矾鏄紝褰撳墠杩愯鍒扮殑瑕佹彃鍏ョ殑鍧楁槸then銆乪lse鍜宔nd鐨勫墠椹憋紝鐒跺悗鏉′欢璇彞鏄渶瑕佸湪褰撳墠瑕佹彃鍏ョ殑鍧楄繘琛岀殑銆�
+    //鎺ョ潃瑕侀€愭鎶婂綋鍓嶈鎻掑叆鐨勫潡璁剧疆涓簍hen鍟ョ殑锛岃濂藉悗genCode
 
     func = builder->getInsertBB()->getParent();
     then_bb = new BasicBlock(func);
@@ -249,7 +249,7 @@ void IfElseStmt::genCode()
     //fprintf(yyout, "fuck\n");
     //builder->getInsertBB()->output();
     //fprintf(yyout, "fuck\n");
-    //可以看到在这个builder->getInsertBB()之后的内容就打印了a<b的比较。
+    //鍙互鐪嬪埌鍦ㄨ繖涓猙uilder->getInsertBB()涔嬪悗鐨勫唴瀹瑰氨鎵撳嵃浜哸<b鐨勬瘮杈冦€�
 
 
     builder->getInsertBB()->addSucc(then_bb);
@@ -283,7 +283,7 @@ void IfElseStmt::genCode()
     builder->setInsertBB(else_bb);
     elseStmt->genCode();
     else_bb = builder->getInsertBB();
-    //别忘了把else和then的语句块最后br回end语句块
+    //鍒繕浜嗘妸else鍜宼hen鐨勮鍙ュ潡鏈€鍚巄r鍥瀍nd璇彞鍧�
     new UncondBrInstruction(end_bb, else_bb);
 
 
@@ -345,8 +345,14 @@ void DeclStmt::genCode()
 
 void ReturnStmt::genCode()
 {
-    // Todo
-    retValue->genCode();
+    //Todo
+    BasicBlock* ret_bb = builder->getInsertBB();
+    Operand* src=nullptr;
+    if(retValue){
+        retValue->genCode();
+        src=retValue->getOperand();
+    }
+    new RetInstruction(src,ret_bb);
 }
 
 void AssignStmt::genCode()
@@ -376,9 +382,9 @@ void FunctionDef::typeCheck()
     if (stmt == nullptr&&ret != TypeSystem::voidType)
     {   
          fprintf(stderr, "function\'%s\'misses return\n",se->toStr().c_str());
-        // 函数体空�?判断是否符合void
+        // 鍑芥暟浣撶┖锟�?鍒ゆ柇鏄惁绗﹀悎void
     }
-    // 函数体不�?去看看是否符合声�?
+    // 鍑芥暟浣撲笉锟�?鍘荤湅鐪嬫槸鍚︾鍚堝０锟�?
     else{
         isreturn=false;
         stmt->typeCheck();
@@ -531,8 +537,8 @@ void ReturnStmt::typeCheck()
     // Todo
     if(retValue)
     {
-       isreturn=true;//说明真有返回的东�?
-        retVal=retValue->getSymPtr()->getType(); //返回值类�?
+       isreturn=true;//璇存槑鐪熸湁杩斿洖鐨勪笢锟�?
+        retVal=retValue->getSymPtr()->getType(); //杩斿洖鍊肩被锟�?
     }
 
 
@@ -544,7 +550,7 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
-    //���ȼ�鸴�ƶ����ǲ���const��
+    //锟斤拷锟饺硷拷楦达拷贫锟斤拷锟斤拷遣锟斤拷锟絚onst锟斤拷
     if (lval->get_symbolEntry()->isConstIdentifer())
     {
         fprintf(stderr, "identifier \"%s\" is const\n", lval->get_name().c_str());
@@ -599,8 +605,8 @@ void AssignStmt::typeCheck()
 
 
 
-//������������������
-/*ս������
+//锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
+/*战锟斤拷锟斤拷锟斤拷
 
 UnaryExpr 
 InitNode
@@ -618,7 +624,7 @@ DoNothingStmt*/
 
 void ArrDimNode::typeCheck()
 {
-    //����Ҫ��鴫�������ǲ���i32����Ϊ�Ƿ����±꣬ʲôvoid��float�����С�
+    //锟斤拷锟斤拷要锟斤拷榇拷锟斤拷锟斤拷锟斤拷遣锟斤拷锟絠32锟斤拷锟斤拷为锟角凤拷锟斤拷锟铰标，什么void锟斤拷float锟斤拷锟斤拷锟叫★拷
     if (!dimension_size->get_symbolEntry()->getType()->isInt())
     {
         fprintf(stderr, "i32 is needed, but %s is given \n",
@@ -682,6 +688,7 @@ void WhileStmt::typeCheck()
 }
 void WhileStmt::genCode()
 {
+
 
 }
 
@@ -823,7 +830,7 @@ void UnaryExpr::genCode()
 
 
 
-//����������ֵֹĶ�����?
+//锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷止值亩锟斤拷锟斤拷锟�?
 
 
 std::string ExprNode::get_name()
@@ -850,7 +857,7 @@ void BinaryExpr::output(int level)
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
     }
-    //����ֱ�������
+    //锟斤拷锟斤拷直锟斤拷锟斤拷锟斤拷锟�
 
 
     //typeCheck();
@@ -1023,7 +1030,7 @@ void ArrDimNode::output(int level)
             if (node_state == ACCESS)
                 dimension_size->output(level + 20);
             else
-                //����
+                //锟斤拷锟斤拷
                 fprintf(stderr, "not a const \n");
         }
         //dimension_size->output(level + 20);
@@ -1071,7 +1078,7 @@ void ConstDeclList::output(int level)
 }
 void WhileStmt::output(int level)
 {
-    //����ʵ�֣�ֻ�ǵ����ķ�������Ļ�����if��һ������
+    //锟斤拷锟斤拷实锟街ｏ拷只锟角碉拷锟斤拷锟侥凤拷锟斤拷锟斤拷锟斤拷幕锟斤拷锟斤拷锟絠f锟斤拷一锟斤拷锟斤拷锟斤拷
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
     cond->output(level + 4);
     if (doStmt != nullptr)
@@ -1135,7 +1142,7 @@ void Constant::output(int level)
     }
     else if (this->symbolEntry->getType()->isFLOAT())
     {
-        //�þͺ���symbolentry�����Ѿ��Ѹ�������������ת��Ϊ�ַ����ˣ������ֱ��?s�ͺ��˲����ڹ�ռλ����
+        //锟矫就猴拷锟斤拷symbolentry锟斤拷锟斤拷锟窖撅拷锟窖革拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷转锟斤拷为锟街凤拷锟斤拷锟剿ｏ拷锟斤拷锟斤拷锟街憋拷锟�?s锟酵猴拷锟剿诧拷锟斤拷锟节癸拷占位锟斤拷锟斤拷
         fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
     }
@@ -1253,8 +1260,8 @@ void FunctionDef::output(int level)
     std::string name, type;
     if (se == nullptr)
     {
-        fprintf(stderr, "Oops!�������\n");//��ӡ�������û�ж���?
-        assert(se != nullptr);      //�׳�һ�����Դ���
+        fprintf(stderr, "Oops!锟斤拷锟斤拷锟斤拷锟絓n");//锟斤拷印锟斤拷锟斤拷锟斤拷锟矫伙拷卸锟斤拷锟�?
+        assert(se != nullptr);      //锟阶筹拷一锟斤拷锟斤拷锟皆达拷锟斤拷
     }
     name = se->toStr();
     type = se->getType()->toStr();
