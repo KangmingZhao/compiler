@@ -298,11 +298,12 @@ class Id : public ExprNode
         else
             is_not_val = 0;
         dst = new Operand(se);
+        //注意，这个函数这里会把dst覆盖掉，所以它应该在声明为临时identifier之前调用。
     }
 public:
     enum { DEFAULT, INT_ARRAY, FUNCT };
 
-    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state(se); };
+    Id(SymbolEntry* se) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr) { init_val_state(se); SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); };
     
     
     
@@ -310,13 +311,13 @@ public:
     Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init) { reset_dim_record();  init_val_state(se);};
     Id(SymbolEntry* se, ArrDimNode* Dimension) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr) { reset_dim_record(); init_val_state(se);};
     
-    Id(SymbolEntry* se, int define_state) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr), define_state(define_state) { SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); init_val_state(se);};
+    Id(SymbolEntry* se, int define_state) : ExprNode(se), id_type(DEFAULT), Dimension(nullptr), Init(nullptr), define_state(define_state) { init_val_state(se); SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); };
     
     
     //用于数组初始化
     Id(SymbolEntry* se, ArrDimNode* Dimension, InitNode* Init, int define_state, int dimension_size) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(Init), define_state(define_state), dimension_size(dimension_size) { reset_dim_record(); se->update_arr_dimension_recorder(dimension_size); init_val_state(se);};
     //用于读取数组下标
-    Id(SymbolEntry* se, ArrDimNode* Dimension, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr), define_state(define_state) { reset_dim_record();init_val_state(se); };
+    Id(SymbolEntry* se, ArrDimNode* Dimension, int define_state) : ExprNode(se), id_type(INT_ARRAY), Dimension(Dimension), Init(nullptr), define_state(define_state) { init_val_state(se); SymbolEntry* temp = new TemporarySymbolEntry(se->getType(), SymbolTable::getLabel()); dst = new Operand(temp); reset_dim_record();};
 
     ArrDimNode* getDimension() { return Dimension; };
 

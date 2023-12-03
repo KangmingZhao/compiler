@@ -4,6 +4,6 @@
     "\\include",
     "\\src"
   ],
-  "SelectedNode": "\\src\\BasicBlock.cpp",
+  "SelectedNode": "\\include\\Instruction.h",
   "PreviewInSolutionExplorer": false
 }

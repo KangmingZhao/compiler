@@ -67,6 +67,7 @@ void BlockMerge::merge(Function *func, BasicBlock *start) {
     // TODO: 1. 处理所有待合并块之间的联系，包括删除冗余的可合并块之间的跳转等；
 
     for (auto bb : mergeList) {
+
         std::vector<Instruction *> mergeInst = {};
         auto head = bb->end();
         for (auto instr = head->getNext(); instr != head;
@@ -78,6 +79,11 @@ void BlockMerge::merge(Function *func, BasicBlock *start) {
         }
 
         // TODO: 2. 在合并留下来的唯一块中插入所有被合并块中留下的指令；
+        //这我乱写的啊，不知道对不对。
+        /*for (auto inst_2_insert : mergeInst)
+            start->insertBack(inst_2_insert);*/
+        
+
 
         // TODO: 3. 维护块之间的前驱后继关系，将被合并的块从容器中移除。
         // bb->deleteAllRelation();

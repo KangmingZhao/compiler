@@ -10,9 +10,10 @@ Instruction::Instruction(unsigned instType, BasicBlock *insert_bb)
     prev = next = this;
     opcode = -1;
     this->instType = instType;
+
     if (insert_bb != nullptr)
     {
-        insert_bb->insertBack(this);
+        insert_bb->insertBack(this);    
         parent = insert_bb;
     }
 }
@@ -159,10 +160,14 @@ void CmpInstruction::output() const
 UncondBrInstruction::UncondBrInstruction(BasicBlock *to, BasicBlock *insert_bb) : Instruction(UNCOND, insert_bb)
 {
     branch = to;
+    //std::cout << "fuck\n";
+    //this->output();
+    //insert_bb->output();
 }
 
 void UncondBrInstruction::output() const
 {
+    //std::cout << branch->getNo() <<std::endl;
     fprintf(yyout, "  br label %%B%d\n", branch->getNo());
 }
 

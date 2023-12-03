@@ -13,6 +13,11 @@ IRBuilder* Node::builder = nullptr;
 bool isreturn=false;
 Type *retVal;
 std::vector<Type*> paramVector;
+
+
+
+bool expr_in_cond = 0;
+
 Node::Node()
 {
     seq = counter++;
@@ -61,6 +66,7 @@ void BinaryExpr::genCode()
     Function *func = bb->getParent();
     if (op < arithmeticEnd)
     {
+        //if(expr_in_cond)
         //arithmetic op
         expr1->genCode();
         expr2->genCode();
@@ -113,6 +119,36 @@ void BinaryExpr::genCode()
     else if (op > logicEnd && op < relationEnd)
     {
         //relation op
+        expr1->genCode();
+        expr2->genCode();
+        Operand* src1 = expr1->getOperand();
+        Operand* src2 = expr2->getOperand();
+        int opcode;
+        switch (op)
+        {
+        case EQUAL:
+            opcode = CmpInstruction::E;
+            break;
+        case NOTEQUAL:
+            opcode = CmpInstruction::NE;
+            break;
+        case LESS:
+            opcode = CmpInstruction::L;
+            break;
+        case GREATER:
+            opcode = CmpInstruction::G;
+            break;
+        case LESSEQUAL:
+            opcode = CmpInstruction::LE;
+            break;
+        case GREATEREQUAL:
+            opcode = CmpInstruction::GE;
+            break;
+        default:
+            opcode = -1;
+            break;
+        }
+        new CmpInstruction(opcode, dst, src1, src2, bb);
     }
     else
     {
@@ -152,6 +188,7 @@ void Id::genCode()
 
 void IfStmt::genCode()
 {
+    //std::cout << "fuck\n";
     Function *func;
     BasicBlock *then_bb, *end_bb;
 
@@ -159,21 +196,100 @@ void IfStmt::genCode()
     then_bb = new BasicBlock(func);
     end_bb = new BasicBlock(func);
 
+
+    builder->getInsertBB()->addSucc(then_bb);
+    builder->getInsertBB()->addSucc(end_bb);
+    then_bb->addPred(builder->getInsertBB());
+    end_bb->addPred(builder->getInsertBB());
+
     cond->genCode();
     backPatch(cond->trueList(), then_bb);
     backPatch(cond->falseList(), end_bb);
 
+    //std::cout << then_bb->empty() << end_bb->empty() << std::endl;
+
     builder->setInsertBB(then_bb);
     thenStmt->genCode();
     then_bb = builder->getInsertBB();
+
+    //虽然这个鬼地方很操蛋直接写了个意义不明的new了一个莫名其妙的东西，但是事实上在指令类的构造函数中，
+    //这个写法会直接把一个新new出来的指令插到insert_bb里面。
+    //在这里，insert_bb就是then_bb。
+    //且这个指令的branch变量就是end_bb。
     new UncondBrInstruction(end_bb, then_bb);
 
+    //end_bb->output();
+    //then_bb->output();
+    //for (auto fuck : then_bb->getParent()->getBlockList())
+    //{
+    //    std::cout << fuck->succEmpty() << " " << fuck->predEmpty() << std::endl;
+    //}
+
+    
     builder->setInsertBB(end_bb);
 }
 
 void IfElseStmt::genCode()
 {
     // Todo
+    Function* func;
+    BasicBlock* then_bb, * else_bb, * end_bb;
+
+    BasicBlock* now_bb = builder->getInsertBB();
+    //大概思路是，当前运行到的要插入的块是then、else和end的前驱，然后条件语句是需要在当前要插入的块进行的。
+    //接着要逐步把当前要插入的块设置为then啥的，设好后genCode
+
+    func = builder->getInsertBB()->getParent();
+    then_bb = new BasicBlock(func);
+    else_bb = new BasicBlock(func);
+    end_bb = new BasicBlock(func);
+
+
+
+    //fprintf(yyout, "fuck\n");
+    //builder->getInsertBB()->output();
+    //fprintf(yyout, "fuck\n");
+    //可以看到在这个builder->getInsertBB()之后的内容就打印了a<b的比较。
+
+
+    builder->getInsertBB()->addSucc(then_bb);
+    builder->getInsertBB()->addSucc(else_bb);
+
+    then_bb->addSucc(end_bb);
+    else_bb->addSucc(end_bb);
+
+
+
+    then_bb->addPred(builder->getInsertBB());
+    else_bb->addPred(builder->getInsertBB());
+
+    end_bb->addPred(then_bb);
+    end_bb->addPred(else_bb);
+
+
+    cond->genCode();
+    backPatch(cond->trueList(), then_bb);    
+    backPatch(cond->falseList(), else_bb);
+
+    //std::cout << then_bb->empty() << end_bb->empty() << std::endl;
+
+    builder->setInsertBB(then_bb);
+    thenStmt->genCode();
+    //then_bb = builder->getInsertBB();
+    then_bb = builder->getInsertBB();
+    new UncondBrInstruction(end_bb, then_bb);
+
+
+    builder->setInsertBB(else_bb);
+    elseStmt->genCode();
+    else_bb = builder->getInsertBB();
+    //别忘了把else和then的语句块最后br回end语句块
+    new UncondBrInstruction(end_bb, else_bb);
+
+
+
+    new CondBrInstruction(then_bb, else_bb, cond->getOperand(), now_bb);
+    builder->setInsertBB(end_bb);
 }
 
 void CompoundStmt::genCode()
