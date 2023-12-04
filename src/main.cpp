@@ -61,7 +61,10 @@ int main(int argc, char *argv[])
     }
 
     //ast.output();
-    ast.typeCheck();
+
+    ast.typeCheck();    
+    //std::cout << "fuck\n";
+
     ast.genCode(&unit);
     if(dump_type == IR)
         unit.output();

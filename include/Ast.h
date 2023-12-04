@@ -20,6 +20,34 @@ class BasicBlock;
 class Instruction;
 class IRBuilder;
 
+class LoopManager
+{
+    std::vector<BasicBlock*> end_loop_bb_stack;//used for break. directly goto end
+    std::vector<BasicBlock*> loop_cond_bb_stack;//used for continue. go back to cond to check whether enter next loop
+public:
+    bool empty() { return end_loop_bb_stack.size() == 0; };
+    int num_of_loop_bb_in_stack = 0;
+    int new_loop_enter(BasicBlock* p_cond_bb, BasicBlock* p_end_bb)
+    {
+        end_loop_bb_stack.push_back(p_end_bb);
+        loop_cond_bb_stack.push_back(p_cond_bb);
+        num_of_loop_bb_in_stack++;
+        return num_of_loop_bb_in_stack;
+    }
+    void loop_end(int recorded_loop_bb_in_stack)
+    {
+        if (recorded_loop_bb_in_stack == num_of_loop_bb_in_stack)
+        {
+            end_loop_bb_stack.pop_back();
+            loop_cond_bb_stack.pop_back();
+            num_of_loop_bb_in_stack--;
+        }
+    }
+    BasicBlock* get_end_bb() { return end_loop_bb_stack[end_loop_bb_stack.size() - 1]; };
+    BasicBlock* get_cond_bb() { return loop_cond_bb_stack[loop_cond_bb_stack.size() - 1]; };
+};
+
+
 class Node
 {
 private:

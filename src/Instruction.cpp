@@ -95,7 +95,7 @@ void BinaryInstruction::output() const
         op = "div";
         break;
     case MOD:
-        op = "mod";
+        op = "srem";
         break;
     default:
         break;

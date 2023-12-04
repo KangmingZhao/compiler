@@ -14,20 +14,7 @@ bool isreturn=false;
 Type *retVal;
 std::vector<Type*> paramVector;
 
-std::vector<BasicBlock*> end_loop_bb_stack;//used for break. directly goto end
-std::vector<BasicBlock*> loop_cond_bb_stack;//used for continue. go back to cond to check whether enter next loop
-int num_of_loop_bb_in_stack = 0;
-void new_loop_enter(BasicBlock* p_cond_bb, BasicBlock* p_end_bb)
-{
-    end_loop_bb_stack.push_back(p_end_bb);
-    loop_cond_bb_stack.push_back(p_cond_bb);
-    num_of_loop_bb_in_stack++;
-}
-void loop_end()
-{
-    end_loop_bb_stack.pop_back();
-    loop_cond_bb_stack.pop_back();
-}
+LoopManager loop_manager;
 
 
 void stmt_genCode(StmtNode* stmtNode_2_gen, BasicBlock* bb_2_entry, Function* func)
@@ -217,26 +204,33 @@ void IfStmt::genCode()
     then_bb = new BasicBlock(func);
     end_bb = new BasicBlock(func);
 
+    LinkBB(builder->getInsertBB(), then_bb);
+    LinkBB(builder->getInsertBB(), end_bb);
 
-    builder->getInsertBB()->addSucc(then_bb);
-    builder->getInsertBB()->addSucc(end_bb);
-    then_bb->addPred(builder->getInsertBB());
-    end_bb->addPred(builder->getInsertBB());
-
+    //builder->getInsertBB()->addSucc(then_bb);
+    //builder->getInsertBB()->addSucc(end_bb);
+    //then_bb->addPred(builder->getInsertBB());
+    //end_bb->addPred(builder->getInsertBB());
+    cond->getSymPtr()->changeType(TypeSystem::boolType);
     cond->genCode();
     backPatch(cond->trueList(), then_bb);
     backPatch(cond->falseList(), end_bb);
 
+    new CondBrInstruction(then_bb, end_bb, cond->getOperand(), builder->getInsertBB());
+
+
     //std::cout << then_bb->empty() << end_bb->empty() << std::endl;
 
     builder->setInsertBB(then_bb);
-    thenStmt->genCode();
+    stmt_genCode(thenStmt, then_bb, func);
+    //thenStmt->genCode();
     then_bb = builder->getInsertBB();
 
     //铏界劧杩欎釜楝煎湴鏂瑰緢鎿嶈泲鐩存帴鍐欎簡涓剰涔変笉鏄庣殑new浜嗕竴涓帿鍚嶅叾濡欑殑涓滆タ锛屼絾鏄簨瀹炰笂鍦ㄦ寚浠ょ被鐨勬瀯閫犲嚱鏁颁腑锛�
     //杩欎釜鍐欐硶浼氱洿鎺ユ妸涓€涓柊new鍑烘潵鐨勬寚浠ゆ彃鍒癷nsert_bb閲岄潰銆�
     //鍦ㄨ繖閲岋紝insert_bb灏辨槸then_bb銆�
     //涓旇繖涓寚浠ょ殑branch鍙橀噺灏辨槸end_bb銆�
+
     new UncondBrInstruction(end_bb, then_bb);
 
     //end_bb->output();
@@ -685,23 +679,29 @@ void DoNothingStmt::genCode()
 
 void ContinueStmt::typeCheck()
 {
-    if (who_2_continue != nullptr)
-        who_2_continue->typeCheck();
 }
 void ContinueStmt::genCode()
 {
-
+    if (whether_valid && !loop_manager.empty())
+    {
+        BasicBlock* cond_bb;
+        cond_bb = loop_manager.get_cond_bb();
+        new UncondBrInstruction(cond_bb, builder->getInsertBB());
+    }
 }
 
 void BreakStmt::typeCheck()
 {
 
-    if (who_2_break != nullptr)
-        who_2_break->typeCheck();
 }
 void BreakStmt::genCode()
 {
-
+    if (whether_valid && !loop_manager.empty())
+    {
+        BasicBlock* end_bb;
+        end_bb = loop_manager.get_end_bb();
+        new UncondBrInstruction(end_bb, builder->getInsertBB());
+    }
 }
 
 void WhileStmt::typeCheck()
@@ -721,10 +721,15 @@ void WhileStmt::genCode()
     //澶ф鎬濊矾鏄紝褰撳墠杩愯鍒扮殑瑕佹彃鍏ョ殑鍧楁槸then銆乪lse鍜宔nd鐨勫墠椹憋紝鐒跺悗鏉′欢璇彞鏄渶瑕佸湪褰撳墠瑕佹彃鍏ョ殑鍧楄繘琛岀殑銆�
     //鎺ョ潃瑕侀€愭鎶婂綋鍓嶈鎻掑叆鐨勫潡璁剧疆涓簍hen鍟ョ殑锛岃濂藉悗genCode
 
+
     func = builder->getInsertBB()->getParent();
     loop_cond_bb = new BasicBlock(func);
     loop_body_bb = new BasicBlock(func);
     end_bb = new BasicBlock(func);
+
+    new UncondBrInstruction(loop_cond_bb, builder->getInsertBB());
+
+    int recorded_loop_bb_in_stack = loop_manager.new_loop_enter(loop_cond_bb, end_bb);
 
 
     LinkBB(builder->getInsertBB(), loop_cond_bb);
@@ -753,8 +758,9 @@ void WhileStmt::genCode()
     new UncondBrInstruction(loop_cond_bb, loop_body_bb);
 
 
-    builder->setInsertBB(end_bb);
 
+    builder->setInsertBB(end_bb);
+    loop_manager.loop_end(recorded_loop_bb_in_stack);
 
 }
 
