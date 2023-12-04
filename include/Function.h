@@ -35,6 +35,9 @@ public:
     reverse_iterator rbegin() { return block_list.rbegin(); };
     reverse_iterator rend() { return block_list.rend(); };
     SymbolEntry *getSymPtr() { return sym_ptr; };
+
+    BasicBlock* setEntry(BasicBlock* entrybb) { BasicBlock* temp = entry; entry = entrybb; return temp; };
+
 };
 
 #endif

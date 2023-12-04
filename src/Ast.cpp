@@ -14,7 +14,28 @@ bool isreturn=false;
 Type *retVal;
 std::vector<Type*> paramVector;
 
+std::vector<BasicBlock*> end_loop_bb_stack;//used for break. directly goto end
+std::vector<BasicBlock*> loop_cond_bb_stack;//used for continue. go back to cond to check whether enter next loop
+int num_of_loop_bb_in_stack = 0;
+void new_loop_enter(BasicBlock* p_cond_bb, BasicBlock* p_end_bb)
+{
+    end_loop_bb_stack.push_back(p_end_bb);
+    loop_cond_bb_stack.push_back(p_cond_bb);
+    num_of_loop_bb_in_stack++;
+}
+void loop_end()
+{
+    end_loop_bb_stack.pop_back();
+    loop_cond_bb_stack.pop_back();
+}
 
+
+void stmt_genCode(StmtNode* stmtNode_2_gen, BasicBlock* bb_2_entry, Function* func)
+{
+    BasicBlock* origin_entry = func->setEntry(bb_2_entry);
+    stmtNode_2_gen->genCode();
+    func->setEntry(origin_entry);
+}
 
 bool expr_in_cond = 0;
 
@@ -251,20 +272,23 @@ void IfElseStmt::genCode()
     //fprintf(yyout, "fuck\n");
     //鍙互鐪嬪埌鍦ㄨ繖涓猙uilder->getInsertBB()涔嬪悗鐨勫唴瀹瑰氨鎵撳嵃浜哸<b鐨勬瘮杈冦€�
 
+    LinkBB(builder->getInsertBB(), then_bb);
+    LinkBB(builder->getInsertBB(), else_bb);
 
-    builder->getInsertBB()->addSucc(then_bb);
+    LinkBB(then_bb, end_bb);
+    LinkBB(else_bb, end_bb);
+
+    /*builder->getInsertBB()->addSucc(then_bb);
     builder->getInsertBB()->addSucc(else_bb);
 
     then_bb->addSucc(end_bb);
     else_bb->addSucc(end_bb);
 
-
-
     then_bb->addPred(builder->getInsertBB());
     else_bb->addPred(builder->getInsertBB());
 
     end_bb->addPred(then_bb);
-    end_bb->addPred(else_bb);
+    end_bb->addPred(else_bb);*/
 
 
     cond->getSymPtr()->changeType(TypeSystem::boolType);
@@ -275,14 +299,16 @@ void IfElseStmt::genCode()
     //std::cout << then_bb->empty() << end_bb->empty() << std::endl;
 
     builder->setInsertBB(then_bb);
-    thenStmt->genCode();
+    stmt_genCode(thenStmt, then_bb, func);
+    //thenStmt->genCode();
     //then_bb = builder->getInsertBB();
     then_bb = builder->getInsertBB();
     new UncondBrInstruction(end_bb, then_bb);
 
 
     builder->setInsertBB(else_bb);
-    elseStmt->genCode();
+    stmt_genCode(elseStmt, then_bb, func);
+    //elseStmt->genCode();
     else_bb = builder->getInsertBB();
     //鍒繕浜嗘妸else鍜宼hen鐨勮鍙ュ潡鏈€鍚巄r鍥瀍nd璇彞鍧�
     new UncondBrInstruction(end_bb, else_bb);
@@ -689,6 +715,45 @@ void WhileStmt::typeCheck()
 }
 void WhileStmt::genCode()
 {
+    Function* func;
+    BasicBlock* loop_cond_bb, * loop_body_bb, * end_bb;
+    //BasicBlock* now_bb = builder->getInsertBB();
+    //澶ф鎬濊矾鏄紝褰撳墠杩愯鍒扮殑瑕佹彃鍏ョ殑鍧楁槸then銆乪lse鍜宔nd鐨勫墠椹憋紝鐒跺悗鏉′欢璇彞鏄渶瑕佸湪褰撳墠瑕佹彃鍏ョ殑鍧楄繘琛岀殑銆�
+    //鎺ョ潃瑕侀€愭鎶婂綋鍓嶈鎻掑叆鐨勫潡璁剧疆涓簍hen鍟ョ殑锛岃濂藉悗genCode
+
+    func = builder->getInsertBB()->getParent();
+    loop_cond_bb = new BasicBlock(func);
+    loop_body_bb = new BasicBlock(func);
+    end_bb = new BasicBlock(func);
+
+
+    LinkBB(builder->getInsertBB(), loop_cond_bb);
+    LinkBB(loop_cond_bb, loop_body_bb);
+    LinkBB(loop_cond_bb, end_bb);
+
+    
+
+    //the judgement to break is set inside the loopbb
+    //thanks to the fucking coding, i have to write english comment now!
+    builder->setInsertBB(loop_cond_bb);
+    cond->getSymPtr()->changeType(TypeSystem::boolType);
+    cond->genCode();
+    backPatch(cond->trueList(), loop_body_bb);
+    backPatch(cond->falseList(), end_bb);
+    new CondBrInstruction(loop_body_bb, end_bb, cond->getOperand(), loop_cond_bb);
+
+
+    builder->setInsertBB(loop_body_bb);
+
+    //i don't know whether it's right. but apparently, the domain must be change.
+
+    stmt_genCode(doStmt, loop_body_bb, func);
+
+    loop_body_bb = builder->getInsertBB();
+    new UncondBrInstruction(loop_cond_bb, loop_body_bb);
+
+
+    builder->setInsertBB(end_bb);
 
 
 }

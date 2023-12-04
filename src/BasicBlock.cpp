@@ -4,6 +4,11 @@
 
 extern FILE* yyout;
 
+void LinkBB(BasicBlock* pre, BasicBlock* suc)
+{
+    pre->addSucc(suc);
+    suc->addPred(pre);
+}
 // insert the instruction to the front of the basicblock.
 void BasicBlock::insertFront(Instruction *inst)
 {
@@ -37,17 +42,21 @@ void BasicBlock::remove(Instruction *inst)
 
 void BasicBlock::output() const
 {
-    fprintf(yyout, "B%d:", no);
-
-    if (!pred.empty())
+    if (head->getNext() != head)//otherwise, there is no any shit in the fucking block, printing whom will lead to 
+        //synax error
     {
-        fprintf(yyout, "%*c; preds = %%B%d", 32, '\t', pred[0]->getNo());
-        for (auto i = pred.begin() + 1; i != pred.end(); i++)
-            fprintf(yyout, ", %%B%d", (*i)->getNo());
+        fprintf(yyout, "B%d:", no);
+
+        if (!pred.empty())
+        {
+            fprintf(yyout, "%*c; preds = %%B%d", 32, '\t', pred[0]->getNo());
+            for (auto i = pred.begin() + 1; i != pred.end(); i++)
+                fprintf(yyout, ", %%B%d", (*i)->getNo());
+        }
+        fprintf(yyout, "\n");
+        for (auto i = head->getNext(); i != head; i = i->getNext())
+            i->output();
     }
-    fprintf(yyout, "\n");
-    for (auto i = head->getNext(); i != head; i = i->getNext())
-        i->output();
 }
 
 void BasicBlock::addSucc(BasicBlock *bb)

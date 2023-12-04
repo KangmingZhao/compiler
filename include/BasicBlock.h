@@ -6,6 +6,8 @@
 
 class Function;
 
+
+
 class BasicBlock
 {
     typedef std::vector<BasicBlock *>::iterator bb_iterator;
@@ -43,6 +45,9 @@ public:
     bb_iterator pred_end() { return pred.end(); };
     int getNumOfPred() const { return pred.size(); };
     int getNumOfSucc() const { return succ.size(); };
-};
 
+
+
+};
+void LinkBB(BasicBlock* pre, BasicBlock* suc);
 #endif

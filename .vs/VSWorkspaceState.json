@@ -4,6 +4,6 @@
     "\\include",
     "\\src"
   ],
-  "SelectedNode": "\\include\\SymbolTable.h",
+  "SelectedNode": "\\src\\BasicBlock.cpp",
   "PreviewInSolutionExplorer": false
 }
