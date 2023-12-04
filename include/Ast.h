@@ -20,6 +20,8 @@ class BasicBlock;
 class Instruction;
 class IRBuilder;
 
+
+
 class LoopManager
 {
     std::vector<BasicBlock*> end_loop_bb_stack;//used for break. directly goto end
@@ -89,6 +91,8 @@ public:
     bool judge_is_not_val(ExprNode* expr) { return expr->is_not_val ? 1 : 0; };
 
 };
+
+
 
 
 class UnaryExpr : public ExprNode
@@ -200,7 +204,12 @@ public:
     }
 };
 
-
+class CalExprManager
+{
+public:
+    Constant* cal_expr(ExprNode* node2cal);
+    
+};
 
 class InitNode
 {

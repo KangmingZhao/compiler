@@ -15,6 +15,31 @@ Type *retVal;
 std::vector<Type*> paramVector;
 
 LoopManager loop_manager;
+CalExprManager cal_expr_manager;
+
+Constant* CalExprManager::cal_expr(ExprNode* node2cal)
+{
+    float cal_result = node2cal->cal_expr_val();
+    int cal_result_i = (int)cal_result;
+    if (node2cal->cal_expr_val() != PRE_CAL_ERROR_MEETING_VAL)
+    {
+        SymbolEntry* se;
+        if (node2cal->getSymPtr()->getType()->isFLOAT())
+        {
+            se = new ConstantSymbolEntry(TypeSystem::floatType, cal_result);
+        }
+        else
+        {
+            se = new ConstantSymbolEntry(TypeSystem::intType, cal_result_i);
+
+        }
+        return new Constant(se);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
 
 
 void stmt_genCode(StmtNode* stmtNode_2_gen, BasicBlock* bb_2_entry, Function* func)
@@ -70,6 +95,7 @@ void FunctionDef::genCode()
 
 void BinaryExpr::genCode()
 {
+
     BasicBlock *bb = builder->getInsertBB();
     Function *func = bb->getParent();
     if (op < arithmeticEnd)
@@ -379,9 +405,20 @@ void ReturnStmt::genCode()
 void AssignStmt::genCode()
 {
     BasicBlock *bb = builder->getInsertBB();
-    expr->genCode();
     Operand *addr = dynamic_cast<IdentifierSymbolEntry*>(lval->getSymPtr())->getAddr();
-    Operand *src = expr->getOperand();
+
+    Operand* src;
+    Constant* cal_result = cal_expr_manager.cal_expr(expr);
+    if (cal_result != nullptr)
+    {
+        //cal_result->genCode();
+        src = cal_result->getOperand();
+    }
+    else
+    {
+        expr->genCode();
+        src = expr->getOperand();
+    }
     /***
      * We haven't implemented array yet, the lval can only be ID. So we just store the result of the `expr` to the addr of the id.
      * If you want to implement array, you have to caculate the address first and then store the result into it.
@@ -679,6 +716,8 @@ void DoNothingStmt::genCode()
 
 void ContinueStmt::typeCheck()
 {
+    if (!whether_valid)
+        fprintf(stderr, "continue not in loop \n");
 }
 void ContinueStmt::genCode()
 {
@@ -692,7 +731,8 @@ void ContinueStmt::genCode()
 
 void BreakStmt::typeCheck()
 {
-
+    if(!whether_valid)
+        fprintf(stderr, "break not in loop \n");
 }
 void BreakStmt::genCode()
 {
