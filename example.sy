@@ -1,9 +1,7 @@
-//test local var define
+//test div
 int main(){
-    int a, b0, _c;
-    a = 1;
-    b0 = 2;
-    _c = 3;
-	const int x=1,y=2;
-    return b0 + _c;
+    int a, b;
+    a = 10;
+    b = 5;
+    return a / b;
 }

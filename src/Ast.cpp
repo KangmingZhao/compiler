@@ -190,7 +190,7 @@ void BinaryExpr::genCode()
 
     //if (op == AND)
     //{
-    //    //锟斤拷锟斤拷锟斤拷锟斤拷一锟斤拷锟解。
+    //    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓瑙ｃ€�
     //    
     //}
     //else if(op == OR)
@@ -250,10 +250,10 @@ void IfStmt::genCode()
     //thenStmt->genCode();
     then_bb = builder->getInsertBB();
 
-    //铏界劧杩欎釜楝煎湴鏂瑰緢鎿嶈泲鐩存帴鍐欎簡涓剰涔変笉鏄庣殑new浜嗕竴涓帿鍚嶅叾濡欑殑涓滆タ锛屼絾鏄簨瀹炰笂鍦ㄦ寚浠ょ被鐨勬瀯閫犲嚱鏁颁腑锛�
-    //杩欎釜鍐欐硶浼氱洿鎺ユ妸涓€涓柊new鍑烘潵鐨勬寚浠ゆ彃鍒癷nsert_bb閲岄潰銆�
-    //鍦ㄨ繖閲岋紝insert_bb灏辨槸then_bb銆�
-    //涓旇繖涓寚浠ょ殑branch鍙橀噺灏辨槸end_bb銆�
+    //閾忕晫鍔ф潻娆庨嚋妤濈厧婀撮弬鐟扮发閹垮秷娉查惄瀛樺复閸愭瑤绨℃稉顏呭壈娑斿绗夐弰搴ｆ畱new娴滃棔绔存稉顏囧缚閸氬秴鍙炬俊娆戞畱娑撴粏銈块敍灞肩稻閺勵垯绨ㄧ€圭偘绗傞崷銊﹀瘹娴犮倗琚惃鍕€柅鐘插毐閺侀鑵戦敍锟�
+    //鏉╂瑤閲滈崘娆愮《娴兼氨娲块幒銉﹀Ω娑撯偓娑擃亝鏌妌ew閸戠儤娼甸惃鍕瘹娴犮倖褰冮崚鐧穘sert_bb闁插矂娼伴妴锟�
+    //閸︺劏绻栭柌宀嬬礉insert_bb鐏忚鲸妲竧hen_bb閵嗭拷
+    //娑撴棁绻栨稉顏呭瘹娴犮倗娈慴ranch閸欐﹢鍣虹亸杈ㄦЦend_bb閵嗭拷
 
     new UncondBrInstruction(end_bb, then_bb);
 
@@ -275,8 +275,8 @@ void IfElseStmt::genCode()
     BasicBlock* then_bb, * else_bb, * end_bb;
 
     BasicBlock* now_bb = builder->getInsertBB();
-    //澶ф鎬濊矾鏄紝褰撳墠杩愯鍒扮殑瑕佹彃鍏ョ殑鍧楁槸then銆乪lse鍜宔nd鐨勫墠椹憋紝鐒跺悗鏉′欢璇彞鏄渶瑕佸湪褰撳墠瑕佹彃鍏ョ殑鍧楄繘琛岀殑銆�
-    //鎺ョ潃瑕侀€愭鎶婂綋鍓嶈鎻掑叆鐨勫潡璁剧疆涓簍hen鍟ョ殑锛岃濂藉悗genCode
+    //婢堆勵洤閹繆鐭鹃弰顖ょ礉瑜版挸澧犳潻鎰攽閸掓壆娈戠憰浣瑰絻閸忋儳娈戦崸妤佹Цthen閵嗕躬lse閸滃當nd閻ㄥ嫬澧犳す鎲嬬礉閻掕泛鎮楅弶鈥叉鐠囶厼褰為弰顖炴付鐟曚礁婀ぐ鎾冲鐟曚焦褰冮崗銉ф畱閸ф绻樼悰宀€娈戦妴锟�
+    //閹恒儳娼冪憰渚€鈧劖顒為幎濠傜秼閸撳秷顩﹂幓鎺戝弳閻ㄥ嫬娼＄拋鍓х枂娑撶皪hen閸熴儳娈戦敍宀冾啎婵傝棄鎮梘enCode
 
     func = builder->getInsertBB()->getParent();
     then_bb = new BasicBlock(func);
@@ -288,7 +288,7 @@ void IfElseStmt::genCode()
     //fprintf(yyout, "fuck\n");
     //builder->getInsertBB()->output();
     //fprintf(yyout, "fuck\n");
-    //鍙互鐪嬪埌鍦ㄨ繖涓猙uilder->getInsertBB()涔嬪悗鐨勫唴瀹瑰氨鎵撳嵃浜哸<b鐨勬瘮杈冦€�
+    //閸欘垯浜掗惇瀣煂閸︺劏绻栨稉鐚檜ilder->getInsertBB()娑斿鎮楅惃鍕敶鐎圭懓姘ㄩ幍鎾冲祪娴滃摳<b閻ㄥ嫭鐦潏鍐︹偓锟�
 
     LinkBB(builder->getInsertBB(), then_bb);
     LinkBB(builder->getInsertBB(), else_bb);
@@ -328,7 +328,7 @@ void IfElseStmt::genCode()
     stmt_genCode(elseStmt, then_bb, func);
     //elseStmt->genCode();
     else_bb = builder->getInsertBB();
-    //鍒繕浜嗘妸else鍜宼hen鐨勮鍙ュ潡鏈€鍚巄r鍥瀍nd璇彞鍧�
+    //閸掝偄绻曟禍鍡樺Ωelse閸滃hen閻ㄥ嫯顕㈤崣銉ユ健閺堚偓閸氬穭r閸ョ€峮d鐠囶厼褰為崸锟�
     new UncondBrInstruction(end_bb, else_bb);
 
 
@@ -445,9 +445,9 @@ void FunctionDef::typeCheck()
     if (stmt == nullptr&&ret != TypeSystem::voidType)
     {   
          fprintf(stderr, "function\'%s\'misses return\n",se->toStr().c_str());
-        // 鍑芥暟浣撶┖锟�?鍒ゆ柇鏄惁绗﹀悎void
+        // 閸戣姤鏆熸担鎾垛敄閿燂拷?閸掋倖鏌囬弰顖氭儊缁楋箑鎮巚oid
     }
-    // 鍑芥暟浣撲笉锟�?鍘荤湅鐪嬫槸鍚︾鍚堝０锟�?
+    // 閸戣姤鏆熸担鎾茬瑝閿燂拷?閸樿崵婀呴惇瀣Ц閸氾妇顑侀崥鍫濓紣閿燂拷?
     else{
         isreturn=false;
         stmt->typeCheck();
@@ -600,8 +600,8 @@ void ReturnStmt::typeCheck()
     // Todo
     if(retValue)
     {
-       isreturn=true;//璇存槑鐪熸湁杩斿洖鐨勪笢锟�?
-        retVal=retValue->getSymPtr()->getType(); //杩斿洖鍊肩被锟�?
+       isreturn=true;//鐠囧瓨妲戦惇鐔告箒鏉╂柨娲栭惃鍕閿燂拷?
+        retVal=retValue->getSymPtr()->getType(); //鏉╂柨娲栭崐鑲╄閿燂拷?
     }
 
 
@@ -613,7 +613,7 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
-    //锟斤拷锟饺硷拷楦达拷贫锟斤拷锟斤拷遣锟斤拷锟絚onst锟斤拷
+    //閿熸枻鎷烽敓楗虹》鎷锋ウ杈炬嫹璐敓鏂ゆ嫹閿熸枻鎷烽仯閿熸枻鎷烽敓绲歰nst閿熸枻鎷�
     if (lval->get_symbolEntry()->isConstIdentifer())
     {
         fprintf(stderr, "identifier \"%s\" is const\n", lval->get_name().c_str());
@@ -668,8 +668,8 @@ void AssignStmt::typeCheck()
 
 
 
-//锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
-/*战锟斤拷锟斤拷锟斤拷
+//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+/*鎴橀敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
 
 UnaryExpr 
 InitNode
@@ -687,7 +687,7 @@ DoNothingStmt*/
 
 void ArrDimNode::typeCheck()
 {
-    //锟斤拷锟斤拷要锟斤拷榇拷锟斤拷锟斤拷锟斤拷遣锟斤拷锟絠32锟斤拷锟斤拷为锟角凤拷锟斤拷锟铰标，什么void锟斤拷float锟斤拷锟斤拷锟叫★拷
+    //閿熸枻鎷烽敓鏂ゆ嫹瑕侀敓鏂ゆ嫹姒囶偓鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閬ｉ敓鏂ゆ嫹閿熺禒32閿熸枻鎷烽敓鏂ゆ嫹涓洪敓瑙掑嚖鎷烽敓鏂ゆ嫹閿熼摪鏍囷紝浠€涔坴oid閿熸枻鎷穎loat閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鈽呮嫹
     if (!dimension_size->get_symbolEntry()->getType()->isInt())
     {
         fprintf(stderr, "i32 is needed, but %s is given \n",
@@ -767,8 +767,8 @@ void WhileStmt::genCode()
     Function* func;
     BasicBlock* loop_cond_bb, * loop_body_bb, * end_bb;
     //BasicBlock* now_bb = builder->getInsertBB();
-    //澶ф鎬濊矾鏄紝褰撳墠杩愯鍒扮殑瑕佹彃鍏ョ殑鍧楁槸then銆乪lse鍜宔nd鐨勫墠椹憋紝鐒跺悗鏉′欢璇彞鏄渶瑕佸湪褰撳墠瑕佹彃鍏ョ殑鍧楄繘琛岀殑銆�
-    //鎺ョ潃瑕侀€愭鎶婂綋鍓嶈鎻掑叆鐨勫潡璁剧疆涓簍hen鍟ョ殑锛岃濂藉悗genCode
+    //婢堆勵洤閹繆鐭鹃弰顖ょ礉瑜版挸澧犳潻鎰攽閸掓壆娈戠憰浣瑰絻閸忋儳娈戦崸妤佹Цthen閵嗕躬lse閸滃當nd閻ㄥ嫬澧犳す鎲嬬礉閻掕泛鎮楅弶鈥叉鐠囶厼褰為弰顖炴付鐟曚礁婀ぐ鎾冲鐟曚焦褰冮崗銉ф畱閸ф绻樼悰宀€娈戦妴锟�
+    //閹恒儳娼冪憰渚€鈧劖顒為幎濠傜秼閸撳秷顩﹂幓鎺戝弳閻ㄥ嫬娼＄拋鍓х枂娑撶皪hen閸熴儳娈戦敍宀冾啎婵傝棄鎮梘enCode
 
 
     func = builder->getInsertBB()->getParent();
@@ -996,7 +996,7 @@ void UnaryExpr::genCode()
 
 
 
-//锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷止值亩锟斤拷锟斤拷锟�?
+//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋鍊间憨閿熸枻鎷烽敓鏂ゆ嫹閿燂拷?
 
 
 std::string ExprNode::get_name()
@@ -1023,7 +1023,7 @@ void BinaryExpr::output(int level)
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
     }*/
-    //锟斤拷锟斤拷直锟斤拷锟斤拷锟斤拷锟�
+    //閿熸枻鎷烽敓鏂ゆ嫹鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
 
 
     //typeCheck();
@@ -1196,7 +1196,7 @@ void ArrDimNode::output(int level)
             if (node_state == ACCESS)
                 dimension_size->output(level + 20);
             else
-                //锟斤拷锟斤拷
+                //閿熸枻鎷烽敓鏂ゆ嫹
                 fprintf(stderr, "not a const \n");
         }
         //dimension_size->output(level + 20);
@@ -1244,7 +1244,7 @@ void ConstDeclList::output(int level)
 }
 void WhileStmt::output(int level)
 {
-    //锟斤拷锟斤拷实锟街ｏ拷只锟角碉拷锟斤拷锟侥凤拷锟斤拷锟斤拷锟斤拷幕锟斤拷锟斤拷锟絠f锟斤拷一锟斤拷锟斤拷锟斤拷
+    //閿熸枻鎷烽敓鏂ゆ嫹瀹為敓琛楋綇鎷峰彧閿熻纰夋嫹閿熸枻鎷烽敓渚ュ嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹骞曢敓鏂ゆ嫹閿熸枻鎷烽敓绲爁閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
     cond->output(level + 4);
     if (doStmt != nullptr)
@@ -1308,7 +1308,7 @@ void Constant::output(int level)
     }
     else if (this->symbolEntry->getType()->isFLOAT())
     {
-        //锟矫就猴拷锟斤拷symbolentry锟斤拷锟斤拷锟窖撅拷锟窖革拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷转锟斤拷为锟街凤拷锟斤拷锟剿ｏ拷锟斤拷锟斤拷锟街憋拷锟�?s锟酵猴拷锟剿诧拷锟斤拷锟节癸拷占位锟斤拷锟斤拷
+        //閿熺煫灏辩尨鎷烽敓鏂ゆ嫹symbolentry閿熸枻鎷烽敓鏂ゆ嫹閿熺獤鎾呮嫹閿熺獤闈╂嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹杞敓鏂ゆ嫹涓洪敓琛楀嚖鎷烽敓鏂ゆ嫹閿熷壙锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻鎲嬫嫹閿燂拷?s閿熼叺鐚存嫹閿熷壙璇ф嫹閿熸枻鎷烽敓鑺傜櫢鎷峰崰浣嶉敓鏂ゆ嫹閿熸枻鎷�
         fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
     }
@@ -1426,8 +1426,8 @@ void FunctionDef::output(int level)
     std::string name, type;
     if (se == nullptr)
     {
-        fprintf(stderr, "Oops!锟斤拷锟斤拷锟斤拷锟絓n");//锟斤拷印锟斤拷锟斤拷锟斤拷锟矫伙拷卸锟斤拷锟�?
-        assert(se != nullptr);      //锟阶筹拷一锟斤拷锟斤拷锟皆达拷锟斤拷
+        fprintf(stderr, "Oops!閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓绲搉");//閿熸枻鎷峰嵃閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐭紮鎷峰嵏閿熸枻鎷烽敓锟�?
+        assert(se != nullptr);      //閿熼樁绛规嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熺殕杈炬嫹閿熸枻鎷�
     }
     name = se->toStr();
     type = se->getType()->toStr();

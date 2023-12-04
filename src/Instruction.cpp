@@ -92,7 +92,7 @@ void BinaryInstruction::output() const
         op = "mul";
         break;
     case DIV:
-        op = "div";
+        op = "sdiv";
         break;
     case MOD:
         op = "srem";
