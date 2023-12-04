@@ -814,9 +814,6 @@ IdDeclList
             fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定�?
             state = REDEFINATION;
         }
-
-        
-
         SymbolEntry *se;
         se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel());
         identifiers->install($1, se);

@@ -824,7 +824,11 @@ void ConstDeclList::typeCheck()
 }
 void ConstDeclList::genCode()
 {
+       if (decl1 != nullptr)
+        decl1->genCode();
 
+    if (decl2 != nullptr)
+        decl2->genCode();
 }
 
 void DeclList::typeCheck()
@@ -838,7 +842,11 @@ void DeclList::typeCheck()
 }
 void DeclList::genCode()
 {
+     if (decl1 != nullptr)
+        decl1->genCode();
 
+    if (decl2 != nullptr)
+        decl2->genCode();
 }
 
 void ConstDeclInitStmt::typeCheck()
@@ -850,7 +858,8 @@ void ConstDeclInitStmt::typeCheck()
 }
 void ConstDeclInitStmt::genCode()
 {
-
+      if (initVal != nullptr)
+        initVal->genCode();
 }
 
 void DeclInitStmt::typeCheck()
@@ -860,7 +869,43 @@ void DeclInitStmt::typeCheck()
 }
 void DeclInitStmt::genCode()
 {
-
+    //std::cout<<"declInit gencode"<<std::endl;
+    IdentifierSymbolEntry *se = dynamic_cast<IdentifierSymbolEntry *>(id->getSymPtr());
+    if(se->isGlobal())
+    {
+        //std::cout << "fuck" << std::endl;
+        Operand *addr;
+        SymbolEntry *addr_se;
+        addr_se = new IdentifierSymbolEntry(*se);
+        addr_se->setType(new PointerType(se->getType()));
+        addr = new Operand(addr_se);
+        se->setAddr(addr);
+    }
+    else if(se->isLocal())
+    {
+        switch (se->getType()->get_range())
+        {
+        case 2:
+            Function * func = builder->getInsertBB()->getParent();
+            BasicBlock* entry = func->getEntry();
+            Instruction* alloca;
+            Operand* addr;
+            SymbolEntry* addr_se;
+            Type* type;
+            type = new PointerType(se->getType());
+            addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
+            addr = new Operand(addr_se);
+            alloca = new AllocaInstruction(addr, se);                   // allocate space for local id in function stack.
+            entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
+            se->setAddr(addr);
+            break;
+        }
+                                               // set the addr operand in symbol entry so that we can use it in subsequent code generation.
+    }
+    else
+    {
+        std::cout << "what the hell are you trying to decl?!" << std::endl;
+    }
 }
 
 void FunctCall::typeCheck()
