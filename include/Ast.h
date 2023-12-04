@@ -21,7 +21,6 @@ class Instruction;
 class IRBuilder;
 
 
-
 class LoopManager
 {
     std::vector<BasicBlock*> end_loop_bb_stack;//used for break. directly goto end
@@ -69,6 +68,10 @@ public:
     virtual void output(int level) = 0;
     virtual void typeCheck() = 0;
     virtual void genCode() = 0;
+
+    virtual void mergeConstExp() = 0;
+
+
     std::vector<BasicBlock**>& trueList() {return true_list;}
     std::vector<BasicBlock**>& falseList() {return false_list;}
 
@@ -92,7 +95,22 @@ public:
 
 };
 
+class Constant : public ExprNode
+{
+public:
+    Constant(SymbolEntry* se) : ExprNode(se) { dst = new Operand(se); };
+    void output(int level);
+    void typeCheck();
+    void genCode();
 
+    float cal_expr_val()
+    {
+        return ((ConstantSymbolEntry*)getSymPtr())->getValue();
+    }
+    void mergeConstExp() {};
+};
+
+Constant* cal_expr(ExprNode* node2cal);
 
 
 class UnaryExpr : public ExprNode
@@ -121,6 +139,18 @@ public:
             )
             :
             PRE_CAL_ERROR_MEETING_VAL;
+    }
+
+    void mergeConstExp()
+    {
+        if (expr != nullptr)
+        {
+            Constant* cal_result = cal_expr(expr);
+            if (cal_result != nullptr)
+                expr = cal_result;
+            else
+                expr->mergeConstExp();
+        }
     }
 };
 
@@ -188,28 +218,43 @@ public:
             :
             PRE_CAL_ERROR_MEETING_VAL;
     }
-};
 
-class Constant : public ExprNode
-{
-public:
-    Constant(SymbolEntry *se) : ExprNode(se){dst = new Operand(se);};
-    void output(int level);
-    void typeCheck();
-    void genCode();
 
-    float cal_expr_val()
+    void mergeConstExp()
     {
-        return ((ConstantSymbolEntry*)getSymPtr())->getValue();
+        if (expr1 != nullptr)
+        {
+            Constant* cal_result = cal_expr(expr1);
+            if (cal_result != nullptr)
+                expr1 = cal_result;
+            else
+                expr1->mergeConstExp();
+        }
+
+        if (expr2 != nullptr)
+        {
+
+            Constant* cal_result = cal_expr(expr2);
+            if (cal_result != nullptr)
+                expr2 = cal_result;
+            else
+                expr2->mergeConstExp();
+
+        }
+
+        if (ID != nullptr)
+            ID->mergeConstExp();
     }
 };
 
-class CalExprManager
-{
-public:
-    Constant* cal_expr(ExprNode* node2cal);
-    
-};
+
+
+//class CalExprManager
+//{
+//public:
+//    Constant* cal_expr(ExprNode* node2cal);
+//    
+//};
 
 class InitNode
 {
@@ -229,6 +274,24 @@ public:
     }
     void typeCheck();
     void genCode();
+
+    void mergeConstExp()
+    {
+        if (value_here != nullptr)
+        {
+            Constant* cal_result = cal_expr(value_here);
+            if (cal_result != nullptr)
+                value_here = cal_result;
+            else
+                value_here->mergeConstExp();
+        }
+
+        if(node1!=nullptr)
+            node1->mergeConstExp();
+
+        if (node2 != nullptr)
+            node2->mergeConstExp();
+    }
 
 };
 
@@ -270,6 +333,23 @@ public:
         }
     }
 
+
+    void mergeConstExp()
+    {
+        if (dimension_size != nullptr)
+        {
+            Constant* cal_result = cal_expr(dimension_size);
+            if (cal_result != nullptr)
+                dimension_size = cal_result;
+            else
+                dimension_size->mergeConstExp();
+        }
+
+        if(arr1 != nullptr)
+            arr1->mergeConstExp();
+        if(arr2!=nullptr)
+            arr2->mergeConstExp();
+    }
 };
 
 class ParaNode : public Node
@@ -301,7 +381,24 @@ public:
             return is_not_val ? para_expr->cal_expr_val() : PRE_CAL_ERROR_MEETING_VAL;
         }
     }
+
+    void mergeConstExp()
+    {
+        Constant* cal_result = cal_expr(para_expr);
+        if (cal_result != nullptr)
+            para_expr = cal_result;
+        else
+            para_expr->mergeConstExp();
+
+
+        if(para1 != nullptr)
+            para1->mergeConstExp();
+        if(para2!=nullptr)
+            para2->mergeConstExp();
+    }
 };
+
+
 class FunctCall : public ExprNode
 {
     ParaNode* para_node;
@@ -315,6 +412,9 @@ public:
     void genCode();
 
     float cal_expr_val() { return PRE_CAL_ERROR_MEETING_VAL; }//这里先默认函数返回的是非const了。不然尊都写不出来了
+
+    void mergeConstExp() { if (para_node != nullptr)para_node->mergeConstExp(); };
+
 };
 
 //令人欣慰的是，c++的编译器并不会对数组越界进行检查，所以这里就可以合法摸鱼了（
@@ -380,6 +480,14 @@ public:
             return PRE_CAL_ERROR_MEETING_VAL;
             
     }//直接返回非法。先不考虑const
+
+    void mergeConstExp() { 
+        if(Init!=nullptr)
+            Init->mergeConstExp();
+        if(Dimension!=nullptr)
+            Dimension->mergeConstExp(); 
+    };
+
 };
 
 class StmtNode : public Node
@@ -394,6 +502,12 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {
+        if (stmt != nullptr)
+            stmt->mergeConstExp();
+    };
+
 };
 
 class SeqNode : public StmtNode
@@ -405,6 +519,14 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {
+        if (stmt1 != nullptr)
+            stmt1->mergeConstExp();
+        if (stmt2 != nullptr)
+            stmt2->mergeConstExp();
+    };
+
 };
 
 class DeclStmt : public StmtNode
@@ -416,6 +538,12 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {
+        if (id != nullptr)
+            id->mergeConstExp();
+    };
+
 };
 
 class DeclInitStmt : public DeclStmt//////////////////////////////////////////////////
@@ -427,6 +555,19 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (initVal != nullptr)
+        {
+            Constant* cal_result = cal_expr(initVal);
+            if (cal_result != nullptr)
+                initVal = cal_result;
+            else
+                initVal->mergeConstExp();
+        }
+    }
 };
 
 
@@ -440,6 +581,19 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (initVal != nullptr)
+        {
+            Constant* cal_result = cal_expr(initVal);
+            if (cal_result != nullptr)
+                initVal = cal_result;
+            else
+                initVal->mergeConstExp();
+        }
+    }
 };
 class DeclList : public StmtNode
 {
@@ -450,6 +604,14 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {
+        if (decl1 != nullptr)
+            decl1->mergeConstExp();
+        if (decl2 != nullptr)
+            decl2->mergeConstExp();
+    };
+
 };
 class ConstDeclList : public StmtNode
 {
@@ -460,6 +622,14 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {
+        if (decl1 != nullptr)
+            decl1->mergeConstExp();
+        if (decl2 != nullptr)
+            decl1->mergeConstExp();
+    };
+
 };///////
 class EmptyStmt : public StmtNode {
 
@@ -468,6 +638,9 @@ public:
     void output(int level);
     void typeCheck() {};
     void genCode() {};
+
+    void mergeConstExp() {};
+
 };
 
 
@@ -483,6 +656,23 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (cond != nullptr)
+        {
+            Constant* cal_result = cal_expr(cond);
+            if (cal_result != nullptr)
+                cond = cal_result;
+            else
+                cond->mergeConstExp();
+        }
+        if (thenStmt != nullptr)
+        {
+            thenStmt->mergeConstExp();
+        }
+    }
 };
 
 class IfElseStmt : public StmtNode
@@ -496,6 +686,23 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (cond != nullptr)
+        {
+            Constant* cal_result = cal_expr(cond);
+            if (cal_result != nullptr)
+                cond = cal_result;
+            else
+                cond->mergeConstExp();
+        }
+        if (thenStmt != nullptr)
+            thenStmt->mergeConstExp();
+        if (elseStmt != nullptr)
+            elseStmt->mergeConstExp();
+    }
 };
 
 class ReturnStmt : public StmtNode
@@ -508,6 +715,18 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+    void mergeConstExp()
+    {
+        if (retValue != nullptr)
+        {
+            Constant* cal_result = cal_expr(retValue);
+            if (cal_result != nullptr)
+                retValue = cal_result;
+            else
+                retValue->mergeConstExp();
+        }
+    }
 };
 
 class AssignStmt : public StmtNode
@@ -520,6 +739,19 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (expr != nullptr)
+        {
+            Constant* cal_result = cal_expr(expr);
+            if (cal_result != nullptr)
+                expr = cal_result;
+            else
+                expr->mergeConstExp();
+        }
+    }
 };
 
 class FunctionDef : public StmtNode
@@ -535,6 +767,14 @@ public:
     void typeCheck();
     void genCode();
     SymbolEntry *getSymbolEntry() { return this->se; };
+
+    void mergeConstExp() {
+        if (stmt != nullptr)
+            stmt->mergeConstExp();
+        if (paraStmt != nullptr)
+            paraStmt->mergeConstExp();
+    };
+
 };
 
 
@@ -552,6 +792,21 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+
+
+    void mergeConstExp()
+    {
+        if (cond != nullptr)
+        {
+            Constant* cal_result = cal_expr(cond);
+            if (cal_result != nullptr)
+                cond = cal_result;
+            else
+                cond->mergeConstExp();
+        }
+        if (doStmt != nullptr)
+            doStmt->mergeConstExp();
+    }
 };
 class BreakStmt : public StmtNode
 {
@@ -564,6 +819,8 @@ public:
     void match_with_loop(StmtNode* who_2_break) { this->who_2_break = who_2_break; whether_valid = 1; }
     void typeCheck();
     void genCode();
+
+    void mergeConstExp() {};
 
 };
 class ContinueStmt : public StmtNode
@@ -580,6 +837,9 @@ public:
     void typeCheck();
     void genCode();
 
+    void mergeConstExp() {};
+
+
 };
 class DoNothingStmt : public StmtNode
 {
@@ -591,6 +851,8 @@ public:
     void output(int level);
     void typeCheck();
     void genCode();
+    void mergeConstExp() {};
+
 };
 
 
@@ -604,6 +866,7 @@ public:
     void setRoot(Node*n) {root = n;}
     void output();
     void typeCheck();
+    void mergeConstExp();
     void genCode(Unit *unit);
 };
 

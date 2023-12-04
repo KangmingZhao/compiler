@@ -52,6 +52,17 @@ private:
     SymbolEntry *se;
 };
 
+class AllocaArrInstruction : public Instruction
+{
+public:
+    AllocaArrInstruction(Operand* dst, SymbolEntry* se, BasicBlock* insert_bb = nullptr);
+    ~AllocaArrInstruction();
+    void output() const;
+    Operand* getDef() { return operands[0]; }
+private:
+    SymbolEntry* se;
+};
+
 class LoadInstruction : public Instruction
 {
 public:

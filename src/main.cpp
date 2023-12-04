@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
 
     ast.typeCheck();    
     //std::cout << "fuck\n";
-
+    ast.mergeConstExp();
+    //ast.output();
     ast.genCode(&unit);
     if(dump_type == IR)
         unit.output();

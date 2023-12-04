@@ -15,9 +15,8 @@ Type *retVal;
 std::vector<Type*> paramVector;
 
 LoopManager loop_manager;
-CalExprManager cal_expr_manager;
 
-Constant* CalExprManager::cal_expr(ExprNode* node2cal)
+Constant* cal_expr(ExprNode* node2cal)
 {
     float cal_result = node2cal->cal_expr_val();
     int cal_result_i = (int)cal_result;
@@ -40,7 +39,6 @@ Constant* CalExprManager::cal_expr(ExprNode* node2cal)
         return nullptr;
     }
 }
-
 
 void stmt_genCode(StmtNode* stmtNode_2_gen, BasicBlock* bb_2_entry, Function* func)
 {
@@ -371,18 +369,24 @@ void DeclStmt::genCode()
     else if(se->isLocal())
     {
         //std::cout << "you" << std::endl;
-        Function *func = builder->getInsertBB()->getParent();
-        BasicBlock *entry = func->getEntry();
-        Instruction *alloca;
-        Operand *addr;
-        SymbolEntry *addr_se;
-        Type *type;
-        type = new PointerType(se->getType());
-        addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
-        addr = new Operand(addr_se);
-        alloca = new AllocaInstruction(addr, se);                   // allocate space for local id in function stack.
-        entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
-        se->setAddr(addr);                                          // set the addr operand in symbol entry so that we can use it in subsequent code generation.
+        switch (se->getType()->get_range())
+        {
+        case 2:
+            Function * func = builder->getInsertBB()->getParent();
+            BasicBlock* entry = func->getEntry();
+            Instruction* alloca;
+            Operand* addr;
+            SymbolEntry* addr_se;
+            Type* type;
+            type = new PointerType(se->getType());
+            addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
+            addr = new Operand(addr_se);
+            alloca = new AllocaInstruction(addr, se);                   // allocate space for local id in function stack.
+            entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
+            se->setAddr(addr);
+            break;
+        }
+                                               // set the addr operand in symbol entry so that we can use it in subsequent code generation.
     }
     else
     {
@@ -406,19 +410,20 @@ void AssignStmt::genCode()
 {
     BasicBlock *bb = builder->getInsertBB();
     Operand *addr = dynamic_cast<IdentifierSymbolEntry*>(lval->getSymPtr())->getAddr();
-
-    Operand* src;
-    Constant* cal_result = cal_expr_manager.cal_expr(expr);
-    if (cal_result != nullptr)
-    {
-        //cal_result->genCode();
-        src = cal_result->getOperand();
-    }
-    else
-    {
-        expr->genCode();
-        src = expr->getOperand();
-    }
+    expr->genCode();
+    Operand* src = expr->getOperand();
+    //Operand* src;
+    //Constant* cal_result = cal_expr_manager.cal_expr(expr);
+    //if (cal_result != nullptr)
+    //{
+    //    //cal_result->genCode();
+    //    src = cal_result->getOperand();
+    //}
+    //else
+    //{
+    //    expr->genCode();
+    //    src = expr->getOperand();
+    //}
     /***
      * We haven't implemented array yet, the lval can only be ID. So we just store the result of the `expr` to the addr of the id.
      * If you want to implement array, you have to caculate the address first and then store the result into it.
@@ -696,7 +701,11 @@ void ArrDimNode::typeCheck()
     if (arr2 != nullptr)
         arr2->typeCheck();
     if (dimension_size != nullptr)
+    {
+        if(dimension_size->cal_expr_val() == PRE_CAL_ERROR_MEETING_VAL)
+            fprintf(stderr, "not a const \n");
         dimension_size->typeCheck();
+    }
 }
 void ArrDimNode::genCode()
 {
@@ -960,7 +969,7 @@ std::string ExprNode::get_name()
 
 void BinaryExpr::output(int level)
 {
-    float temp_store = cal_expr_val();
+    /*float temp_store = cal_expr_val();
     if (temp_store != PRE_CAL_ERROR_MEETING_VAL)
     {
         if (getSymPtr()->getType()->isFLOAT())
@@ -968,7 +977,7 @@ void BinaryExpr::output(int level)
         else if (getSymPtr()->getType()->isInt())
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
-    }
+    }*/
     //锟斤拷锟斤拷直锟斤拷锟斤拷锟斤拷锟�
 
 
@@ -1040,7 +1049,7 @@ void BinaryExpr::output(int level)
 }
 void UnaryExpr::output(int level)
 {
-    float temp_store = cal_expr_val();
+    /*float temp_store = cal_expr_val();
     if (temp_store != PRE_CAL_ERROR_MEETING_VAL)
     {
         if (getSymPtr()->getType()->isFLOAT())
@@ -1048,7 +1057,7 @@ void UnaryExpr::output(int level)
         else if (getSymPtr()->getType()->isInt())
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
-    }
+    }*/
 
 
     std::string op_str;
@@ -1384,3 +1393,26 @@ void FunctionDef::output(int level)
     if (stmt != nullptr)
         stmt->output(level + 4);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//merge const exp here
+void Ast::mergeConstExp()
+{
+    root->mergeConstExp();
+}
+
+
+
+

@@ -253,6 +253,11 @@ void RetInstruction::output() const
     }
 }
 
+
+
+
+
+
 AllocaInstruction::AllocaInstruction(Operand *dst, SymbolEntry *se, BasicBlock *insert_bb) : Instruction(ALLOCA, insert_bb)
 {
     operands.push_back(dst);
@@ -274,6 +279,36 @@ void AllocaInstruction::output() const
     type = se->getType()->toStr();
     fprintf(yyout, "  %s = alloca %s, align 4\n", dst.c_str(), type.c_str());
 }
+
+
+AllocaArrInstruction::AllocaArrInstruction(Operand* dst, SymbolEntry* se, BasicBlock* insert_bb) : Instruction(ALLOCA, insert_bb)
+{
+    operands.push_back(dst);
+    dst->setDef(this);
+    this->se = se;
+}
+
+AllocaArrInstruction::~AllocaArrInstruction()
+{
+    operands[0]->setDef(nullptr);
+    if (operands[0]->usersNum() == 0)
+        delete operands[0];
+}
+
+void AllocaArrInstruction::output() const
+{
+    std::string dst, type;
+    dst = operands[0]->toStr();
+    type = se->getType()->toStr();
+    fprintf(yyout, "  %s = alloca %s, align 4\n", dst.c_str(), type.c_str());
+}
+
+
+
+
+
+
+
 
 LoadInstruction::LoadInstruction(Operand *dst, Operand *src_addr, BasicBlock *insert_bb) : Instruction(LOAD, insert_bb)
 {
