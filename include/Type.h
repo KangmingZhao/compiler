@@ -23,18 +23,22 @@ protected:
 
         //¾¯½äÏß¶þ
         from_now_on_is_single_data,
-        INT,FLOAT,  
+        INT, FLOAT, BOOL
     };
 public:
     Type(int kind) : kind(kind) {};
     virtual ~Type() {};
-    virtual std::string toStr() = 0;
+    virtual std::string toStr() = 0; 
+    bool isBool() const { return kind == BOOL; };
     bool isInt() const {return kind == INT;};
     bool isVoid() const {return kind == VOID;};
     bool isFunc() const {return kind == FUNC;};
     bool isINT_ARRAY() const { return kind == INT_ARRAY; };
     bool isFLOAT() const { return kind == FLOAT; };
     bool isFLOAT_ARRAY() const { return kind == FLOAT_ARRAY; };
+
+
+
 
     int getKindValue() { return kind; };
     int get_range()
@@ -46,6 +50,15 @@ public:
         else
             return 2;
     }
+};
+
+class BoolType : public Type
+{
+private:
+    int size;
+public:
+    BoolType(int size) : Type(Type::BOOL), size(size) {};
+    std::string toStr();
 };
 
 class IntType : public Type

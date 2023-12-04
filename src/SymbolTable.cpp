@@ -9,6 +9,16 @@ SymbolEntry::SymbolEntry(Type *type, int kind)
     this->type = type;
     this->kind = kind;
 }
+void SymbolEntry::changeType(Type *new_type)
+{
+    type = new_type;
+    /*Type* new_type = Type::isBool(type_2_change) ? TypeSystem::boolType :
+        Type::isFLOAT(type_2_change) ? TypeSystem::floatType :
+        Type::isInt(type_2_change) ? TypeSystem::intType :
+        nullptr;
+    if (new_type != nullptr)
+        type = new_type;*/
+}
 
 ConstantSymbolEntry::ConstantSymbolEntry(Type *type, int value) : SymbolEntry(type, SymbolEntry::CONSTANT)
 {

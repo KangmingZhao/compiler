@@ -30,6 +30,13 @@ std::string IntType::toStr()
     return buffer.str();
 }
 
+std::string BoolType::toStr()
+{
+    std::ostringstream buffer;
+    buffer << "i" << size;
+    return buffer.str();
+}
+
 std::string INT_arrayType::toStr()
 {
     return "int_array";

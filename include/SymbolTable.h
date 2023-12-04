@@ -26,6 +26,7 @@ public:
     bool isVariable() const {return kind == VARIABLE;};
     bool isConstIdentifer() const { return kind == CONSTIDENTIFER; };
     Type* getType() {return type;};
+    void changeType(Type* new_type);
     
     void setType(Type *type) {this->type = type;};
     virtual std::string toStr() = 0;

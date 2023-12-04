@@ -267,6 +267,7 @@ void IfElseStmt::genCode()
     end_bb->addPred(else_bb);
 
 
+    cond->getSymPtr()->changeType(TypeSystem::boolType);
     cond->genCode();
     backPatch(cond->trueList(), then_bb);    
     backPatch(cond->falseList(), else_bb);
