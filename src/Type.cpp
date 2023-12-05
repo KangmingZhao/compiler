@@ -64,6 +64,12 @@ std::string FunctionType::toStr()
     buffer << returnType->toStr() << "()";
     return buffer.str();
 }
+std::string FunctionType::toStr_for_funct()
+{
+    std::ostringstream buffer;
+    buffer << returnType->toStr();
+    return buffer.str();
+}
 
 std::string PointerType::toStr()
 {

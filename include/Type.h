@@ -29,6 +29,7 @@ public:
     Type(int kind) : kind(kind) {};
     virtual ~Type() {};
     virtual std::string toStr() = 0; 
+    virtual std::string toStr_for_funct() = 0;
     bool isBool() const { return kind == BOOL; };
     bool isInt() const {return kind == INT;};
     bool isVoid() const {return kind == VOID;};
@@ -59,6 +60,7 @@ private:
 public:
     BoolType(int size) : Type(Type::BOOL), size(size) {};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class IntType : public Type
@@ -68,6 +70,7 @@ private:
 public:
     IntType(int size) : Type(Type::INT), size(size){};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class INT_arrayType : public Type
@@ -75,6 +78,7 @@ class INT_arrayType : public Type
 public:
     INT_arrayType() : Type(Type::INT_ARRAY) {};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 class FloatType : public Type
 {
@@ -83,6 +87,7 @@ private:
 public:
     FloatType(int size) : Type(Type::FLOAT), size(size) {};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class FLOAT_arrayType : public Type
@@ -90,6 +95,7 @@ class FLOAT_arrayType : public Type
 public:
     FLOAT_arrayType() : Type(Type::FLOAT_ARRAY) {};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class VoidType : public Type
@@ -97,6 +103,7 @@ class VoidType : public Type
 public:
     VoidType() : Type(Type::VOID){};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class FunctionType : public Type
@@ -108,6 +115,7 @@ public:
     Type(Type::FUNC), returnType(returnType), paramsType(paramsType){};
     Type* getRetType() {return returnType;};
     std::string toStr();
+    std::string toStr_for_funct();
 };
 
 class PointerType : public Type
@@ -117,6 +125,7 @@ private:
 public:
     PointerType(Type* valueType) : Type(Type::PTR) {this->valueType = valueType;};
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class ERROR_OCUPIER : public Type
@@ -125,6 +134,7 @@ public:
     ERROR_OCUPIER() :Type(Type::ERROR) {};
     //这个类是用来给那些未定义的ID占位用的type，保证程序能继续执行下去
     std::string toStr();
+    std::string toStr_for_funct() { return "what do you want, bro?"; };
 };
 
 class TypeSystem

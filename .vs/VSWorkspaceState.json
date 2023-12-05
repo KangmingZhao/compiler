@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\include",
-    "\\src"
+    "\\src",
+    "\\test",
+    "\\test\\level1-1"
   ],
-  "SelectedNode": "\\src\\main.cpp",
+  "SelectedNode": "\\test\\level1-1\\047_op_priority5.sy",
   "PreviewInSolutionExplorer": false
 }

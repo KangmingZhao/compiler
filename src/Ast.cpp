@@ -632,7 +632,15 @@ void AssignStmt::typeCheck()
 
 
     Type* type1 = lval->getSymPtr()->getType();
+    if (type1->isFunc())
+    {
+        fprintf(stderr, "funct can't be lval \n");
+    }
     Type* type2 = expr->getSymPtr()->getType();
+    if (type2->isFunc())
+    {
+        type2 = ((FunctionType*)type2)->returnType;
+    }
 
     if (type1->get_range() != type2->get_range())
     {

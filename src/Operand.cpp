@@ -2,6 +2,7 @@
 #include <sstream>
 #include <algorithm>
 #include <string.h>
+#include "Type.h"
 
 std::string Operand::toStr() const
 {
@@ -15,3 +16,8 @@ void Operand::removeUse(Instruction *inst)
         uses.erase(i);
 }
 
+void Operand::change_funct_type() {
+    if (se->getType()->isFunc()) {
+        se->setType(((FunctionType*)se->getType())->returnType);
+    }
+}

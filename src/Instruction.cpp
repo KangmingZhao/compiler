@@ -399,9 +399,12 @@ CallInstruction::CallInstruction(Operand *dst,
                                  BasicBlock *insert_bb)
     : Instruction(CALL, insert_bb), func(func)
 {
-    operands.push_back(dst);
-    if (dst)
-        dst->setDef(this);
+    Operand* dst_ = dst;
+    dst_->change_funct_type();
+    operands.push_back(dst_);
+    if (dst_)
+        dst_->setDef(this);
+    //std::cout<<dst->getType()->toStr();
     for (auto param : params)
     {
         operands.push_back(param);
@@ -412,12 +415,12 @@ CallInstruction::CallInstruction(Operand *dst,
 void CallInstruction::output() const
 {
     fprintf(yyout, "  ");
-    if (operands[0])
+    FunctionType* type = (FunctionType*)(func->getType());
+    if (operands[0] && !type->returnType->isVoid())
     {
         //std::cout<<operands[0]<<std::endl;
         fprintf(yyout, "%s =", operands[0]->toStr().c_str());
     }
-    FunctionType *type = (FunctionType *)(func->getType());
     fprintf(yyout, "call %s %s(", type->getRetType()->toStr().c_str(),
             func->toStr().c_str());
     for (long unsigned int i = 1; i < operands.size(); i++)

@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 #include "Function.h"
 #include <algorithm>
+#include "Type.h"
 
 extern FILE* yyout;
 
@@ -42,21 +43,46 @@ void BasicBlock::remove(Instruction *inst)
 
 void BasicBlock::output() const
 {
-    if (head->getNext() != head)//otherwise, there is no any shit in the fucking block, printing whom will lead to 
-        //synax error
-    {
-        fprintf(yyout, "B%d:", no);
+    fprintf(yyout, "B%d:", no);
 
-        if (!pred.empty())
-        {
-            fprintf(yyout, "%*c; preds = %%B%d", 32, '\t', pred[0]->getNo());
-            for (auto i = pred.begin() + 1; i != pred.end(); i++)
-                fprintf(yyout, ", %%B%d", (*i)->getNo());
-        }
-        fprintf(yyout, "\n");
+    if (!pred.empty())
+    {
+        fprintf(yyout, "%*c; preds = %%B%d", 32, '\t', pred[0]->getNo());
+        for (auto i = pred.begin() + 1; i != pred.end(); i++)
+            fprintf(yyout, ", %%B%d", (*i)->getNo());
+    }
+    fprintf(yyout, "\n");
+    if (head->getNext() != head)//otherwise, there is no any shit in the fucking block, printing whom will lead to synax error
+    {
         for (auto i = head->getNext(); i != head; i = i->getNext())
             i->output();
     }
+    else
+    {
+        //世界上真的存在没有指令但是有很多后继的结点吗?
+        if (succ.size())
+        {
+            for (auto succ_bb : succ)
+            {
+                fprintf(yyout, "  br label %%B%d\n", succ_bb->no);
+            }
+        }
+        else
+        {
+            if (parent->getSymPtr()->getType()->isVoid())
+            {
+                fprintf(yyout, "  ret void\n");
+            }
+            else
+            {
+                fprintf(yyout, "  ret %s %d\n", parent->getSymPtr()->getType()->toStr_for_funct().c_str(), 0);
+            }
+        }
+    }
+
+
+    
+    
 }
 
 void BasicBlock::addSucc(BasicBlock *bb)
