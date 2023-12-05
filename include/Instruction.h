@@ -30,7 +30,7 @@ protected:
     Instruction *next;
     BasicBlock *parent;
     std::vector<Operand*> operands;
-    enum {BINARY, COND, UNCOND, RET, LOAD, STORE, CMP, ALLOCA};
+    enum {BINARY, COND, UNCOND, RET, LOAD, STORE, CMP, ALLOCA,GLOBAL};
 };
 
 // meaningless instruction, used as the head node of the instruction list.
@@ -160,6 +160,19 @@ public:
             return {};
     }
     void output() const;
+};
+
+class GlobalInstruction: public Instruction
+{
+public:
+    // dst为变量名 expr为变量初始值 
+    GlobalInstruction(Operand *dst, Operand *expr, SymbolEntry *se, BasicBlock *insertBB = nullptr);
+    ~GlobalInstruction();
+    void output() const;
+    Operand *getDef() { return operands[0]; }
+private:
+    SymbolEntry *se;
+
 };
 
 #endif

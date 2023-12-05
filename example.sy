@@ -1,7 +1,6 @@
 //test div
+int c;
 int main(){
-    int a, b;
-    a = 10;
-    b = 5;
-    return a / b;
+ int a;
+ return 0;
 }

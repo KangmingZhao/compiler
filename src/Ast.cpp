@@ -190,7 +190,7 @@ void BinaryExpr::genCode()
 
     //if (op == AND)
     //{
-    //    //閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹涓€閿熸枻鎷烽敓瑙ｃ€�
+    //    //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗娑撯偓闁跨喐鏋婚幏鐑芥晸鐟欙絻鈧拷
     //    
     //}
     //else if(op == OR)
@@ -250,10 +250,10 @@ void IfStmt::genCode()
     //thenStmt->genCode();
     then_bb = builder->getInsertBB();
 
-    //閾忕晫鍔ф潻娆庨嚋妤濈厧婀撮弬鐟扮发閹垮秷娉查惄瀛樺复閸愭瑤绨℃稉顏呭壈娑斿绗夐弰搴ｆ畱new娴滃棔绔存稉顏囧缚閸氬秴鍙炬俊娆戞畱娑撴粏銈块敍灞肩稻閺勵垯绨ㄧ€圭偘绗傞崷銊﹀瘹娴犮倗琚惃鍕€柅鐘插毐閺侀鑵戦敍锟�
-    //鏉╂瑤閲滈崘娆愮《娴兼氨娲块幒銉﹀Ω娑撯偓娑擃亝鏌妌ew閸戠儤娼甸惃鍕瘹娴犮倖褰冮崚鐧穘sert_bb闁插矂娼伴妴锟�
-    //閸︺劏绻栭柌宀嬬礉insert_bb鐏忚鲸妲竧hen_bb閵嗭拷
-    //娑撴棁绻栨稉顏呭瘹娴犮倗娈慴ranch閸欐﹢鍣虹亸杈ㄦЦend_bb閵嗭拷
+    //闁惧繒鏅崝褎娼诲▎搴ㄥ殝濡ゆ繄鍘у﹢鎾棘閻熸壆鍙戦柟鍨Х濞夋煡鎯勭€涙ê澶嶉柛鎰懁缁ㄢ剝绋夐鍛濞戞柨顦粭澶愬及鎼达絾鐣眓ew濞存粌妫旂粩瀛樼▔椤忓洤缂氶柛姘Т閸欑偓淇婂▎鎴炵暠濞戞挻绮忛妶鍧楁晬鐏炶偐绋婚柡鍕靛灟缁ㄣ劎鈧湱鍋樼粭鍌炲捶閵婏箑鐦瑰ù鐘€楃悮顐︽儍閸曨剛鈧垶鏌呴悩鎻掓瘣闁轰線顣﹂懙鎴︽晬閿燂拷
+    //閺夆晜鐟ら柌婊堝礃濞嗘劗銆婂ù鍏兼皑濞插潡骞掗妷锕€惟濞戞挴鍋撳☉鎿冧簼閺屽ew闁告垹鍎ゅ鐢告儍閸曨剙鐦瑰ù鐘€栬ぐ鍐礆閻хsert_bb闂佹彃鐭傚浼村Υ閿燂拷
+    //闁革负鍔忕换鏍煂瀹€瀣insert_bb閻忓繗椴稿Σ绔en_bb闁靛棴鎷�
+    //濞戞挻妫佺换鏍ㄧ▔椤忓懎鐦瑰ù鐘€楀▓鎱磖anch闁告瑦锕㈤崳铏逛焊鏉堛劍笑end_bb闁靛棴鎷�
 
     new UncondBrInstruction(end_bb, then_bb);
 
@@ -275,8 +275,8 @@ void IfElseStmt::genCode()
     BasicBlock* then_bb, * else_bb, * end_bb;
 
     BasicBlock* now_bb = builder->getInsertBB();
-    //婢堆勵洤閹繆鐭鹃弰顖ょ礉瑜版挸澧犳潻鎰攽閸掓壆娈戠憰浣瑰絻閸忋儳娈戦崸妤佹Цthen閵嗕躬lse閸滃當nd閻ㄥ嫬澧犳す鎲嬬礉閻掕泛鎮楅弶鈥叉鐠囶厼褰為弰顖炴付鐟曚礁婀ぐ鎾冲鐟曚焦褰冮崗銉ф畱閸ф绻樼悰宀€娈戦妴锟�
-    //閹恒儳娼冪憰渚€鈧劖顒為幎濠傜秼閸撳秷顩﹂幓鎺戝弳閻ㄥ嫬娼＄拋鍓х枂娑撶皪hen閸熴儳娈戦敍宀冾啎婵傝棄鎮梘enCode
+    //濠㈠爢鍕垫搐闁诡剚绻嗛惌楣冨及椤栥倗绀夌憸鐗堟尭婢х姵娼婚幇顖ｆ斀闁告帗澹嗗▓鎴犳啺娴ｇ懓绲婚柛蹇嬪劤濞堟垿宕稿Δ浣剐hen闁靛棔韬琹se闁告粌鐣秐d闁汇劌瀚晶鐘炽仚閹插绀夐柣鎺曟硾閹寮堕垾鍙夘偨閻犲浂鍘艰ぐ鐐哄及椤栫偞浠橀悷鏇氱濠€顏囥亹閹惧啿顤呴悷鏇氱劍瑜板啴宕楅妷褎鐣遍柛褎顨夌换妯兼偘瀹€鈧▓鎴﹀Υ閿燂拷
+    //闁规亽鍎冲鍐啺娓氣偓閳ь剚鍔栭鐐哄箮婵犲倻绉奸柛鎾崇Х椤╋箓骞撻幒鎴濆汲闁汇劌瀚锛勬媼閸撗呮瀭濞戞挾鐨猦en闁哥喆鍎冲▓鎴︽晬瀹€鍐惧晭濠靛倽妫勯幃姊榚nCode
 
     func = builder->getInsertBB()->getParent();
     then_bb = new BasicBlock(func);
@@ -288,7 +288,7 @@ void IfElseStmt::genCode()
     //fprintf(yyout, "fuck\n");
     //builder->getInsertBB()->output();
     //fprintf(yyout, "fuck\n");
-    //閸欘垯浜掗惇瀣煂閸︺劏绻栨稉鐚檜ilder->getInsertBB()娑斿鎮楅惃鍕敶鐎圭懓姘ㄩ幍鎾冲祪娴滃摳<b閻ㄥ嫭鐦潏鍐︹偓锟�
+    //闁告瑯鍨禍鎺楁儑鐎ｎ亜鐓傞柛锔哄姀缁绘牗绋夐悮妾渋lder->getInsertBB()濞戞柨顑呴幃妤呮儍閸曨偄鏁堕悗鍦嚀濮樸劑骞嶉幘鍐茬オ濞存粌鎽�<b闁汇劌瀚惁顔芥綇閸愶腹鍋撻敓锟�
 
     LinkBB(builder->getInsertBB(), then_bb);
     LinkBB(builder->getInsertBB(), else_bb);
@@ -328,7 +328,7 @@ void IfElseStmt::genCode()
     stmt_genCode(elseStmt, then_bb, func);
     //elseStmt->genCode();
     else_bb = builder->getInsertBB();
-    //閸掝偄绻曟禍鍡樺Ωelse閸滃hen閻ㄥ嫯顕㈤崣銉ユ健閺堚偓閸氬穭r閸ョ€峮d鐠囶厼褰為崸锟�
+    //闁告帩鍋勭换鏇熺閸℃ê惟else闁告粌顔揾en闁汇劌瀚銏ゅ矗閵夈儲鍋ラ柡鍫氬亾闁告艾绌璻闁搞儳鈧钞d閻犲浂鍘艰ぐ鐐哄锤閿燂拷
     new UncondBrInstruction(end_bb, else_bb);
 
 
@@ -365,6 +365,11 @@ void DeclStmt::genCode()
         addr_se->setType(new PointerType(se->getType()));
         addr = new Operand(addr_se);
         se->setAddr(addr);
+        Instruction *g;
+        //initVal->genCode();
+        g = new GlobalInstruction(new Operand(id->getSymPtr()), nullptr, se);
+        g->output();
+     
     }
     else if(se->isLocal())
     {
@@ -445,9 +450,9 @@ void FunctionDef::typeCheck()
     if (stmt == nullptr&&ret != TypeSystem::voidType)
     {   
          fprintf(stderr, "function\'%s\'misses return\n",se->toStr().c_str());
-        // 閸戣姤鏆熸担鎾垛敄閿燂拷?閸掋倖鏌囬弰顖氭儊缁楋箑鎮巚oid
+        // 闁告垼濮ら弳鐔告媴閹惧灈鏁勯柨鐕傛嫹?闁告帇鍊栭弻鍥及椤栨碍鍎婄紒妤嬬畱閹窔oid
     }
-    // 閸戣姤鏆熸担鎾茬瑝閿燂拷?閸樿崵婀呴惇瀣Ц閸氾妇顑侀崥鍫濓紣閿燂拷?
+    // 闁告垼濮ら弳鐔告媴閹捐尙鐟濋柨鐕傛嫹?闁告ǹ宕靛﹢鍛存儑鐎ｎ偅笑闁告熬濡囬渚€宕ラ崼婵撶矗闁跨噦鎷�?
     else{
         isreturn=false;
         stmt->typeCheck();
@@ -600,8 +605,8 @@ void ReturnStmt::typeCheck()
     // Todo
     if(retValue)
     {
-       isreturn=true;//鐠囧瓨妲戦惇鐔告箒鏉╂柨娲栭惃鍕閿燂拷?
-        retVal=retValue->getSymPtr()->getType(); //鏉╂柨娲栭崐鑲╄閿燂拷?
+       isreturn=true;//閻犲洤鐡ㄥΣ鎴︽儑閻斿憡绠掗弶鈺傛煥濞叉牠鎯冮崟顏嗩偨闁跨噦鎷�?
+        retVal=retValue->getSymPtr()->getType(); //閺夆晜鏌ㄥú鏍磹閼测晞顫﹂柨鐕傛嫹?
     }
 
 
@@ -613,7 +618,7 @@ void ReturnStmt::typeCheck()
 void AssignStmt::typeCheck()
 {
     // Todo
-    //閿熸枻鎷烽敓楗虹》鎷锋ウ杈炬嫹璐敓鏂ゆ嫹閿熸枻鎷烽仯閿熸枻鎷烽敓绲歰nst閿熸枻鎷�
+    //闁跨喐鏋婚幏鐑芥晸妤楄櫣銆嬮幏閿嬨偊鏉堢偓瀚圭拹顐︽晸閺傘倖瀚归柨鐔告灮閹风兘浠柨鐔告灮閹风兘鏁撶徊姝皀st闁跨喐鏋婚幏锟�
     if (lval->get_symbolEntry()->isConstIdentifer())
     {
         fprintf(stderr, "identifier \"%s\" is const\n", lval->get_name().c_str());
@@ -668,8 +673,8 @@ void AssignStmt::typeCheck()
 
 
 
-//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
-/*鎴橀敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹
+//闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏锟�
+/*閹存﹢鏁撻弬銈嗗闁跨喐鏋婚幏鐑芥晸閺傘倖瀚�
 
 UnaryExpr 
 InitNode
@@ -687,7 +692,7 @@ DoNothingStmt*/
 
 void ArrDimNode::typeCheck()
 {
-    //閿熸枻鎷烽敓鏂ゆ嫹瑕侀敓鏂ゆ嫹姒囶偓鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閬ｉ敓鏂ゆ嫹閿熺禒32閿熸枻鎷烽敓鏂ゆ嫹涓洪敓瑙掑嚖鎷烽敓鏂ゆ嫹閿熼摪鏍囷紝浠€涔坴oid閿熸枻鎷穎loat閿熸枻鎷烽敓鏂ゆ嫹閿熷彨鈽呮嫹
+    //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚圭憰渚€鏁撻弬銈嗗濮掑浂鍋撻幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁綁鏁撻弬銈嗗闁跨喓绂�32闁跨喐鏋婚幏鐑芥晸閺傘倖瀚规稉娲晸鐟欐帒鍤栭幏鐑芥晸閺傘倖瀚归柨鐔兼應閺嶅浄绱濇禒鈧稊鍧磑id闁跨喐鏋婚幏绌巐oat闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔峰建閳藉懏瀚�
     if (!dimension_size->get_symbolEntry()->getType()->isInt())
     {
         fprintf(stderr, "i32 is needed, but %s is given \n",
@@ -767,8 +772,8 @@ void WhileStmt::genCode()
     Function* func;
     BasicBlock* loop_cond_bb, * loop_body_bb, * end_bb;
     //BasicBlock* now_bb = builder->getInsertBB();
-    //婢堆勵洤閹繆鐭鹃弰顖ょ礉瑜版挸澧犳潻鎰攽閸掓壆娈戠憰浣瑰絻閸忋儳娈戦崸妤佹Цthen閵嗕躬lse閸滃當nd閻ㄥ嫬澧犳す鎲嬬礉閻掕泛鎮楅弶鈥叉鐠囶厼褰為弰顖炴付鐟曚礁婀ぐ鎾冲鐟曚焦褰冮崗銉ф畱閸ф绻樼悰宀€娈戦妴锟�
-    //閹恒儳娼冪憰渚€鈧劖顒為幎濠傜秼閸撳秷顩﹂幓鎺戝弳閻ㄥ嫬娼＄拋鍓х枂娑撶皪hen閸熴儳娈戦敍宀冾啎婵傝棄鎮梘enCode
+    //濠㈠爢鍕垫搐闁诡剚绻嗛惌楣冨及椤栥倗绀夌憸鐗堟尭婢х姵娼婚幇顖ｆ斀闁告帗澹嗗▓鎴犳啺娴ｇ懓绲婚柛蹇嬪劤濞堟垿宕稿Δ浣剐hen闁靛棔韬琹se闁告粌鐣秐d闁汇劌瀚晶鐘炽仚閹插绀夐柣鎺曟硾閹寮堕垾鍙夘偨閻犲浂鍘艰ぐ鐐哄及椤栫偞浠橀悷鏇氱濠€顏囥亹閹惧啿顤呴悷鏇氱劍瑜板啴宕楅妷褎鐣遍柛褎顨夌换妯兼偘瀹€鈧▓鎴﹀Υ閿燂拷
+    //闁规亽鍎冲鍐啺娓氣偓閳ь剚鍔栭鐐哄箮婵犲倻绉奸柛鎾崇Х椤╋箓骞撻幒鎴濆汲闁汇劌瀚锛勬媼閸撗呮瀭濞戞挾鐨猦en闁哥喆鍎冲▓鎴︽晬瀹€鍐惧晭濠靛倽妫勯幃姊榚nCode
 
 
     func = builder->getInsertBB()->getParent();
@@ -880,6 +885,10 @@ void DeclInitStmt::genCode()
         addr_se->setType(new PointerType(se->getType()));
         addr = new Operand(addr_se);
         se->setAddr(addr);
+        Instruction *g;
+        //initVal->genCode();
+        g = new GlobalInstruction(new Operand(id->getSymPtr()), initVal->getOperand(), se);
+        g->output();
     }
     else if(se->isLocal())
     {
@@ -996,7 +1005,7 @@ void UnaryExpr::genCode()
 
 
 
-//閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷锋鍊间憨閿熸枻鎷烽敓鏂ゆ嫹閿燂拷?
+//闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏閿嬵剾閸婇棿鎲ㄩ柨鐔告灮閹风兘鏁撻弬銈嗗闁跨噦鎷�?
 
 
 std::string ExprNode::get_name()
@@ -1023,7 +1032,7 @@ void BinaryExpr::output(int level)
             fprintf(yyout, "%*c\tExprValue:\t%d\n", level, ' ', (int)temp_store);
         return;
     }*/
-    //閿熸枻鎷烽敓鏂ゆ嫹鐩撮敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷
+    //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归惄鎾晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨噦鎷�
 
 
     //typeCheck();
@@ -1196,7 +1205,7 @@ void ArrDimNode::output(int level)
             if (node_state == ACCESS)
                 dimension_size->output(level + 20);
             else
-                //閿熸枻鎷烽敓鏂ゆ嫹
+                //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚�
                 fprintf(stderr, "not a const \n");
         }
         //dimension_size->output(level + 20);
@@ -1244,7 +1253,7 @@ void ConstDeclList::output(int level)
 }
 void WhileStmt::output(int level)
 {
-    //閿熸枻鎷烽敓鏂ゆ嫹瀹為敓琛楋綇鎷峰彧閿熻纰夋嫹閿熸枻鎷烽敓渚ュ嚖鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹骞曢敓鏂ゆ嫹閿熸枻鎷烽敓绲爁閿熸枻鎷蜂竴閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+    //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚圭€圭偤鏁撶悰妤嬬秶閹峰嘲褰ч柨鐔活潡绾板瀚归柨鐔告灮閹风兘鏁撴笟銉ュ殩閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归獮鏇㈡晸閺傘倖瀚归柨鐔告灮閹风兘鏁撶徊鐖侀柨鐔告灮閹疯渹绔撮柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏锟�
     fprintf(yyout, "%*cWhileStmt\n", level, ' ');
     cond->output(level + 4);
     if (doStmt != nullptr)
@@ -1308,7 +1317,7 @@ void Constant::output(int level)
     }
     else if (this->symbolEntry->getType()->isFLOAT())
     {
-        //閿熺煫灏辩尨鎷烽敓鏂ゆ嫹symbolentry閿熸枻鎷烽敓鏂ゆ嫹閿熺獤鎾呮嫹閿熺獤闈╂嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹杞敓鏂ゆ嫹涓洪敓琛楀嚖鎷烽敓鏂ゆ嫹閿熷壙锝忔嫹閿熸枻鎷烽敓鏂ゆ嫹閿熻鎲嬫嫹閿燂拷?s閿熼叺鐚存嫹閿熷壙璇ф嫹閿熸枻鎷烽敓鑺傜櫢鎷峰崰浣嶉敓鏂ゆ嫹閿熸枻鎷�
+        //闁跨喓鐓亸杈╁皑閹风兘鏁撻弬銈嗗symbolentry闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔虹崵閹惧懏瀚归柨鐔虹崵闂堚晜瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗鏉烆剟鏁撻弬銈嗗娑撴椽鏁撶悰妤€鍤栭幏鐑芥晸閺傘倖瀚归柨鐔峰閿濆繑瀚归柨鐔告灮閹风兘鏁撻弬銈嗗闁跨喕顢滈幉瀣闁跨噦鎷�?s闁跨喖鍙洪悮瀛樺闁跨喎澹欑拠褎瀚归柨鐔告灮閹风兘鏁撻懞鍌滄閹峰嘲宕版担宥夋晸閺傘倖瀚归柨鐔告灮閹凤拷
         fprintf(yyout, "%*cFLOATLiteral\tvalue: %s\ttype: %s\n", level, ' ',
             value.c_str(), type.c_str());
     }
@@ -1426,8 +1435,8 @@ void FunctionDef::output(int level)
     std::string name, type;
     if (se == nullptr)
     {
-        fprintf(stderr, "Oops!閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓绲搉");//閿熸枻鎷峰嵃閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鐭紮鎷峰嵏閿熸枻鎷烽敓锟�?
-        assert(se != nullptr);      //閿熼樁绛规嫹涓€閿熸枻鎷烽敓鏂ゆ嫹閿熺殕杈炬嫹閿熸枻鎷�
+        fprintf(stderr, "Oops!闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撶徊鎼�");//闁跨喐鏋婚幏宄板祪闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻惌顐＄串閹峰嘲宓忛柨鐔告灮閹风兘鏁撻敓锟�?
+        assert(se != nullptr);      //闁跨喖妯佺粵瑙勫娑撯偓闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔烘畷鏉堢偓瀚归柨鐔告灮閹凤拷
     }
     name = se->toStr();
     type = se->getType()->toStr();

@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Function.h"
 #include "Type.h"
+#include <string>
 extern FILE* yyout;
 
 Instruction::Instruction(unsigned instType, BasicBlock *insert_bb)
@@ -359,4 +360,34 @@ void StoreInstruction::output() const
     std::string src_type = operands[1]->getType()->toStr();
 
     fprintf(yyout, "  store %s %s, %s %s, align 4\n", src_type.c_str(), src.c_str(), dst_type.c_str(), dst.c_str());
+}
+
+GlobalInstruction::GlobalInstruction(Operand *dst, Operand *expr, SymbolEntry *se, BasicBlock *insertBB): Instruction(GLOBAL, insertBB)
+{
+    //std::cout<<"globalInstruction iniitial"<<std::endl;
+    operands.push_back(dst);
+    operands.push_back(expr);
+    dst->setDef(this);
+    this->se = se;
+}
+GlobalInstruction::~GlobalInstruction()
+{
+  operands[0]->setDef(nullptr);
+    if(operands[0]->usersNum() == 0)
+        delete operands[0];
+}
+
+void GlobalInstruction::output() const
+{
+    // 如果这是个声明
+    //std::cout<<"fuck output"<<std::endl;
+   if(operands[1]==nullptr)
+   {
+    //std::cout<<"non initial"<<std::endl;
+    fprintf(yyout, "%s = global %s 0, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str());
+   }
+   else
+   {
+     fprintf(yyout, "%s = global %s %s, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str(), operands[1]->toStr().c_str());
+   }
 }
