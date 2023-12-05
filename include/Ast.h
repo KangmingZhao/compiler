@@ -405,7 +405,19 @@ class FunctCall : public ExprNode
 public:
     FunctCall(SymbolEntry* se, ParaNode* para_node) : ExprNode(se), para_node(para_node) {
         is_not_val = 0;
-        dst = new Operand(se);
+    if (symbolEntry)
+    {
+        // 构造目标寄存器的保存操作数
+        if (se->getType() != TypeSystem::voidType)
+        {
+             SymbolEntry *temp =new TemporarySymbolEntry(symbolEntry->getType(), SymbolTable::getLabel());
+                dst = new Operand(temp);
+        }     
+        else{
+        dst=new Operand(se);
+    }
+    }
+ 
     };
     void output(int level);
     void typeCheck();

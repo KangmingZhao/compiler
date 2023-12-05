@@ -391,3 +391,42 @@ void GlobalInstruction::output() const
      fprintf(yyout, "%s = global %s %s, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str(), operands[1]->toStr().c_str());
    }
 }
+
+
+CallInstruction::CallInstruction(Operand *dst,
+                                 SymbolEntry *func,
+                                 std::vector<Operand *> params,
+                                 BasicBlock *insert_bb)
+    : Instruction(CALL, insert_bb), func(func)
+{
+    operands.push_back(dst);
+    if (dst)
+        dst->setDef(this);
+    for (auto param : params)
+    {
+        operands.push_back(param);
+        param->addUse(this);
+    }
+}
+
+void CallInstruction::output() const
+{
+    fprintf(yyout, "  ");
+    if (operands[0])
+    {
+        //std::cout<<operands[0]<<std::endl;
+        fprintf(yyout, "%s =", operands[0]->toStr().c_str());
+    }
+    FunctionType *type = (FunctionType *)(func->getType());
+    fprintf(yyout, "call %s %s(", type->getRetType()->toStr().c_str(),
+            func->toStr().c_str());
+    for (long unsigned int i = 1; i < operands.size(); i++)
+    {
+        if (i != 1)
+            fprintf(yyout, ", ");
+        fprintf(yyout, "%s %s", operands[i]->getType()->toStr().c_str(),
+                operands[i]->toStr().c_str());
+    }
+    fprintf(yyout, ")\n");
+}
+

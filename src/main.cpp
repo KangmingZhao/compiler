@@ -54,18 +54,66 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: fail to open output file\n", outfile);
         exit(EXIT_FAILURE);
     }
+       // getint 
+    std::vector<Type*> vec;
+    SymbolTable* st = identifiers;
+    while(st->getPrev())
+        st = st->getPrev();
+    Type* funcType = new FunctionType(TypeSystem::intType, vec);
+    SymbolEntry* se = new IdentifierSymbolEntry(funcType, "getint",0);
+    st->install("getint", se);
+
+    // getch
+    funcType = new FunctionType(TypeSystem::intType, vec);
+    st = identifiers;
+    while(st->getPrev())
+        st = st->getPrev();
+    se = new IdentifierSymbolEntry(funcType,"getch", 0);
+    st->install("getch", se);
+
+    // putint
+    vec.clear();
+    vec.push_back(TypeSystem::intType);
+    funcType = new FunctionType(TypeSystem::voidType, vec);
+    st = identifiers;
+    while(st->getPrev())
+         st = st->getPrev();
+    se = new IdentifierSymbolEntry(funcType, "putint", 0);
+    st->install("putint", se);
+
+    // putch
+    vec.clear();
+    vec.push_back(TypeSystem::intType);
+    funcType = new FunctionType(TypeSystem::voidType, vec);
+    st = identifiers;
+    while(st->getPrev())
+        st = st->getPrev();
+    se = new IdentifierSymbolEntry(funcType, "putch", 0);
+    st->install("putch", se);
+
+    // putf
+    vec.clear();
+    funcType = new FunctionType(TypeSystem::voidType, vec);
+    st = identifiers;
+    while(st->getPrev())
+        st = st->getPrev();
+    se = new IdentifierSymbolEntry(funcType, "putf", 0);
+    st->install("putf", se);
     yyparse();
     if (dump_type == AST)
     {
         ast.output();
     }
 
+
+ 
+
     //ast.output();
 
     ast.typeCheck();    
     //std::cout << "fuck\n";
     ast.mergeConstExp();
-    ast.output();
+    //ast.output();
     ast.genCode(&unit);
     if(dump_type == IR)
         unit.output();

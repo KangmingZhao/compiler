@@ -7,8 +7,8 @@
 
     //ArrDimNode** now_arrdim;
     //int now_arrindex;
-    //我们会在stmt后面加上BREAK SEMICOLON的识�?，然后只有在blockstmt�?会�?�理某一�?作用域是不是在while内部的。因为其他的表达�?
-    //要么�?能�?�表达式不能装break，�?�么�?己就是break�?
+    //閹存垳婊戞导姘躬stmt閸氬酣娼伴崝鐘辩瑐BREAK SEMICOLON閻ㄥ嫯鐦戦敓锟�?閿涘瞼鍔ч崥搴″涧閺堝婀猙lockstmt閿燂拷?娴兼熬鎷�?閿熺晫鎮婇弻鎰閿燂拷?娴ｆ粎鏁ら崺鐔告Ц娑撳秵妲搁崷鈺砲ile閸愬懘鍎撮惃鍕┾偓鍌氭礈娑撳搫鍙炬禒鏍畱鐞涖劏鎻敓锟�?
+    //鐟曚椒绠為敓锟�?閼虫枻鎷�?閿熷€熴€冩潏鎯х础娑撳秷鍏樼憗鍗媟eak閿涘矉鎷�?閿熸垝绠為敓锟�?瀹稿崬姘ㄩ弰鐥搑eak閿燂拷?
     
     Type  *declType;
     std::vector<Type*> FuncParamsVector;
@@ -52,24 +52,24 @@
 }
 
 %initial-action {
-    //这里还有这�?�初始化方法，太爽啦
-    std::string getint = "getint";
-    Type* funcType1 = new FunctionType(TypeSystem::intType, {});
-    SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
-    identifiers->install(getint, entry1);
+    //鏉╂瑩鍣锋潻妯绘箒鏉╂瑱鎷�?閿熻棄鍨垫慨瀣閺傝纭堕敍灞姐亰閻栬棄鏆�
+    // std::string getint = "getint";
+    // Type* funcType1 = new FunctionType(TypeSystem::intType, {});
+    // SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
+    // identifiers->install(getint, entry1);
     
-    std::string putint = "putint";
-    Type* funcType2 = new FunctionType(TypeSystem::voidType, {});
-    SymbolEntry* entry2 = new IdentifierSymbolEntry(funcType2, putint, 0);
-    identifiers->install(putint, entry2);
+    // std::string putint = "putint";
+    // Type* funcType2 = new FunctionType(TypeSystem::voidType, {});
+    // SymbolEntry* entry2 = new IdentifierSymbolEntry(funcType2, putint, 0);
+    // identifiers->install(putint, entry2);
 
     
-    std::string putch = "putch";
-    std::vector<Type*> vec; 
-    vec.push_back(TypeSystem::intType);
-    Type* funcType3 = new FunctionType(TypeSystem::voidType, vec); 
-    SymbolEntry* entry3 = new IdentifierSymbolEntry(funcType3, putch, 0);
-    identifiers->install(putch, entry3);
+    // std::string putch = "putch";
+    // std::vector<Type*> vec; 
+    // vec.push_back(TypeSystem::intType);
+    // Type* funcType3 = new FunctionType(TypeSystem::voidType, vec); 
+    // SymbolEntry* entry3 = new IdentifierSymbolEntry(funcType3, putch, 0);
+    // identifiers->install(putch, entry3);
 
 
 }
@@ -88,7 +88,7 @@
 }
 
 
-/* 这里的INTEGER、FLOATPOINT�?具体数据，INT和FLOAT�?数据类型 */
+/* 鏉╂瑩鍣烽惃鍑TEGER閵嗕笚LOATPOINT閿燂拷?閸忚渹缍嬮弫鐗堝祦閿涘瓥NT閸滃瓗LOAT閿燂拷?閺佺増宓佺猾璇茬€� */
 
 %start Program
 %token <strtype> ID 
@@ -147,24 +147,24 @@ LVal
         int state = 0;
         
         SymbolEntry *se;
-        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID�?
-        if(se == nullptr) //如果没有
+        se = identifiers->lookup($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
+        if(se == nullptr) //婵″倹鐏夊▽鈩冩箒
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//鎵撳嵃杩欎釜鍙橀噺娌℃湁瀹氫箟
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //抛出一�?�?言错�??
+            //assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
 
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //给这�?$$赋一个ID子类的表达式结点。用来输出的/
+            $$ = new Id(error_se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
             delete []$1;
 
         }
         else
         {
-            $$ = new Id(se, state);    //给这�?$$赋一个ID子类的表达式结点。用来输出的/
+            $$ = new Id(se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
             delete []$1;
         }
     }
@@ -175,28 +175,28 @@ LVal
     }
     ArrDimensions
     {
-        //我们知道数组的�?�问�?�?以作为左值的�?
+        //閹存垳婊戦惌銉╀壕閺佹壆绮嶉惃鍕舵嫹?閿熶粙妫堕敓锟�?閿燂拷?娴犮儰缍旀稉鍝勪箯閸婅偐娈戦敓锟�?
         int state = 0;
 
         SymbolEntry *se;
-        se = identifiers->lookup($1); //在已有的符号表里找有没有这个ID�?
-        if(se == nullptr) //如果没有
+        se = identifiers->lookup($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
+        if(se == nullptr) //婵″倹鐏夊▽鈩冩箒
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//鎵撳嵃杩欎釜鍙橀噺娌℃湁瀹氫箟
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //抛出一�?�?言错�??
+            //assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //给这�?$$赋一个ID子类的表达式结点。用来输出的/
+            $$ = new Id(error_se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
             delete []$1;
         }
         else
         {
-            $$ = new Id(se, $3, state);    //给这�?$$赋一个ID子类的表达式结点。用来输出的/
+            $$ = new Id(se, $3, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
             if(se->get_arr_dimension_recorder() < arr_dimension_recorder)
-                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//打印这个访问超过�?
+                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//閹垫挸宓冩潻娆庨嚋鐠佸潡妫剁搾鍛扮箖閿燂拷?
             arr_dimension_recorder = 0;
             delete []$1;
         }
@@ -320,7 +320,7 @@ PrimaryExp
     }
     ;
 
-// 璇嗗埆;
+// 閻犲洤妫楅崺锟�;
 EmptyStmt
     :
      SEMICOLON{
@@ -367,16 +367,17 @@ FunctCall
     {   
         SymbolEntry *se;
         se = identifiers->lookup($1); 
-        if(se == nullptr) //濡傛灉娌℃湁
+        if(se == nullptr) //濠碘€冲€归悘澶娾柦閳╁啯绠�
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//鎵撳嵃杩欎釜鍙橀噺娌℃湁瀹氫箟
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
             delete [](char*)$1;
-            assert(se != nullptr);      //抛出一�?�?言错�??
+            assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
         }
+        // SymbolEntry* temp=new TemporarySymbolEntry(se->getType(),SymbolTable::getLabel());
         $$ = new FunctCall(se, $3);
     }
     ;
-// 鍑芥暟瀹氫箟 Funcdef->
+// 闁告垼濮ら弳鐔衡偓瑙勭煯缁狅拷 Funcdef->
 FuncDef
     :
     Type ID{
@@ -406,7 +407,7 @@ FuncDef
         delete top;
         delete []$2;
     }
-// 鍗曠洰杩愮畻
+// 闁告娲滃ú鐗堟交閹邦喚鏆�
 UnaryExp
     :
     PrimaryExp {
@@ -449,7 +450,7 @@ MulExp
     UnaryExp { $$ = $1;}
     |
     MulExp MUL UnaryExp {
-        //这里我们任务�?要有一�?是float那么就按float来算�?
+        //鏉╂瑩鍣烽幋鎴滄粦娴犺濮熼敓锟�?鐟曚焦婀佹稉鈧敓锟�?閺勭棞loat闁絼绠炵亸杈ㄥ瘻float閺夈儳鐣婚敓锟�?
         if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
         {
             SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
@@ -478,7 +479,7 @@ MulExp
     |
     MulExp MOD UnaryExp
     {
-        //求余数是int的专�?
+        //濮瑰倷缍戦弫鐗堟Цint閻ㄥ嫪绗撻敓锟�?
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
     }
@@ -506,7 +507,7 @@ AddExp
         
 
         //SymbolEntry *se;
-        //se = identifiers->lookup($1->get_name()); //在已有的符号表里找有没有这个Lval�?
+        //se = identifiers->lookup($1->get_name()); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淟val閿燂拷?
         //$$ = new BinaryExpr(se, BinaryExpr::ADD, $1, const_1_node);
     }
     |
@@ -713,7 +714,7 @@ ArrInitList
     :
     Exp
     {
-        //这个�?到头了，开始进入具体值了�?
+        //鏉╂瑤閲滈敓锟�?閸掓澘銇旀禍鍡礉瀵偓婵绻橀崗銉ュ徔娴ｆ挸鈧棿绨￠敓锟�?
 
         $1->getSymPtr()->setType(declType);
         $$ = new InitNode($1);
@@ -721,7 +722,7 @@ ArrInitList
     |
     LBRACE ArrInitLists RBRACE
     {
-        //这个�?说明还有至少一�?
+        //鏉╂瑤閲滈敓锟�?鐠囧瓨妲戞潻妯绘箒閼峰啿鐨稉鈧敓锟�?
         $$ = $2;
         $$->i_m_checkpoint();
     }
@@ -776,14 +777,14 @@ ArrDimensions
     }
     ;
 
-// 甯搁噺鍜屽彉閲忕殑澹版槑
+// 閻㈩垱鎮傞崳娲椽鐏炶棄缍侀梺鎻掔箳濞堟垶绔熼悧鍫燁潠
 DeclStmt
      :
     VarDeclStmt {$$=$1;}
     |
     ConstDeclStmt {$$=$1;}
     ;
-// 变量 变量+一�?
+// 閸欐﹢鍣� 閸欐﹢鍣�+娑撯偓閿燂拷?
 VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
@@ -791,12 +792,12 @@ VarDeclStmt
         ;
 
 
-// 甯搁噺 const +涓€鍫嗭紱
+// 閻㈩垱鎮傞崳锟� const +濞戞挴鍋撻柛顐㈡４缁憋拷
 ConstDeclStmt
     :
     CONST Type ConstDeclLists SEMICOLON{$$=$3;}
     ;
-// 鍙橀噺
+// 闁告瑦锕㈤崳锟�
 IdDeclLists 
     :
     IdDeclLists COMMA IdDeclList {$$=new DeclList($1,$3);}
@@ -808,10 +809,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID�?
-        if(check_redefination_se != nullptr) //如果没有
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
+        if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定�?
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
             state = REDEFINATION;
         }
         SymbolEntry *se;
@@ -825,10 +826,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID�?
-        if(check_redefination_se != nullptr) //如果没有
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
+        if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定�?
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
             state = REDEFINATION;
         }
 
@@ -844,10 +845,10 @@ IdDeclList
             int state = LEGAL_VAR;
         
             SymbolEntry *check_redefination_se;
-            check_redefination_se = identifiers->lookup_in_present_domain($1); //在已有的符号表里找有没有这个ID�?
-            if(check_redefination_se != nullptr) //如果没有
+            check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
+            if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
             {
-                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//打印这个变量重定�?
+                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
                 state = REDEFINATION;
             }
 
@@ -871,7 +872,7 @@ IdDeclList
         }
     ;
 
-// 甯搁噺
+// 閻㈩垱鎮傞崳锟�
 ConstDeclLists 
     :
     ConstDeclLists COMMA ConstDeclList {$$=new ConstDeclList($1,$3);}
