@@ -5,6 +5,7 @@
     #include <stdarg.h>
     #include "common.h"
     #include "parser.h"
+    #include <iostream>
 }
 %{
     extern dump_type_t dump_type;
@@ -269,7 +270,7 @@ line_commentend \n
 
 {OCTAL} {
     int decmial = 0;
-    int i = 2;//�?�?"0b"也算进去
+    int i = 1;//�?�?"0b"也算进去
     while(yytext[i] != '\0')
     {
         decmial *= 8;
@@ -278,6 +279,7 @@ line_commentend \n
     }
     dump_tokens("DECIMAL\t%s\t%d\n", yytext, decmial);
     yylval.itype = decmial;
+    //std::cout<<decmial<<std::endl;
     return INTEGER;
 }
 
