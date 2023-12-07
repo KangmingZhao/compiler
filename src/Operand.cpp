@@ -21,3 +21,7 @@ void Operand::change_funct_type() {
         se->setType(((FunctionType*)se->getType())->returnType);
     }
 }
+void Operand::set_bool()
+{
+    se->setType(TypeSystem::boolType);
+}

@@ -114,6 +114,8 @@ CmpInstruction::CmpInstruction(unsigned opcode, Operand *dst, Operand *src1, Ope
     src2->addUse(this);
 }
 
+
+
 CmpInstruction::~CmpInstruction()
 {
     operands[0]->setDef(nullptr);
@@ -188,6 +190,8 @@ CondBrInstruction::CondBrInstruction(BasicBlock*true_branch, BasicBlock*false_br
     cond->addUse(this);
     operands.push_back(cond);
 }
+
+
 
 CondBrInstruction::~CondBrInstruction()
 {

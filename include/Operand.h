@@ -29,7 +29,9 @@ public:
     use_iterator use_begin() {return uses.begin();};
     use_iterator use_end() {return uses.end();};
     Type* getType() {return se->getType();};
+    SymbolEntry* get_se() { return se; };
     void change_funct_type();
+    void set_bool();
     std::string toStr() const;
 };
 

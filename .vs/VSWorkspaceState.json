@@ -4,8 +4,9 @@
     "\\include",
     "\\src",
     "\\test",
-    "\\test\\level1-1"
+    "\\test\\level1-1",
+    "\\test\\level1-2"
   ],
-  "SelectedNode": "\\test\\level1-1\\047_op_priority5.sy",
+  "SelectedNode": "\\test\\level2-1",
   "PreviewInSolutionExplorer": false
 }

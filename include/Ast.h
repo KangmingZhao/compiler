@@ -18,6 +18,7 @@ class Unit;
 class Function;
 class BasicBlock;
 class Instruction;
+class CondBrInstruction;
 class IRBuilder;
 
 
@@ -55,11 +56,17 @@ private:
     static int counter;
     int seq;
 protected:
-    std::vector<BasicBlock**> true_list;
-    std::vector<BasicBlock**> false_list;
+    //std::vector<BasicBlock**> true_list;
+    //std::vector<BasicBlock**> false_list;
     static IRBuilder *builder;
-    void backPatch(std::vector<BasicBlock**> &list, BasicBlock*target);
-    std::vector<BasicBlock**> merge(std::vector<BasicBlock**> &list1, std::vector<BasicBlock**> &list2);
+    //void backPatch(std::vector<BasicBlock**> &list, BasicBlock*target);
+    //std::vector<BasicBlock**> merge(std::vector<BasicBlock**> &list1, std::vector<BasicBlock**> &list2);
+
+
+    std::vector<CondBrInstruction*> i_true_list;
+    std::vector<CondBrInstruction*> i_false_list;
+    void ibackPatch(std::vector<CondBrInstruction*>& list, BasicBlock* target, bool is_true);
+    std::vector<CondBrInstruction*> merge(std::vector<CondBrInstruction*>& list1, std::vector<CondBrInstruction*>& list2);
 
 public:
     Node();
@@ -72,8 +79,11 @@ public:
     virtual void mergeConstExp() = 0;
 
 
-    std::vector<BasicBlock**>& trueList() {return true_list;}
-    std::vector<BasicBlock**>& falseList() {return false_list;}
+    //std::vector<BasicBlock**>& trueList() {return true_list;}
+    //std::vector<BasicBlock**>& falseList() {return false_list;}
+
+    std::vector<CondBrInstruction*>& itrueList() { return i_true_list; }
+    std::vector<CondBrInstruction*>& ifalseList() { return i_false_list; }
 
     bool is_not_val = 1;
 };
