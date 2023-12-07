@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Operand.h"
 #include "Type.h"
+#include <unordered_map>
 
 
 #define ERROR_MESSAGE_WRITE_INTO_AST 0
@@ -21,6 +22,16 @@ class Instruction;
 class CondBrInstruction;
 class IRBuilder;
 
+
+class ControlFlowGraph
+{
+    BasicBlock* entry;
+    std::unordered_map<BasicBlock*, std::vector<BasicBlock*>> map_blocks;
+public:
+    ControlFlowGraph(BasicBlock* entry) :entry(entry) {};
+    void add_map(BasicBlock* in_bb, BasicBlock* exit_bb) { map_blocks[in_bb].push_back(exit_bb); };
+    void build_BB_link();
+};
 
 class LoopManager
 {
@@ -793,8 +804,6 @@ public:
     void mergeConstExp() {
         if (stmt != nullptr)
             stmt->mergeConstExp();
-        if (paraStmt != nullptr)
-            paraStmt->mergeConstExp();
     };
 
 };
