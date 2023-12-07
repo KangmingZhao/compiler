@@ -106,7 +106,7 @@
 
 %nterm <stmttype> Stmts Stmt AssignStmt BlockStmt IfStmt ReturnStmt DeclStmt  WhileStmt ExprStmt BreakStmt ContinueStmt
 %nterm <exprtype> Exp AddExp MulExp Cond LOrExp PrimaryExp LVal RelExp LAndExp UnaryExp InitVal FunctCall 
-%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt  EmptyStmt
+%nterm <stmttype> IdDeclLists IdDeclList ConstDeclLists ConstDeclList VarDeclStmt ConstDeclStmt  EmptyStmt 
 %nterm <arrdimtype> ArrDimensions ArrDimension 
 %nterm <inittype> ArrInit ArrInitLists ArrInitList
 
@@ -225,6 +225,9 @@ BlockStmt
         $$ = new EmptyStmt();
     }
     ;
+
+
+
 IfStmt
     : IF LPAREN Cond RPAREN Stmt %prec THEN {
         $$ = new IfStmt($3, $5);
@@ -233,6 +236,9 @@ IfStmt
         $$ = new IfElseStmt($3, $5, $7);
     }
     ;
+
+
+
 
 WhileStmt
     : WHILE

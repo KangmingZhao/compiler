@@ -141,7 +141,7 @@ class TypeSystem
 {
 private:
     static IntType commonInt;
-    static IntType commonBool;
+    static BoolType commonBool;
     static VoidType commonVoid;
     static FloatType commonFloat;
 public:

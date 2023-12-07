@@ -44,6 +44,17 @@ std::string ConstantSymbolEntry::toStr()
     {
         buffer << value_f;
     }
+    else if(this->getType()->isBool())
+    {
+        if (data_type == 1)
+        {
+            buffer << (bool)value;
+        }
+        else
+        {
+            buffer << (bool)value_f;
+        }
+    }
 
     return buffer.str();
 }

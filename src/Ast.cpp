@@ -23,6 +23,7 @@ Constant* cal_expr(ExprNode* node2cal)
 {
     float cal_result = node2cal->cal_expr_val();
     int cal_result_i = (int)cal_result;
+    //std::cout << cal_result_i << std::endl;
     if (node2cal->cal_expr_val() != PRE_CAL_ERROR_MEETING_VAL)
     {
         SymbolEntry* se;
@@ -33,8 +34,8 @@ Constant* cal_expr(ExprNode* node2cal)
         else
         {
             se = new ConstantSymbolEntry(TypeSystem::intType, cal_result_i);
-
         }
+        //std::cout << se->toStr() << std::endl;
         return new Constant(se);
     }
     else
@@ -259,7 +260,7 @@ void BinaryExpr::genCode()
         dst->set_bool();
         new CmpInstruction(opcode, dst, src1, src2, bb);
 
-        BasicBlock* temp_bb = new BasicBlock(func);
+        BasicBlock* temp_bb = nullptr;// = new BasicBlock(func);
         CondBrInstruction * temp_cb = new CondBrInstruction(temp_bb, temp_bb, dst, builder->getInsertBB());
         //std::cout << "fuck\n";
 
@@ -295,6 +296,15 @@ void BinaryExpr::genCode()
 void Constant::genCode()
 {
     // we don't need to generate code.
+    //std::cout << dst->getType()->toStr() << " " << dst->getType()->isBool() << std::endl;
+    //std::cout << dst->toStr() << std::endl;
+    if (dst->getType()->isBool())
+    {
+        BasicBlock* temp_bb = nullptr;// = new BasicBlock(func);
+        CondBrInstruction* temp_cb = new CondBrInstruction(temp_bb, temp_bb, dst, builder->getInsertBB());
+        i_true_list.emplace_back(temp_cb);
+        i_false_list.emplace_back(temp_cb);
+    }
 }
 
 void Id::genCode()
@@ -315,6 +325,9 @@ void IfStmt::genCode()
     temp_end_bb = end_bb;
     temp_then_bb = then_bb;
 
+
+    //std::cout << cond->getSymPtr()->toStr() << std::endl;
+    cond->getSymPtr()->setType(TypeSystem::boolType);
     cond->genCode();
     ibackPatch(cond->itrueList(), then_bb, 1);
     ibackPatch(cond->ifalseList(), end_bb, 0);
@@ -341,7 +354,6 @@ void IfElseStmt::genCode()
     Function* func;
     BasicBlock* then_bb, * else_bb, * end_bb;
 
-    BasicBlock* now_bb = builder->getInsertBB();
     func = builder->getInsertBB()->getParent();
     then_bb = new BasicBlock(func);
     else_bb = new BasicBlock(func);
@@ -382,7 +394,6 @@ void IfElseStmt::genCode()
 
 
 
-    new CondBrInstruction(then_bb, else_bb, cond->getOperand(), now_bb);
     builder->setInsertBB(end_bb);
 }
 
@@ -860,7 +871,6 @@ void WhileStmt::genCode()
     cond->genCode();
     ibackPatch(cond->itrueList(), loop_body_bb, 1);
     ibackPatch(cond->ifalseList(), end_bb, 0 );
-    new CondBrInstruction(loop_body_bb, end_bb, cond->getOperand(), loop_cond_bb);
 
 
     builder->setInsertBB(loop_body_bb);
@@ -1092,9 +1102,25 @@ void UnaryExpr::typeCheck()
 }
 void UnaryExpr::genCode()
 {
+    expr->genCode();
+    if (op == SUB) 
+    {
+        SymbolEntry* se = new ConstantSymbolEntry(TypeSystem::intType, -1);
+        Constant* temp_const = new Constant(se); 
+        Operand* src1 = temp_const->getOperand();
+        Operand* src2 = expr->getOperand();
+        int opcode = BinaryInstruction::MUL;
+        new BinaryInstruction(opcode, dst, src1, src2, builder->getInsertBB());
+    }
+    if (dst->getType()->isBool())
+    {
+        BasicBlock* temp_bb = nullptr;// = new BasicBlock(func);
+        CondBrInstruction* temp_cb = new CondBrInstruction(temp_bb, temp_bb, dst, builder->getInsertBB());
+        i_true_list.emplace_back(temp_cb);
+        i_false_list.emplace_back(temp_cb);
+    }
 
 }
-
 
 
 
