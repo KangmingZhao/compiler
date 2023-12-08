@@ -7,8 +7,8 @@
 
     //ArrDimNode** now_arrdim;
     //int now_arrindex;
-    //閹存垳婊戞导姘躬stmt閸氬酣娼伴崝鐘辩瑐BREAK SEMICOLON閻ㄥ嫯鐦戦敓锟�?閿涘瞼鍔ч崥搴″涧閺堝婀猙lockstmt閿燂拷?娴兼熬鎷�?閿熺晫鎮婇弻鎰閿燂拷?娴ｆ粎鏁ら崺鐔告Ц娑撳秵妲搁崷鈺砲ile閸愬懘鍎撮惃鍕┾偓鍌氭礈娑撳搫鍙炬禒鏍畱鐞涖劏鎻敓锟�?
-    //鐟曚椒绠為敓锟�?閼虫枻鎷�?閿熷€熴€冩潏鎯х础娑撳秷鍏樼憗鍗媟eak閿涘矉鎷�?閿熸垝绠為敓锟�?瀹稿崬姘ㄩ弰鐥搑eak閿燂拷?
+    //闂佺懓鐡ㄩ崹鍐测堪閹寸偛顕辨慨姗嗗墯闊憘tmt闂佸憡鑹鹃柊锝咁焽娴兼潙绀夐柣妯夸含閻熸€婻EAK SEMICOLON闂佹眹鍔岀€氼垶鎯侀幋锔芥櫢闁跨噦鎷�?闂佹寧绋戦惉濂稿礉瑜斿畷銉︽償閳ヨ櫕閿梺鍝勭墕椤︻垰锕㈤悮妾抩ckstmt闂佽法鍣﹂幏锟�?婵炴潙鍚嬮悢顒勫箯閿燂拷?闂佽法鍠撻弲顐﹀箖婵犲洤钃熼柟閭︿簽椤忛亶鏌ㄩ悤鍌涘?婵炶揪绲剧划搴ㄥ极閵堝鏄ラ柣鏂挎啞绗戞繛鎴炴尭缁夐潧危閹间礁鎹堕柍铏圭壀ile闂佸憡鍔曢幊姗€宕曢幘顔藉剭闁告洍鏂侀崑鎾诲磼濮橆厾顦繛鎴炴尭閹碱偊宕ｉ悙顒傤浄闁哄稁鍋呴悾閬嶆偠濞戞牕濮€闁规椿浜弫鎾绘晸閿燂拷?
+    //闁荤喐娲戝鎺旂不閻愮儤鏅搁柨鐕傛嫹?闂佽壈娅曢弸濠氬箯閿燂拷?闂佽法鍠庨埀顒傚枂閳ь剙鍟蹇涘箚瑜忕涵鈧繛鎴炴尭缁夌兘宕楀Ο鍏煎晳闁告鐛癳ak闂佹寧绋戦惌澶愬箯閿燂拷?闂佽法鍠愰崹婵堢不閻愮儤鏅搁柨鐕傛嫹?閻庡湱枪瀹曨剙顫濋妸鈺佸強闁汇儲鎮渆ak闂佽法鍣﹂幏锟�?
     
     Type  *declType;
     std::vector<Type*> FuncParamsVector;
@@ -52,7 +52,7 @@
 }
 
 %initial-action {
-    //鏉╂瑩鍣锋潻妯绘箒鏉╂瑱鎷�?閿熻棄鍨垫慨瀣閺傝纭堕敍灞姐亰閻栬棄鏆�
+    //闁哄鏅滈悷鈺呭闯闁垮浜ゆ俊顖滅帛缁犳帡寮堕埡鍌滄嚂闁瑰嚖鎷�?闂佽法鍠曞Λ鍕垂閸偅鍙忛悗锝庝簻椤曆囨煛閸屾繍娼愮痪顓炵埣閺佸秶浠︽慨鎰枈闂佺粯鐗炲Λ鍕汲閿燂拷
     // std::string getint = "getint";
     // Type* funcType1 = new FunctionType(TypeSystem::intType, {});
     // SymbolEntry* entry1 = new IdentifierSymbolEntry(funcType1, getint, 0);
@@ -88,7 +88,7 @@
 }
 
 
-/* 鏉╂瑩鍣烽惃鍑TEGER閵嗕笚LOATPOINT閿燂拷?閸忚渹缍嬮弫鐗堝祦閿涘瓥NT閸滃瓗LOAT閿燂拷?閺佺増宓佺猾璇茬€� */
+/* 闁哄鏅滈悷鈺呭闯閻戣姤鍎嶉柛鎴瘹TEGER闂侀潧妫旂粭姝€OATPOINT闂佽法鍣﹂幏锟�?闂佺ǹ绻楀〒鍦礊鐎ｎ喖鏋侀柣妤€鐗嗙粊锕傛煥濞戞鎽淣T闂佸憡绮岄悺妗砄AT闂佽法鍣﹂幏锟�?闂佽桨鑳舵晶妤€鐣垫担铏瑰暗閻犲洩灏欓埀顒婃嫹 */
 
 %start Program
 %token <strtype> ID 
@@ -97,7 +97,7 @@
 %token IF ELSE WHILE
 %token INT VOID FLOAT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA NOT
-%token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN INCREMENT DECREMENT LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
+%token ADD SUB MUL DIV MOD OR AND LESS GREATER ASSIGN  LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
 %token RETURN CONST BREAK CONTINUE
 
 
@@ -147,24 +147,24 @@ LVal
         int state = 0;
         
         SymbolEntry *se;
-        se = identifiers->lookup($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
-        if(se == nullptr) //婵″倹鐏夊▽鈩冩箒
+        se = identifiers->lookup($1); //闂侀潻璐熼崝宀勫礄閿熺姴瀚夊璺烘湰閻ｈ京绱掑Δ瀣暠鐟滄媽娉曢幃浼村Ω閳轰焦顏為梺鍦暩閸嬫挸锕㈡担绯曟煢闁斥晛鍟粻鎺楀级閳哄倻鎳侀梺鍙夌獢D闂佽法鍣﹂幏锟�?
+        if(se == nullptr) //婵犵鈧啿鈧綊鎮樻径濞炬煢闁斥晛鍟粻锟�
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闂備胶鎳撻悘姘跺箰缁嬭法鏆ら柛鎰ㄦ櫆娴溿倖绻涢崱妤呭弰闁搞倕顑夐弻娑樷枎閹版儼鈧潡鏌涢敐鍛儓闁宠绮欓崺鍕礃閳哄啰鏆㈤梺璇叉唉椤鎯岄鍓т笉闁跨噦鎷�
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
+            //assert(se != nullptr);      //闂佺鍩栫粙鎴﹀吹椤撶喓鈻旈柍褜鍓熼弫鎾绘晸閿燂拷?闂佽法鍣﹂幏锟�?闁荤喎鐨濋崑鎾绘⒑閹稿海鎳曢柟鍑ゆ嫹??
 
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
+            $$ = new Id(error_se, state);    //缂傚倷鐒﹂悷銊ф崲閺嶎厽鏅搁柨鐕傛嫹?$$闁荤姍鍐惧剮缂佹柨鐡ㄧ粙澶愭偑閻欙綁鎮楀☉娆忓閻炴凹鍋婇幆鍐礋椤旇　鍋撻崘鈺傜秶闁诡垎鍛攨缂傚倷鐒﹂幐楣冨磻閿濆违闁稿本绮嶉弳蹇涙煛婢跺牆鍔ョ紒棰濆弮瀹曟瑩鎼圭憴鍕殸/
             delete []$1;
 
         }
         else
         {
-            $$ = new Id(se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
+            $$ = new Id(se, state);    //缂傚倷鐒﹂悷銊ф崲閺嶎厽鏅搁柨鐕傛嫹?$$闁荤姍鍐惧剮缂佹柨鐡ㄧ粙澶愭偑閻欙綁鎮楀☉娆忓閻炴凹鍋婇幆鍐礋椤旇　鍋撻崘鈺傜秶闁诡垎鍛攨缂傚倷鐒﹂幐楣冨磻閿濆违闁稿本绮嶉弳蹇涙煛婢跺牆鍔ョ紒棰濆弮瀹曟瑩鎼圭憴鍕殸/
             delete []$1;
         }
     }
@@ -175,28 +175,28 @@ LVal
     }
     ArrDimensions
     {
-        //閹存垳婊戦惌銉╀壕閺佹壆绮嶉惃鍕舵嫹?閿熶粙妫堕敓锟�?閿燂拷?娴犮儰缍旀稉鍝勪箯閸婅偐娈戦敓锟�?
+        //闂佺懓鐡ㄩ崹鍐测堪閹达附鍎楅柕澶嗘櫃婢规洟鏌℃担鐟邦棆缂侇喖绉归幆鍐礋閼搁潧顏�?闂佽法鍠嶇划娆徫涢崼鏇熸櫢闁跨噦鎷�?闂佽法鍣﹂幏锟�?婵炲濮伴崕鎵礊閺冣偓缁嬪宕崟顏嗩唵闂佺ǹ锕ㄩ崑鎰枔閹达附鏅搁柨鐕傛嫹?
         int state = 0;
 
         SymbolEntry *se;
-        se = identifiers->lookup($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
-        if(se == nullptr) //婵″倹鐏夊▽鈩冩箒
+        se = identifiers->lookup($1); //闂侀潻璐熼崝宀勫礄閿熺姴瀚夊璺烘湰閻ｈ京绱掑Δ瀣暠鐟滄媽娉曢幃浼村Ω閳轰焦顏為梺鍦暩閸嬫挸锕㈡担绯曟煢闁斥晛鍟粻鎺楀级閳哄倻鎳侀梺鍙夌獢D闂佽法鍣﹂幏锟�?
+        if(se == nullptr) //婵犵鈧啿鈧綊鎮樻径濞炬煢闁斥晛鍟粻锟�
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闂備胶鎳撻悘姘跺箰缁嬭法鏆ら柛鎰ㄦ櫆娴溿倖绻涢崱妤呭弰闁搞倕顑夐弻娑樷枎閹版儼鈧潡鏌涢敐鍛儓闁宠绮欓崺鍕礃閳哄啰鏆㈤梺璇叉唉椤鎯岄鍓т笉闁跨噦鎷�
             state = NOT_DEFINED;
             //delete [](char*)$1;
-            //assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
+            //assert(se != nullptr);      //闂佺鍩栫粙鎴﹀吹椤撶喓鈻旈柍褜鍓熼弫鎾绘晸閿燂拷?闂佽法鍣﹂幏锟�?闁荤喎鐨濋崑鎾绘⒑閹稿海鎳曢柟鍑ゆ嫹??
 
             SymbolEntry *error_se;
             error_se = new IdentifierSymbolEntry(new ERROR_OCUPIER(), $1, identifiers->getLevel());
-            $$ = new Id(error_se, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
+            $$ = new Id(error_se, state);    //缂傚倷鐒﹂悷銊ф崲閺嶎厽鏅搁柨鐕傛嫹?$$闁荤姍鍐惧剮缂佹柨鐡ㄧ粙澶愭偑閻欙綁鎮楀☉娆忓閻炴凹鍋婇幆鍐礋椤旇　鍋撻崘鈺傜秶闁诡垎鍛攨缂傚倷鐒﹂幐楣冨磻閿濆违闁稿本绮嶉弳蹇涙煛婢跺牆鍔ョ紒棰濆弮瀹曟瑩鎼圭憴鍕殸/
             delete []$1;
         }
         else
         {
-            $$ = new Id(se, $3, state);    //缂佹瑨绻栭敓锟�?$$鐠у绔存稉鐙狣鐎涙劗琚惃鍕€冩潏鎯х础缂佹挾鍋ｉ妴鍌滄暏閺夈儴绶崙铏规畱/
+            $$ = new Id(se, $3, state);    //缂傚倷鐒﹂悷銊ф崲閺嶎厽鏅搁柨鐕傛嫹?$$闁荤姍鍐惧剮缂佹柨鐡ㄧ粙澶愭偑閻欙綁鎮楀☉娆忓閻炴凹鍋婇幆鍐礋椤旇　鍋撻崘鈺傜秶闁诡垎鍛攨缂傚倷鐒﹂幐楣冨磻閿濆违闁稿本绮嶉弳蹇涙煛婢跺牆鍔ョ紒棰濆弮瀹曟瑩鎼圭憴鍕殸/
             if(se->get_arr_dimension_recorder() < arr_dimension_recorder)
-                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//閹垫挸宓冩潻娆庨嚋鐠佸潡妫剁搾鍛扮箖閿燂拷?
+                fprintf(stderr, "array \"%s\" has max dimension \"%d\" but accessed by \"%d\" \n", (char*)$1,se->get_arr_dimension_recorder(), arr_dimension_recorder );//闂佺懓鐏氶幐绋跨暤閸愨晜浜ゆ繛鍡楅叄閸ゅ鎮规担鍛婂仴婵☆偄澧庨幖楣冨川閹殿喚鐣洪梺璺ㄥ櫐閹凤拷?
             arr_dimension_recorder = 0;
             delete []$1;
         }
@@ -307,8 +307,12 @@ PrimaryExp
     LVal {
         $$ = $1;
     }
+    // |
+    // LPAREN Exp RPAREN{
+    //     $$=$2;
+    // }
     |
-    LPAREN Exp RPAREN{
+     LPAREN Cond RPAREN{
         $$=$2;
     }
     | INTEGER {
@@ -326,7 +330,7 @@ PrimaryExp
     }
     ;
 
-// 閻犲洤妫楅崺锟�;
+// 闂佽崵濮村ú銈呂涘Δ鍛槬闁跨噦鎷�;
 EmptyStmt
     :
      SEMICOLON{
@@ -373,17 +377,17 @@ FunctCall
     {   
         SymbolEntry *se;
         se = identifiers->lookup($1); 
-        if(se == nullptr) //濠碘€冲€归悘澶娾柦閳╁啯绠�
+        if(se == nullptr) //濠电姷顣介埀顒€鍟块埀顒€缍婇幃妯诲緞婵炵偓鐓㈤梺鏂ユ櫅閸燁垳绮婚敓锟�
         {
-            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闁瑰灚鎸稿畵鍐╂交濞嗗酣鍤嬮柛娆愶耿閸ｅ搫鈻介埄鍐╃畳閻庤鐭粻锟�
+            fprintf(stderr, "identifier \"%s\" is undefined\n", (char*)$1);//闂備胶鎳撻悘姘跺箰缁嬭法鏆ら柛鎰ㄦ櫆娴溿倖绻涢崱妤呭弰闁搞倕顑夐弻娑樷枎閹版儼鈧潡鏌涢敐鍛儓闁宠绮欓崺鍕礃閳哄啰鏆㈤梺璇叉唉椤鎯岄鍓т笉闁跨噦鎷�
             delete [](char*)$1;
-            assert(se != nullptr);      //閹舵稑鍤稉鈧敓锟�?閿燂拷?鐟封偓闁挎瑱鎷�??
+            assert(se != nullptr);      //闂佺鍩栫粙鎴﹀吹椤撶喓鈻旈柍褜鍓熼弫鎾绘晸閿燂拷?闂佽法鍣﹂幏锟�?闁荤喎鐨濋崑鎾绘⒑閹稿海鎳曢柟鍑ゆ嫹??
         }
         // SymbolEntry* temp=new TemporarySymbolEntry(se->getType(),SymbolTable::getLabel());
         $$ = new FunctCall(se, $3);
     }
     ;
-// 闁告垼濮ら弳鐔衡偓瑙勭煯缁狅拷 Funcdef->
+// 闂備礁鎲￠崹鍏兼叏閵堝姹查柣鏃囥€€閸嬫挾鎲撮崟顓犲彎缂備胶濯撮幏锟� Funcdef->
 FuncDef
     :
     Type ID{
@@ -413,7 +417,7 @@ FuncDef
         delete top;
         delete []$2;
     }
-// 闁告娲滃ú鐗堟交閹邦喚鏆�
+// 闂備礁鎲￠〃鍡椕哄⿰鍏犳椽鎮ч崼鐔舵唉闂佸綊鍋婇崰姘跺汲閿燂拷
 UnaryExp
     :
     PrimaryExp {
@@ -456,7 +460,7 @@ MulExp
     UnaryExp { $$ = $1;}
     |
     MulExp MUL UnaryExp {
-        //鏉╂瑩鍣烽幋鎴滄粦娴犺濮熼敓锟�?鐟曚焦婀佹稉鈧敓锟�?閺勭棞loat闁絼绠炵亸杈ㄥ瘻float閺夈儳鐣婚敓锟�?
+        //闁哄鏅滈悷鈺呭闯閻戣棄绠ｉ柟瀛樼矋缁箑霉閻樹警鍤欏┑顔惧枛閺佹捇鏁撻敓锟�?闁荤喐娲戦悞锕€锕㈡担鍦枖闁逞屽墴閺佹捇鏁撻敓锟�?闂佸搫瀚Λ鐎昽at闂備緡鍙忕徊鑲╃不閻愬吀鐒婇弶鍫涘妼閻︾豹loat闂佸搫顦崕鎶芥偩婵犳碍鏅搁柨鐕傛嫹?
         if($3->get_symbolEntry()->getType()->isFLOAT() || $1->get_symbolEntry()->getType()->isFLOAT())
         {
             SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
@@ -485,7 +489,7 @@ MulExp
     |
     MulExp MOD UnaryExp
     {
-        //濮瑰倷缍戦弫鐗堟Цint閻ㄥ嫪绗撻敓锟�?
+        //濠殿喚鎳撻崐椋庣礊閹达箑鏋侀柣妤€鐗婄瑧int闂佹眹鍔岀€氼亞绮幘缁樻櫢闁跨噦鎷�?
         SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
         $$ = new BinaryExpr(se, BinaryExpr::MOD, $1, $3);
     }
@@ -493,44 +497,6 @@ MulExp
 
 AddExp
     :
-    Exp INCREMENT
-    {
-        //SymbolEntry *const_1 = new ConstantSymbolEntry(TypeSystem::intType, 1);
-        //ExprNode *const_1_node = new Constant(const_1);
-
-
-        if($1->get_symbolEntry()->getType()->isFLOAT())
-        {
-            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
-            $$ = new BinaryExpr(se, BinaryExpr::INCREMENT_AFTER, $1);
-        }
-        else
-        {
-            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-            $$ = new BinaryExpr(se, BinaryExpr::INCREMENT_AFTER, $1);
-        }
-
-        
-
-        //SymbolEntry *se;
-        //se = identifiers->lookup($1->get_name()); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淟val閿燂拷?
-        //$$ = new BinaryExpr(se, BinaryExpr::ADD, $1, const_1_node);
-    }
-    |
-    Exp DECREMENT
-    {
-        if($1->get_symbolEntry()->getType()->isFLOAT())
-        {
-            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::floatType, SymbolTable::getLabel());
-            $$ = new BinaryExpr(se, BinaryExpr::DECREMENT_AFTER, $1);
-        }
-        else
-        {
-            SymbolEntry *se = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-            $$ = new BinaryExpr(se, BinaryExpr::DECREMENT_AFTER, $1);
-        }
-    }
-    |
     MulExp { $$ = $1; }
     |
     AddExp ADD MulExp
@@ -720,7 +686,7 @@ ArrInitList
     :
     Exp
     {
-        //鏉╂瑤閲滈敓锟�?閸掓澘銇旀禍鍡礉瀵偓婵绻橀崗銉ュ徔娴ｆ挸鈧棿绨￠敓锟�?
+        //闁哄鏅滈悷銈夋煂濠婂牊鏅搁柨鐕傛嫹?闂佸憡甯楀姗€濡甸弮鈧粋宥夊幢椤撶姷顦悗娈垮枓閸嬫挸鈹戦纰卞創缂佺粯锕㈠畷妤呭Ψ閵夈儱绶繛杈剧稻閹告悂鍩€椤掑嫭锛熺紒顭掔節閺佹捇鏁撻敓锟�?
 
         $1->getSymPtr()->setType(declType);
         $$ = new InitNode($1);
@@ -728,7 +694,7 @@ ArrInitList
     |
     LBRACE ArrInitLists RBRACE
     {
-        //鏉╂瑤閲滈敓锟�?鐠囧瓨妲戞潻妯绘箒閼峰啿鐨稉鈧敓锟�?
+        //闁哄鏅滈悷銈夋煂濠婂牊鏅搁柨鐕傛嫹?闁荤姴娲ら悺銊ノｉ幋鐐翠氦婵☆垳绮粻鎺楁煠瀹勬澘鏆遍柣顭戝灡缁嬪鍩€椤掑嫭鏅搁柨鐕傛嫹?
         $$ = $2;
         $$->i_m_checkpoint();
     }
@@ -783,14 +749,14 @@ ArrDimensions
     }
     ;
 
-// 閻㈩垱鎮傞崳娲椽鐏炶棄缍侀梺鎻掔箳濞堟垶绔熼悧鍫燁潠
+// 闂佹眹鍩勯崹閬嶅箖閸岀偛闂繛宸簻濡炰粙鎮橀悙鑸殿棄缂傚秳绶氬娲箵閹烘梻顔婂┑鐐茬墛閸ㄥ墎绮╅悢鍏煎亱闁割偆鍣ュ锟�
 DeclStmt
      :
     VarDeclStmt {$$=$1;}
     |
     ConstDeclStmt {$$=$1;}
     ;
-// 閸欐﹢鍣� 閸欐﹢鍣�+娑撯偓閿燂拷?
+// 闂佸憡鐟﹂敃銏ゅ闯閿燂拷 闂佸憡鐟﹂敃銏ゅ闯閿燂拷+婵炴垶鎸撮崑鎾绘煥閻曞倹瀚�?
 VarDeclStmt
     :
     Type IdDeclLists SEMICOLON{$$=$2;}
@@ -798,12 +764,12 @@ VarDeclStmt
         ;
 
 
-// 閻㈩垱鎮傞崳锟� const +濞戞挴鍋撻柛顐㈡４缁憋拷
+// 闂佹眹鍩勯崹閬嶅箖閸岀偛闂柨鐕傛嫹 const +濠电偞鍨堕幐鎾磻閹剧粯鐓曟い鎰╁灪閿涙梻绱掗幉瀣
 ConstDeclStmt
     :
     CONST Type ConstDeclLists SEMICOLON{$$=$3;}
     ;
-// 闁告瑦锕㈤崳锟�
+// 闂備礁鎲￠悷锕傛晝閵忋倕闂柨鐕傛嫹
 IdDeclLists 
     :
     IdDeclLists COMMA IdDeclList {$$=new DeclList($1,$3);}
@@ -815,10 +781,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
-        if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //闂侀潻璐熼崝宀勫礄閿熺姴瀚夊璺烘湰閻ｈ京绱掑Δ瀣暠鐟滄媽娉曢幃浼村Ω閳轰焦顏為梺鍦暩閸嬫挸锕㈡担绯曟煢闁斥晛鍟粻鎺楀级閳哄倻鎳侀梺鍙夌獢D闂佽法鍣﹂幏锟�?
+        if(check_redefination_se != nullptr) //婵犵鈧啿鈧綊鎮樻径濞炬煢闁斥晛鍟粻锟�
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//闂佺懓鐏氶幐绋跨暤閸愨晜浜ゆ繛鍡楅叄閸ゅ鏌涘▎鎰惰€块柛锝嗘そ閺屽苯顓奸崨顖涙瘞闂佽法鍣﹂幏锟�?
             state = REDEFINATION;
         }
         SymbolEntry *se;
@@ -832,10 +798,10 @@ IdDeclList
         int state = LEGAL_VAR;
         
         SymbolEntry *check_redefination_se;
-        check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
-        if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
+        check_redefination_se = identifiers->lookup_in_present_domain($1); //闂侀潻璐熼崝宀勫礄閿熺姴瀚夊璺烘湰閻ｈ京绱掑Δ瀣暠鐟滄媽娉曢幃浼村Ω閳轰焦顏為梺鍦暩閸嬫挸锕㈡担绯曟煢闁斥晛鍟粻鎺楀级閳哄倻鎳侀梺鍙夌獢D闂佽法鍣﹂幏锟�?
+        if(check_redefination_se != nullptr) //婵犵鈧啿鈧綊鎮樻径濞炬煢闁斥晛鍟粻锟�
         {
-            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
+            fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//闂佺懓鐏氶幐绋跨暤閸愨晜浜ゆ繛鍡楅叄閸ゅ鏌涘▎鎰惰€块柛锝嗘そ閺屽苯顓奸崨顖涙瘞闂佽法鍣﹂幏锟�?
             state = REDEFINATION;
         }
 
@@ -851,10 +817,10 @@ IdDeclList
             int state = LEGAL_VAR;
         
             SymbolEntry *check_redefination_se;
-            check_redefination_se = identifiers->lookup_in_present_domain($1); //閸︺劌鍑￠張澶屾畱缁楋箑褰跨悰銊╁櫡閹电偓婀佸▽鈩冩箒鏉╂瑤閲淚D閿燂拷?
-            if(check_redefination_se != nullptr) //婵″倹鐏夊▽鈩冩箒
+            check_redefination_se = identifiers->lookup_in_present_domain($1); //闂侀潻璐熼崝宀勫礄閿熺姴瀚夊璺烘湰閻ｈ京绱掑Δ瀣暠鐟滄媽娉曢幃浼村Ω閳轰焦顏為梺鍦暩閸嬫挸锕㈡担绯曟煢闁斥晛鍟粻鎺楀级閳哄倻鎳侀梺鍙夌獢D闂佽法鍣﹂幏锟�?
+            if(check_redefination_se != nullptr) //婵犵鈧啿鈧綊鎮樻径濞炬煢闁斥晛鍟粻锟�
             {
-                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//閹垫挸宓冩潻娆庨嚋閸欐﹢鍣洪柌宥呯暰閿燂拷?
+                fprintf(stderr, "identifier \"%s\" is redefined\n", (char*)$1);//闂佺懓鐏氶幐绋跨暤閸愨晜浜ゆ繛鍡楅叄閸ゅ鏌涘▎鎰惰€块柛锝嗘そ閺屽苯顓奸崨顖涙瘞闂佽法鍣﹂幏锟�?
                 state = REDEFINATION;
             }
 
@@ -878,7 +844,7 @@ IdDeclList
         }
     ;
 
-// 閻㈩垱鎮傞崳锟�
+// 闂佹眹鍩勯崹閬嶅箖閸岀偛闂柨鐕傛嫹
 ConstDeclLists 
     :
     ConstDeclLists COMMA ConstDeclList {$$=new ConstDeclList($1,$3);}

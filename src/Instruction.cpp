@@ -112,6 +112,7 @@ CmpInstruction::CmpInstruction(unsigned opcode, Operand *dst, Operand *src1, Ope
     dst->setDef(this);
     src1->addUse(this);
     src2->addUse(this);
+    dst->get_se()->setType(TypeSystem::boolType);
 }
 
 
@@ -436,4 +437,81 @@ void CallInstruction::output() const
     }
     fprintf(yyout, ")\n");
 }
+UnaryInstruction::UnaryInstruction(unsigned opcode, Operand *dst, Operand *src, BasicBlock *insert_bb) : Instruction(UNARY, insert_bb)
+{
+    this->opcode = opcode;
+    operands.push_back(dst);
+    operands.push_back(src);
+    dst->setDef(this);
+    src->addUse(this);
+}
 
+UnaryInstruction::~UnaryInstruction()
+{
+    operands[0]->setDef(nullptr);
+    if (operands[0]->usersNum() == 0)
+        delete operands[0];
+    operands[1]->removeUse(this);
+}
+
+void UnaryInstruction::output() const
+{
+    std::string s1, s2, type;
+    s1 = operands[0]->toStr();
+    s2 = operands[1]->toStr();
+    type = operands[0]->getType()->toStr();
+    switch (opcode)
+    {
+    case ADD:
+        fprintf(yyout, "  %s = add %s 0, %s\n", s1.c_str(), type.c_str(), s2.c_str());
+        break;
+    case SUB:
+        fprintf(yyout, "  %s = sub %s 0, %s\n", s1.c_str(), type.c_str(), s2.c_str());
+        break;
+    case NOT:
+        fprintf(yyout, "  %s = not %s %s\n", s1.c_str(), type.c_str(), s2.c_str());
+        break;
+    default:
+        break;
+    }
+}
+
+NotInstruction::NotInstruction(Operand *dst, Operand *src, BasicBlock *insert_bb) : Instruction(NOT, insert_bb)
+{
+    operands.push_back(dst);
+    operands.push_back(src);
+    dst->setDef(this);
+    src->addUse(this);
+
+    dst->get_se()->setType(TypeSystem::boolType);
+}
+
+NotInstruction::~NotInstruction()
+{
+    operands[0]->setDef(nullptr);
+    if (operands[0]->usersNum() == 0)
+        delete operands[0];
+    operands[1]->removeUse(this);
+}
+
+void NotInstruction::output() const
+{
+    std::string s1, s2, type;
+    s1 = operands[0]->toStr();
+    s2 = operands[1]->toStr();
+    type = operands[0]->getType()->toStr();
+
+    fprintf(yyout, "  %s = xor %s %s, true\n", s1.c_str(), type.c_str(), s2.c_str());
+}
+
+
+ZextInstruction::ZextInstruction(Operand *dst, Operand *src, BasicBlock *insertBB) : Instruction(TEMP, insertBB)
+{
+    operands.push_back(dst);
+    operands.push_back(src);
+}
+
+void ZextInstruction::output() const
+{
+    fprintf(yyout, "  %s = zext i1 %s to i32\n", operands[0]->toStr().c_str(), operands[1]->toStr().c_str());
+}

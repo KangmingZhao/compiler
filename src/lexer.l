@@ -43,9 +43,8 @@ WHITE [\t ]
 
 
 /* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆硷�??   */
-ADD_type "+"?"+"
-SUB_type "-"?"-"
-
+ADD_type "+"
+SUB_type "-"
 
 /* 锟斤拷锟斤拷锟斤拷锟斤拷注锟酵和匡拷注锟斤拷 */
 
@@ -151,39 +150,20 @@ line_commentend \n
 
 
 {ADD_type} {
-    int i = 0;
-    while(yytext[i] != '\0')
-    {
-        i++;
-    }
-    if(i == 1)
-    {
-        dump_tokens("ADD\t%s\n", yytext);
-        return ADD;
-    }
-    else if(i == 2)
-    {
-        dump_tokens("INCREMENT\t%s\n", yytext);
-        return INCREMENT;
-    }
+
+ 
+    dump_tokens("ADD\t%s\n", yytext);
+    return ADD;
+
+
 }
 
 {SUB_type} {
-    int i = 0;
-    while(yytext[i] != '\0')
-    {
-        i++;
-    }
-    if(i == 1)
-    {
-        dump_tokens("SUB\t%s\n", yytext);
-        return SUB;
-    }
-    else if(i == 2)
-    {
-        dump_tokens("DECREMENT\t%s\n", yytext);
-        return DECREMENT;
-    }
+ 
+    dump_tokens("SUB\t%s\n", yytext);
+    return SUB;
+    
+
 }
 
 "*" {

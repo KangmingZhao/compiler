@@ -146,8 +146,41 @@ void FunctionDef::genCode()
      * Construct control flow graph. You need do set successors and predecessors for each basic block.
      * Todo
     */
+    for (auto bb = func->begin(); bb != func->end(); bb++){
+    Instruction *last = (*bb)->rbegin();
+    Instruction *first = (*bb)->begin();
+    while (first != last) {
+      if (first->isCond() || first->isUncond()) {
+        (*bb)->remove(first);
+      }
+      first = first->getNext();
+    }
+
+    if (last->isCond()){
+      BasicBlock *trueBranch = ((CondBrInstruction *)last)->getTrueBranch();
+      BasicBlock *falseBranch = ((CondBrInstruction *)last)->getFalseBranch();
+      (*bb)->addSucc(trueBranch);
+      (*bb)->addSucc(falseBranch);
+      trueBranch->addPred(*bb);
+      falseBranch->addPred(*bb);
+    }
+    else if (last->isUncond()){
+      BasicBlock *branch = ((UncondBrInstruction *)last)->getBranch();
+      (*bb)->addSucc(branch);
+      branch->addPred(*bb);
+    }
+    else if (!last->isRet()){
+      if (((FunctionType *)func->getSymPtr()->getType())->getRetType() == TypeSystem::intType)
+      {
+        new RetInstruction(new Operand(new ConstantSymbolEntry(TypeSystem::intType, 0)), (*bb));
+      }
+      else if (((FunctionType *)func->getSymPtr()->getType())->getRetType() == TypeSystem::voidType){
+        new RetInstruction(nullptr, (*bb));
+      }
+    }
+  }
    
-    builder->build_link();
+   // builder->build_link();
 }
 
 void BinaryExpr::genCode()
@@ -1105,12 +1138,52 @@ void UnaryExpr::genCode()
     expr->genCode();
     if (op == SUB) 
     {
-        SymbolEntry* se = new ConstantSymbolEntry(TypeSystem::intType, -1);
-        Constant* temp_const = new Constant(se); 
-        Operand* src1 = temp_const->getOperand();
+        //SymbolEntry* se = new ConstantSymbolEntry(TypeSystem::intType, -1);
+        //Constant* temp_const = new Constant(se); 
+        //Operand* src1=temp_const->getOperand();
         Operand* src2 = expr->getOperand();
-        int opcode = BinaryInstruction::MUL;
-        new BinaryInstruction(opcode, dst, src1, src2, builder->getInsertBB());
+        Operand *temp=src2;
+        int opcode = UnaryInstruction::SUB;
+        // if(src2->getType()->isBool())
+        // {
+        //     std::cout<<src2->toStr()<<std::endl;
+        //     std::cout<<"fuck"<<std::endl;
+        //     SymbolEntry *s = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+        //     temp = new Operand(s);
+        //     new ZextInstruction(temp, src2, builder->getInsertBB());
+        // }
+        //std::cout<<"fuck22"<<std::endl;
+        //new BinaryInstruction(opcode, dst, src1, src2, builder->getInsertBB());
+         new UnaryInstruction(opcode,dst,temp,builder->getInsertBB());
+    }
+    else if( op==NOT)
+    {
+        // if(！2)
+        // !(bool)
+        
+        if(expr->getSymPtr()->getType()->isBool())
+        {
+             new NotInstruction(this->dst,expr->getOperand(), builder->getInsertBB());
+        }
+        else
+        {
+            int opcode = CmpInstruction::E;
+            Operand *src = expr->getOperand();
+            SymbolEntry *se_const0 = new ConstantSymbolEntry(TypeSystem::intType, 0);
+            ExprNode *temp_const0 = new Constant(se_const0);
+            Operand *src0_const0 = temp_const0->getOperand();
+            Operand *src0 = src0_const0;
+            SymbolEntry *s = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            Operand *n = new Operand(s);
+            if (dst->getType() != src->getType())
+            {
+                //std::cout<<"fuck"<<std::endl;
+               // std::cout<<dst->toStr()<<std::endl;
+                //std::cout<<src->toStr()<<std::endl;
+                new ZextInstruction(n,dst,builder->getInsertBB());
+            }    
+            new CmpInstruction(opcode, this->dst, src, src0, builder->getInsertBB());
+        }
     }
     if (dst->getType()->isBool())
     {
@@ -1119,6 +1192,7 @@ void UnaryExpr::genCode()
         i_true_list.emplace_back(temp_cb);
         i_false_list.emplace_back(temp_cb);
     }
+    
 
 }
 
