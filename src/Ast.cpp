@@ -19,6 +19,8 @@ BasicBlock* temp_end_bb;
 BasicBlock* temp_then_bb;
 ExprNode* temp_cond_expr;
 
+bool now_is_def_funct = 0;
+
 Constant* cal_expr(ExprNode* node2cal)
 {
     float cal_result = node2cal->cal_expr_val();
@@ -138,8 +140,14 @@ void FunctionDef::genCode()
     builder->setInsertBB(entry);
     builder->set_cfg(entry);
 
+    now_is_def_funct = 1;
     if (paraStmt != nullptr)
-        paraStmt->genCode();
+    {
+        if (paraStmt != nullptr)
+            paraStmt->genCode();
+    }
+    now_is_def_funct = 0;
+
     stmt->genCode();
 
     /**
@@ -510,18 +518,6 @@ void AssignStmt::genCode()
     Operand *addr = dynamic_cast<IdentifierSymbolEntry*>(lval->getSymPtr())->getAddr();
     expr->genCode();
     Operand* src = expr->getOperand();
-    //Operand* src;
-    //Constant* cal_result = cal_expr_manager.cal_expr(expr);
-    //if (cal_result != nullptr)
-    //{
-    //    //cal_result->genCode();
-    //    src = cal_result->getOperand();
-    //}
-    //else
-    //{
-    //    expr->genCode();
-    //    src = expr->getOperand();
-    //}
     /***
      * We haven't implemented array yet, the lval can only be ID. So we just store the result of the `expr` to the addr of the id.
      * If you want to implement array, you have to caculate the address first and then store the result into it.
@@ -1093,11 +1089,27 @@ void ParaNode::typeCheck()
 }
 void ParaNode::genCode()
 {
+
     if(!is_link)
     {
-        //std::cout<<"fuck expr"<<std::endl;
-        para_operands.push_back(para_expr->getOperand());
-        para_expr->genCode();
+        if (now_is_def_funct)
+        {
+            Function* func = builder->getInsertBB()->getParent();
+            Operand* addr;
+            SymbolEntry* addr_se;
+            Type* type;
+            type = new PointerType(para_expr->getSymPtr()->getType());
+            addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
+            addr = new Operand(addr_se);
+            ((IdentifierSymbolEntry*)para_expr->getSymPtr())->setAddr(addr);
+
+            func->add_para(para_expr);
+        }
+        else 
+        {
+            para_operands.push_back(para_expr->getOperand());
+            para_expr->genCode();
+        }
     }
     else 
     {

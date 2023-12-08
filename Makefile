@@ -2,7 +2,7 @@ SHELL:=/bin/bash
 SRC_PATH ?= src
 INC_PATH += include
 BUILD_PATH ?= build
-TEST_PATH ?= test/level1-1
+TEST_PATH ?= test/level1-2
 OBJ_PATH ?= $(BUILD_PATH)/obj
 BINARY ?= $(BUILD_PATH)/compiler
 SYSLIB_PATH ?= sysyruntimelibrary
@@ -49,7 +49,6 @@ $(BINARY):$(OBJ)
 app:$(LEXER) $(PARSER) $(BINARY)
 
 run:app
-	@$(BINARY) -o example.ast -a example.sy
 	@$(BINARY) -o example.ll -i example.sy
 gdb:app
 	@gdb $(BINARY)

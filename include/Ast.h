@@ -111,6 +111,7 @@ public:
     Operand* getOperand() {return dst;};
     SymbolEntry* getSymPtr() {return symbolEntry;};
 
+    //void setSymPtr(SymbolEntry* se) { symbolEntry = se; };
     virtual float cal_expr_val() = 0;
     bool judge_is_not_val(ExprNode* expr) { return expr->is_not_val ? 1 : 0; };
 
@@ -794,7 +795,7 @@ private:
     StmtNode *stmt;    
     ParaNode* paraStmt;
 public:
-    FunctionDef(SymbolEntry *se, StmtNode *stmt) : se(se), stmt(stmt){};
+    FunctionDef(SymbolEntry* se, StmtNode* stmt) : se(se), stmt(stmt), paraStmt(nullptr) {};
     FunctionDef(SymbolEntry* se, StmtNode* stmt, ParaNode* paraStmt) : se(se), stmt(stmt), paraStmt(paraStmt) {};
     void output(int level);
     void typeCheck();

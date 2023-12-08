@@ -10,6 +10,7 @@
 #include "SymbolTable.h"
 
 class Unit;
+class ExprNode;
 
 class Function
 {
@@ -21,6 +22,9 @@ private:
     SymbolEntry *sym_ptr;
     BasicBlock *entry;
     Unit *parent;
+
+    std::vector<ExprNode*> para_list;
+
 
 public:
     Function(Unit *, SymbolEntry *);
@@ -37,6 +41,9 @@ public:
     SymbolEntry *getSymPtr() { return sym_ptr; };
 
     BasicBlock* setEntry(BasicBlock* entrybb) { BasicBlock* temp = entry; entry = entrybb; return temp; };
+
+    bool no_para() { return para_list.size() == 0; };
+    void add_para(ExprNode* para_node) { para_list.push_back(para_node); };
 
 };
 
