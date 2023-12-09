@@ -29,7 +29,7 @@ bool now_is_def_funct = 0;
 
 Constant* cal_expr(ExprNode* node2cal)
 {
-    float cal_result = node2cal->cal_expr_val();
+    double cal_result = node2cal->cal_expr_val();
     int cal_result_i = (int)cal_result;
     //std::cout << cal_result_i << std::endl;
     if (node2cal->cal_expr_val() != PRE_CAL_ERROR_MEETING_VAL)
@@ -37,7 +37,7 @@ Constant* cal_expr(ExprNode* node2cal)
         SymbolEntry* se;
         if (node2cal->getSymPtr()->getType()->isFLOAT())
         {
-            se = new ConstantSymbolEntry(TypeSystem::floatType, cal_result);
+            se = new ConstantSymbolEntry(TypeSystem::floatType, (int)cal_result);
         }
         else
         {

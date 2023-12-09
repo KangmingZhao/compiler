@@ -57,11 +57,11 @@ public:
     ConstantSymbolEntry(Type *type, int value);
     ConstantSymbolEntry(Type* type, float value);
     virtual ~ConstantSymbolEntry() {};
-    float getValue() const {
+    double getValue() const {
         if(data_type == 1)
-            return (float)value;
+            return (double)value;
         else 
-            return value_f;
+            return (double)value_f;
     };
     std::string toStr();
     // You can add any function you need here.

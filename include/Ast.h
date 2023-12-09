@@ -5,6 +5,7 @@
 #include "Operand.h"
 #include "Type.h"
 #include <unordered_map>
+#include<iostream>
 
 
 #define ERROR_MESSAGE_WRITE_INTO_AST 0
@@ -112,7 +113,7 @@ public:
     SymbolEntry* getSymPtr() {return symbolEntry;};
 
     //void setSymPtr(SymbolEntry* se) { symbolEntry = se; };
-    virtual float cal_expr_val() = 0;
+    virtual double cal_expr_val() = 0;
     bool judge_is_not_val(ExprNode* expr) { return expr->is_not_val ? 1 : 0; };
 
 };
@@ -125,8 +126,9 @@ public:
     void typeCheck();
     void genCode();
 
-    float cal_expr_val()
+    double cal_expr_val()
     {
+        
         return ((ConstantSymbolEntry*)getSymPtr())->getValue();
     }
     void mergeConstExp() {};
@@ -151,7 +153,7 @@ public:
     void genCode();
 
     //我操这个超多三目运算符尊都好机掰炫酷，我尊牛逼！感谢坤坤
-    float cal_expr_val() {
+    double cal_expr_val() {
         return 
             expr->is_not_val ? 
             (
@@ -215,7 +217,7 @@ public:
     void typeCheck();
     void genCode();
 
-    float cal_expr_val()
+    double cal_expr_val()
     {
         //艹！这么多运算符要写死我啊！
         
@@ -343,7 +345,7 @@ public:
 
 
     bool judge_is_not_val(ExprNode* expr) { return expr->is_not_val ? 1 : 0; };
-    float cal_expr_val() {
+    double cal_expr_val() {
 
         if (is_link)
         {
@@ -393,7 +395,7 @@ public:
     void genCode();
 
     bool judge_is_not_val(ExprNode* expr) { return expr->is_not_val ? 1 : 0; };
-    float cal_expr_val() {
+    double cal_expr_val() {
         if (is_link)
         {
             return para1->cal_expr_val() + para2->cal_expr_val();
@@ -445,9 +447,9 @@ public:
     void typeCheck();
     void genCode();
 
-    float cal_expr_val() { return PRE_CAL_ERROR_MEETING_VAL; }//这里先默认函数返回的是非const了。不然尊都写不出来了
+    double cal_expr_val() { return PRE_CAL_ERROR_MEETING_VAL; }//这里先默认函数返回的是非const了。不然尊都写不出来了
 
-    void mergeConstExp() { if (para_node != nullptr)para_node->mergeConstExp(); };
+    void mergeConstExp() {  };
 
 };
 
@@ -505,7 +507,7 @@ public:
         }
     }
 
-    float cal_expr_val() { 
+    double cal_expr_val() { 
         if (getSymPtr()->isConstIdentifer())
         {
             return ((IdentifierSymbolEntry*)getSymPtr())->getValueExpr()->cal_expr_val();

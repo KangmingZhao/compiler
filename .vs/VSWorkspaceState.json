@@ -4,9 +4,8 @@
     "\\include",
     "\\src",
     "\\test",
-    "\\test\\level1-1",
     "\\test\\level1-2"
   ],
-  "SelectedNode": "\\Makefile",
+  "SelectedNode": "\\include\\SymbolTable.h",
   "PreviewInSolutionExplorer": false
 }
