@@ -207,6 +207,7 @@ void BinaryExpr::genCode()
         //if(expr_in_cond)
         //arithmetic op
         expr1->genCode();
+        //std::cout << (expr2->getSymPtr()->getType() == nullptr) << std::endl;
         expr2->genCode();
         Operand* src1 = expr1->getOperand();
         Operand* src2 = expr2->getOperand();
@@ -358,6 +359,7 @@ void Id::genCode()
 {
     BasicBlock *bb = builder->getInsertBB();
     Operand *addr = dynamic_cast<IdentifierSymbolEntry*>(symbolEntry)->getAddr();
+    //std::cout << addr->toStr() << std::endl;
     new LoadInstruction(dst, addr, bb);
 }
 
@@ -465,6 +467,7 @@ void DeclStmt::genCode()
     IdentifierSymbolEntry *se = dynamic_cast<IdentifierSymbolEntry *>(id->getSymPtr());
     if(se->isGlobal())
     {
+        //std::cout << id->getSymPtr()->toStr() << std::endl;
         //std::cout << "fuck" << std::endl;
         Operand *addr;
         SymbolEntry *addr_se;
@@ -509,7 +512,6 @@ void DeclStmt::genCode()
 void ReturnStmt::genCode()
 {
     //Todo
-
     BasicBlock* ret_bb = builder->getInsertBB();
     Operand* src=nullptr;
     if(retValue){
@@ -971,8 +973,20 @@ void ConstDeclInitStmt::typeCheck()
 }
 void ConstDeclInitStmt::genCode()
 {
-      if (initVal != nullptr)
+    
+    Operand* addr;
+    SymbolEntry* addr_se;
+    addr_se = new IdentifierSymbolEntry(*dynamic_cast<IdentifierSymbolEntry*>(id->getSymPtr()));
+    addr_se->setType(new PointerType(id->getSymPtr()->getType()));
+    addr = new Operand(addr_se);
+    dynamic_cast<IdentifierSymbolEntry*>(id->getSymPtr())->setAddr(addr);
+    Instruction* g;
+    //initVal->genCode();
+    g = new GlobalInstruction(new Operand(id->getSymPtr()), new Operand(initVal->getSymPtr()), id->getSymPtr());
+    if (initVal != nullptr)
         initVal->genCode();
+    g->output();
+
 }
 
 void DeclInitStmt::typeCheck()

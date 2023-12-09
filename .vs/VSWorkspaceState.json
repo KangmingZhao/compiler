@@ -4,8 +4,9 @@
     "\\include",
     "\\src",
     "\\test",
+    "\\test\\level1-1",
     "\\test\\level1-2"
   ],
-  "SelectedNode": "\\test\\level1-2\\029_if_test2.sy",
+  "SelectedNode": "\\Makefile",
   "PreviewInSolutionExplorer": false
 }

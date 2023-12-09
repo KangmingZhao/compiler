@@ -855,6 +855,8 @@ ConstDeclList
     :
     ID ASSIGN InitVal {
         SymbolEntry *se;
+        //fprintf(stderr, "%d",identifiers->getLevel());//闂佺懓鐏氶幐绋跨暤閸愨晜浜ゆ繛鍡楅叄閸ゅ鏌涘▎鎰惰€块柛锝嗘そ閺屽苯顓奸崨顖涙瘞闂佽法鍣﹂幏锟�?
+
         se = new IdentifierSymbolEntry(declType, $1, identifiers->getLevel(), $3);
         identifiers->install($1, se);
         $$ = new ConstDeclInitStmt(new Id(se),$3);
