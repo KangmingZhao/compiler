@@ -757,8 +757,6 @@ public:
             Constant* cal_result = cal_expr(retValue);
             if (cal_result != nullptr)
                 retValue = cal_result;
-            else
-                retValue->mergeConstExp();
         }
     }
 };

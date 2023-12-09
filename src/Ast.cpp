@@ -14,10 +14,16 @@ bool isreturn=false;
 Type *retVal;
 std::vector<Type*> paramVector;
 std::vector<Operand *> para_operands;// 闂佽瀛╃粙鎺楁晪闂佹悶鍊濇禍璺侯嚕椤愶箑绠€光偓閳ь剙鈻撻崼鏇熺厽闁逞屽墮婵℃寧绻涢崼鐔风伌鐎规洩缍佸畷鎺戔槈濞嗘劦鍟€闂備焦鐪归崝宀勫垂缁卞墖
+
+std::vector<std::vector<Operand*>>para_operands_stack;
+
 LoopManager loop_manager;
 BasicBlock* temp_end_bb;
 BasicBlock* temp_then_bb;
 ExprNode* temp_cond_expr;
+
+ExprNode* bugs_detector;
+
 
 bool now_is_def_funct = 0;
 
@@ -503,6 +509,7 @@ void DeclStmt::genCode()
 void ReturnStmt::genCode()
 {
     //Todo
+
     BasicBlock* ret_bb = builder->getInsertBB();
     Operand* src=nullptr;
     if(retValue){
@@ -514,6 +521,7 @@ void ReturnStmt::genCode()
 
 void AssignStmt::genCode()
 {
+
     BasicBlock *bb = builder->getInsertBB();
     Operand *addr = dynamic_cast<IdentifierSymbolEntry*>(lval->getSymPtr())->getAddr();
     expr->genCode();
@@ -553,7 +561,7 @@ void FunctionDef::typeCheck()
         {
             if(ret!=retVal)
             {
-            fprintf(stderr, "function \'%s\'has wrong return \n",se->toStr().c_str());
+                fprintf(stderr, "function \'%s\'has wrong return \n",se->toStr().c_str());
             }
         }
 
@@ -1059,17 +1067,26 @@ void FunctCall::typeCheck()
 }
 void FunctCall::genCode()
 {
-     
     //std::cout<<"functcall_gencode"<<std::endl;
     if(para_node!=nullptr)
     {
-    para_operands.clear();
-    para_node->genCode();
+        //para_operands.clear();
+        std::vector<Operand*> stack_top;
+        para_operands_stack.push_back(stack_top);
+        para_node->genCode();
     }
     //std::cout<<"paranode_gencode"<<std::endl;
     BasicBlock *bb = builder->getInsertBB();
     // fprintf("ssssssssss%s")
-    new CallInstruction(dst, symbolEntry, para_operands, bb);
+    if (para_node != nullptr) {
+        new CallInstruction(dst, symbolEntry, para_operands_stack[para_operands_stack.size() - 1], bb);
+        para_operands_stack.pop_back();
+    }
+    else
+    {
+        std::vector<Operand*> empty_vec;
+        new CallInstruction(dst, symbolEntry, empty_vec, bb);
+    }
 }
 
 void ParaNode::typeCheck()
@@ -1095,19 +1112,29 @@ void ParaNode::genCode()
         if (now_is_def_funct)
         {
             Function* func = builder->getInsertBB()->getParent();
+            BasicBlock* entry = func->getEntry();
+            Instruction* alloca;
             Operand* addr;
             SymbolEntry* addr_se;
             Type* type;
             type = new PointerType(para_expr->getSymPtr()->getType());
             addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
             addr = new Operand(addr_se);
-            ((IdentifierSymbolEntry*)para_expr->getSymPtr())->setAddr(addr);
+            alloca = new AllocaInstruction(addr, para_expr->getSymPtr());                   // allocate space for local id in function stack.
+            entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
+            dynamic_cast<IdentifierSymbolEntry*>(para_expr->getSymPtr())->setAddr(addr);
 
-            func->add_para(para_expr);
+
+
+            SymbolEntry * temp_src_addr = new TemporarySymbolEntry(para_expr->getSymPtr()->getType(), SymbolTable::getLabel());
+            Operand* temp_src = new Operand(temp_src_addr);
+            new StoreInstruction(addr, temp_src, entry);
+
+            func->add_para(temp_src);
         }
         else 
         {
-            para_operands.push_back(para_expr->getOperand());
+            para_operands_stack[para_operands_stack.size() - 1].push_back(para_expr->getOperand());
             para_expr->genCode();
         }
     }

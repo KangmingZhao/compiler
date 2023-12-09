@@ -11,6 +11,7 @@
 
 class Unit;
 class ExprNode;
+class Operand;
 
 class Function
 {
@@ -23,7 +24,7 @@ private:
     BasicBlock *entry;
     Unit *parent;
 
-    std::vector<ExprNode*> para_list;
+    std::vector<Operand*> para_list;
 
 
 public:
@@ -43,7 +44,7 @@ public:
     BasicBlock* setEntry(BasicBlock* entrybb) { BasicBlock* temp = entry; entry = entrybb; return temp; };
 
     bool no_para() { return para_list.size() == 0; };
-    void add_para(ExprNode* para_node) { para_list.push_back(para_node); };
+    void add_para(Operand* para_node) { para_list.push_back(para_node); };
 
 };
 

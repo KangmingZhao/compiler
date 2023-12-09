@@ -3,6 +3,7 @@
 #include "Type.h"
 #include <list>
 #include "Ast.h"
+#include "Operand.h"
 
 extern FILE* yyout;
 
@@ -62,11 +63,11 @@ void Function::output() const
         {
             if (i == 0)
             {
-                fprintf(yyout, "%s %s", para_list[i]->getSymPtr()->getType()->toStr().c_str(), para_list[i]->getSymPtr()->toStr().c_str());
+                fprintf(yyout, "%s %s", para_list[i]->getType()->toStr().c_str(), para_list[i]->toStr().c_str());
             }
             else
             {
-                fprintf(yyout, ",%s %s", para_list[i]->getSymPtr()->getType()->toStr().c_str(), para_list[i]->getSymPtr()->toStr().c_str());
+                fprintf(yyout, ",%s %s", para_list[i]->getType()->toStr().c_str(), para_list[i]->toStr().c_str());
             }
         }
         fprintf(yyout, ") {\n");

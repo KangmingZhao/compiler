@@ -166,6 +166,7 @@ public:
 
     SymbolEntry* lookup_in_present_domain(std::string name);
 
+
     SymbolTable* getPrev() {return prev;};
     int getLevel() {return level;};
     static int getLabel() {return counter++;};

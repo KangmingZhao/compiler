@@ -37,6 +37,7 @@ public:
     bool isINT_ARRAY() const { return kind == INT_ARRAY; };
     bool isFLOAT() const { return kind == FLOAT; };
     bool isFLOAT_ARRAY() const { return kind == FLOAT_ARRAY; };
+    bool isBTR() const { return kind == PTR; };
 
 
 
