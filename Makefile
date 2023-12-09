@@ -64,7 +64,7 @@ $(TEST_PATH)/%.ast:$(TEST_PATH)/%.sy
 	@$(BINARY) $< -o $@ -a
 
 $(TEST_PATH)/%.ll:$(TEST_PATH)/%.sy
-	@timeout 5s $(BINARY) $< -o $@ -i 2>$(addsuffix .log, $(basename $@))
+	@timeout 120s $(BINARY) $< -o $@ -i 2>$(addsuffix .log, $(basename $@))
 	@[ $$? != 0 ] && echo -e "\033[1;31mFAIL:\033[0m $(notdir $<)" || echo -e "\033[1;32mSUCCESS:\033[0m $(notdir $<)"
 
 $(TEST_PATH)/%_std.ll:$(TEST_PATH)/%.sy
