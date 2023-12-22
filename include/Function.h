@@ -40,7 +40,7 @@ public:
     reverse_iterator rbegin() { return block_list.rbegin(); };
     reverse_iterator rend() { return block_list.rend(); };
     SymbolEntry *getSymPtr() { return sym_ptr; };
-
+    void genMachineCode(AsmBuilder*);
     BasicBlock* setEntry(BasicBlock* entrybb) { BasicBlock* temp = entry; entry = entrybb; return temp; };
 
     bool no_para() { return para_list.size() == 0; };

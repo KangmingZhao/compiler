@@ -33,6 +33,7 @@ public:
     void change_funct_type();
     void set_bool();
     std::string toStr() const;
+     SymbolEntry * getEntry() { return se; };
 };
 
 #endif
