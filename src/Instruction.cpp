@@ -491,6 +491,7 @@ void LoadInstruction::genMachineCode(AsmBuilder* builder)
 void StoreInstruction::genMachineCode(AsmBuilder* builder)
 {
     // TODO
+    
 }
 
 void BinaryInstruction::genMachineCode(AsmBuilder* builder)
