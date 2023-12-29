@@ -488,11 +488,53 @@ void LoadInstruction::genMachineCode(AsmBuilder* builder)
     }
 }
 
+
 void StoreInstruction::genMachineCode(AsmBuilder* builder)
 {
     // TODO
-    
+    auto cur_block = builder->getBlock();
+    MachineInstruction* cur_inst = nullptr;
+    MachineOperand* dst = genMachineOperand(operands[0]);
+    MachineOperand* src = genMachineOperand(operands[1]);
+
+    // store immediate
+    if (operands[1]->getEntry()->isConstant()) 
+    {
+        auto dst1 = genMachineVReg();
+        cur_inst = new LoadMInstruction(cur_block, dst1, src);
+        cur_block->InsertInst(cur_inst);
+        src = new MachineOperand(*dst1);
+    }
+
+    // store global operand
+    if(operands[0]->getEntry()->isVariable()
+    && dynamic_cast<IdentifierSymbolEntry*>(operands[0]->getEntry())->isGlobal())
+    {
+        MachineOperand* internal_reg1 = genMachineVReg();
+        // store r1, [r0]
+        cur_inst = new LoadMInstruction(cur_block, internal_reg1, dst);
+        cur_block->InsertInst(cur_inst);
+        cur_inst = new StoreMInstruction(cur_block, src, internal_reg1);
+        cur_block->InsertInst(cur_inst);
+    }
+    // store local operand
+    else if(operands[0]->getEntry()->isTemporary()
+    && operands[0]->getDef()
+    && operands[0]->getDef()->isAlloc())
+    {
+        //  store r1, [r0, #4]
+        auto src1 = genMachineReg(11);
+        int offset = dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry()) ->getOffset();
+        auto src2 = genMachineImm(offset);
+
+        // 如果参数数量大于3 那么需要到栈里去算偏移量 尚未完善！！
+        
+        cur_inst = new StoreMInstruction(cur_block, src, src1, src2);
+        cur_block->InsertInst(cur_inst);
+    }
+
 }
+
 
 void BinaryInstruction::genMachineCode(AsmBuilder* builder)
 {
