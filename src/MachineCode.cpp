@@ -126,10 +126,32 @@ void BinaryMInstruction::output()
 {
     // TODO: 
     // Complete other instructions
-    switch (this->op)
+    /*
+    大草了这里可能要考虑返回64位结果的情况，先看看需不需要吧后面如果需要可能还要对寄存器高很多操作。
+    这里咱们没有无符号整数类型，就默认只写有符号数了。
+    */
+    if (this->op < arithmetic_end)
     {
-    case BinaryMInstruction::ADD:
-        fprintf(yyout, "\tadd ");
+        switch (this->op)
+        {
+        case BinaryMInstruction::ADD:
+            fprintf(yyout, "\tadd ");
+            break;
+        case BinaryMInstruction::SUB:
+            fprintf(yyout, "\tsub ");
+            break;
+        case BinaryMInstruction::MUL:
+            fprintf(yyout, "\tmul ");
+            break;
+        case BinaryMInstruction::DIV:
+            fprintf(yyout, "\tsdiv ");
+            break;
+        case BinaryMInstruction::MOD:
+            fprintf(yyout, "\tadd ");
+            break;
+        default:
+            break;
+        }
         this->PrintCond();
         this->def_list[0]->output();
         fprintf(yyout, ", ");
@@ -137,11 +159,27 @@ void BinaryMInstruction::output()
         fprintf(yyout, ", ");
         this->use_list[1]->output();
         fprintf(yyout, "\n");
-        break;
-    case BinaryMInstruction::SUB:
-        break;
-    default:
-        break;
+    }
+    else if (this->op < logical_end)
+    {
+        switch (this->op)
+        {
+        case BinaryMInstruction::AND:
+            fprintf(yyout, "\tand ");
+            break;
+        case BinaryMInstruction::OR:
+            fprintf(yyout, "\torr ");
+            break;
+        default:
+            break;
+        }
+        this->PrintCond();
+        this->def_list[0]->output();
+        fprintf(yyout, ", ");
+        this->use_list[0]->output();
+        fprintf(yyout, ", ");
+        this->use_list[1]->output();
+        fprintf(yyout, "\n");
     }
 }
 
@@ -253,6 +291,44 @@ void StackMInstrcuton::output()
 {
     // TODO
 }
+
+
+MachineFunctCall::MachineFunctCall(MachineBlock* p, MachineOperand* dst, std::vector<Operand*> params,
+    int cond)
+{
+    this->params = params;
+    this->parent = p;
+    //this->op = -1;
+    //this->cond = cond;
+    dst->setParent(this);
+    this->def_list.push_back(dst);
+}
+void MachineFunctCall::output()
+{
+    //在bl之前，得先把这些够吧参数全部存入。但是现在寄存器还没有实现所以先鸽一会儿。到时候传入的参数
+    //也许应该是点Operand以外的别的东西。
+
+
+    /*
+    这里是push各自参数
+    */
+    unsigned i;
+    for (i = 0; i < (unsigned)params.size() && i < 4; i++)
+    {
+        //高贵的寄存器里只能放0~3
+        //暂时还没有实现
+    }
+    for (; i < (unsigned)params.size(); i++)
+    {
+        //剩下的全塞栈里
+    }
+
+    //然后润到函数
+    const char* func_name = def_list[0]->getLabel().c_str() + 1;
+    fprintf(yyout, "\tbl %s", func_name);
+}
+
+
 
 MachineFunction::MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr) 
 { 

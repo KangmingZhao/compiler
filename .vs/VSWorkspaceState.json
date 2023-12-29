@@ -2,10 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\include",
-    "\\src",
-    "\\test",
-    "\\test\\level1-2"
+    "\\src"
   ],
-  "SelectedNode": "\\include\\SymbolTable.h",
+  "SelectedNode": "\\src\\MachineCode.cpp",
   "PreviewInSolutionExplorer": false
 }

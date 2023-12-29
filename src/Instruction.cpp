@@ -626,10 +626,10 @@ void GlobalInstruction::genMachineCode(AsmBuilder *)
 {
 }
 
-CallInstruction::CallInstruction(Operand *dst,
-                                 SymbolEntry *func,
-                                 std::vector<Operand *> params,
-                                 BasicBlock *insert_bb)
+CallInstruction::CallInstruction(Operand* dst,
+    SymbolEntry* func,
+    std::vector<Operand*> params,
+    BasicBlock* insert_bb)
     : Instruction(CALL, insert_bb), func(func)
 {
     Operand* dst_ = dst;
@@ -655,19 +655,28 @@ void CallInstruction::output() const
         fprintf(yyout, "%s =", operands[0]->toStr().c_str());
     }
     fprintf(yyout, "call %s %s(", type->getRetType()->toStr().c_str(),
-            func->toStr().c_str());
+        func->toStr().c_str());
     for (long unsigned int i = 1; i < operands.size(); i++)
     {
         if (i != 1)
             fprintf(yyout, ", ");
         fprintf(yyout, "%s %s", operands[i]->getType()->toStr().c_str(),
-                operands[i]->toStr().c_str());
+            operands[i]->toStr().c_str());
     }
     fprintf(yyout, ")\n");
 }
-void CallInstruction::genMachineCode(AsmBuilder *)
+void CallInstruction::genMachineCode(AsmBuilder* builder)
 {
+    //operands[0]是dst，后面的一大坨全是参数。
+    auto cur_block = builder->getBlock();
+    auto dst = genMachineOperand(new Operand(func));
+    std::vector<Operand*> paras = std::vector<Operand*>(operands.begin() + 1, operands.end());
+
+    MachineInstruction* cur_inst = nullptr;
+    cur_inst = new MachineFunctCall(cur_block, dst, paras, MachineInstruction::NONE);
+    cur_block->InsertInst(cur_inst);
 }
+
 UnaryInstruction::UnaryInstruction(unsigned opcode, Operand *dst, Operand *src, BasicBlock *insert_bb) : Instruction(UNARY, insert_bb)
 {
     this->opcode = opcode;

@@ -1,4 +1,4 @@
-﻿锘�#include "Ast.h"
+﻿#include "Ast.h"
 #include "SymbolTable.h"
 #include "Unit.h"
 #include "Instruction.h"

@@ -80,7 +80,17 @@ public:
 class BinaryMInstruction : public MachineInstruction
 {
 public:
-    enum opType { ADD, SUB, MUL, DIV, AND, OR };
+    enum opType {
+
+
+        ADD, SUB, MUL, DIV, MOD,
+        arithmetic_end,
+
+
+        AND, OR,
+        logical_end
+
+    };
     BinaryMInstruction(MachineBlock* p, int op, 
                     MachineOperand* dst, MachineOperand* src1, MachineOperand* src2, 
                     int cond = MachineInstruction::NONE);
@@ -144,6 +154,16 @@ public:
                 MachineOperand* src,
                 int cond = MachineInstruction::NONE);
     void output();
+};
+
+class MachineFunctCall : public MachineInstruction
+{
+public:
+    std::vector<Operand*> params;
+    MachineFunctCall(MachineBlock* p, MachineOperand* dst, std::vector<Operand*> params,
+        int cond = MachineInstruction::NONE);
+    void output();
+
 };
 
 class MachineBlock
