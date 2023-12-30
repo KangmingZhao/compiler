@@ -1,10 +1,12 @@
-void fuck(int a, int b)
+void fuck(int a, int b,int c,int d,int e)
 {
-    a = b + 1;
+    a = 1;
+    b= 1;
+    c= 1;
+    d = 1;
+    e = 1;
 }
 int main () {
-    int a;
-    int b;
-    fuck(a,b);
+    fuck(1,2,3,4,5);
     return 0;
 }

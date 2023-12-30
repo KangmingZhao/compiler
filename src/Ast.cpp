@@ -1241,6 +1241,7 @@ void ParaNode::genCode()
             addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
             addr = new Operand(addr_se);
             alloca = new AllocaInstruction(addr, para_expr->getSymPtr());                   // allocate space for local id in function stack.
+            ((AllocaInstruction*)alloca)->set_funct();
             entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
             dynamic_cast<IdentifierSymbolEntry*>(para_expr->getSymPtr())->setAddr(addr);
 
@@ -1248,7 +1249,7 @@ void ParaNode::genCode()
 
             SymbolEntry * temp_src_addr = new TemporarySymbolEntry(para_expr->getSymPtr()->getType(), SymbolTable::getLabel());
             Operand* temp_src = new Operand(temp_src_addr);
-            new StoreInstruction(addr, temp_src, entry);
+            new StoreInstruction(addr, temp_src, entry, 1);
 
             func->add_para(temp_src);
         }

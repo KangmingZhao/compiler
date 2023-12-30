@@ -53,7 +53,9 @@ public:
 
 class AllocaInstruction : public Instruction
 {
+    bool funct = 0;
 public:
+    void set_funct() { funct = 1; };
     AllocaInstruction(Operand *dst, SymbolEntry *se, BasicBlock *insert_bb = nullptr);
     ~AllocaInstruction();
     void output() const;
@@ -87,8 +89,10 @@ public:
 
 class StoreInstruction : public Instruction
 {
+    bool whether_para = 0;
 public:
     StoreInstruction(Operand *dst_addr, Operand *src, BasicBlock *insert_bb = nullptr);
+    StoreInstruction(Operand* dst_addr, Operand* src, BasicBlock* insert_bb, bool whether_para);
     ~StoreInstruction();
     void output() const;
     std::vector<Operand *> getUse() { return {operands[0], operands[1]}; }

@@ -1,5 +1,6 @@
 #include "MachineCode.h"
 extern FILE* yyout;
+#include "Operand.h"
 
 MachineOperand::MachineOperand(int tp, int val)
 {
@@ -235,11 +236,51 @@ StoreMInstruction::StoreMInstruction(MachineBlock* p,
     int cond)
 {
     // TODO
+    this->parent = p;
+    this->type = MachineInstruction::STORE;
+    this->op = -1;
+    this->cond = cond;
+    this->def_list.push_back(src1);
+    this->use_list.push_back(src2);
+    if (src3)
+        this->use_list.push_back(src3);
+    src1->setParent(this);
+    src2->setParent(this);
+    if (src3)
+        src3->setParent(this);
 }
 
 void StoreMInstruction::output()
 {
     // TODO
+
+    fprintf(yyout, "\tstr ");
+    this->def_list[0]->output();
+    fprintf(yyout, ", ");
+
+    // Load immediate num, eg: str r1, =8
+    if (this->use_list[0]->isImm())
+    {
+        //我们不可能到达这里。
+        
+        fprintf(yyout, "what happen bro? :(");
+        //return;
+    }
+
+    fprintf(yyout, "[");
+
+    this->use_list[0]->output();
+    if (this->use_list.size() > 1)
+    {
+        fprintf(yyout, ", ");
+        this->use_list[1]->output();
+    }
+
+    fprintf(yyout, "]");
+    fprintf(yyout, "\n");
+
+    
+
 }
 
 MovMInstruction::MovMInstruction(MachineBlock* p, int op, 
@@ -247,11 +288,27 @@ MovMInstruction::MovMInstruction(MachineBlock* p, int op,
     int cond)
 {
     // TODO
+    if (op == MovMInstruction::MOV)
+    {
+        this->parent = p;
+        this->type = MovMInstruction::MOV;
+        this->def_list.push_back(dst);
+        this->use_list.push_back(src);
+        dst->setParent(this);
+        src->setParent(this);
+    }
 }
 
 void MovMInstruction::output() 
 {
     // TODO
+    fprintf(yyout, "\tmov ");
+    def_list[0]->output();
+    fprintf(yyout, ", ");
+    use_list[0]->output();
+    use_list[0]->setReg(def_list[0]->getReg());
+    fprintf(yyout, "\n");
+
 }
 
 BranchMInstruction::BranchMInstruction(MachineBlock* p, int op, 
@@ -293,39 +350,19 @@ void StackMInstrcuton::output()
 }
 
 
-MachineFunctCall::MachineFunctCall(MachineBlock* p, MachineOperand* dst, std::vector<Operand*> params,
+MachineFunctCall::MachineFunctCall(MachineBlock* p, MachineOperand* dst, 
     int cond)
 {
-    this->params = params;
     this->parent = p;
-    //this->op = -1;
-    //this->cond = cond;
     dst->setParent(this);
     this->def_list.push_back(dst);
 }
 void MachineFunctCall::output()
 {
-    //在bl之前，得先把这些够吧参数全部存入。但是现在寄存器还没有实现所以先鸽一会儿。到时候传入的参数
-    //也许应该是点Operand以外的别的东西。
-
-
-    /*
-    这里是push各自参数
-    */
-    unsigned i;
-    for (i = 0; i < (unsigned)params.size() && i < 4; i++)
-    {
-        //高贵的寄存器里只能放0~3
-        //暂时还没有实现
-    }
-    for (; i < (unsigned)params.size(); i++)
-    {
-        //剩下的全塞栈里
-    }
 
     //然后润到函数
     const char* func_name = def_list[0]->getLabel().c_str() + 1;
-    fprintf(yyout, "\tbl %s", func_name);
+    fprintf(yyout, "\tbl %s\n", func_name);
 }
 
 
@@ -335,7 +372,21 @@ MachineFunction::MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr)
     this->parent = p; 
     this->sym_ptr = sym_ptr; 
     this->stack_size = 0;
-};
+}
+MachineFunction::MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr, std::vector<Operand*> params)
+{
+    this->parent = p;
+    this->sym_ptr = sym_ptr;
+    this->stack_size = 0;
+    this->params = params;
+
+    /*for (unsigned i = 0; i < (unsigned)params.size(); i++)
+    {
+        int offset = AllocSpace(4);
+
+        dynamic_cast<TemporarySymbolEntry*>(params[i]->getEntry())->setOffset(-offset);
+    }*/
+}
 
 void MachineBlock::output()
 {
@@ -356,11 +407,62 @@ void MachineFunction::output()
     *  2. fp = sp
     *  3. Save callee saved register
     *  4. Allocate stack space for local variable */
+
+    fprintf(yyout, "\tstr fp, [sp, #%d]!\n", (int)params.size() * 4 + 4);
+
+    fprintf(yyout, "\tmov fp, sp\n");
+
+   /* if ((unsigned)params.size())
+    {
+        
+        fprintf(yyout, "\tpush {");
+        for (unsigned i = 0; i < (unsigned)params.size() - 4; i++)
+        {
+            fprintf(yyout, "r%d,", i + 4);
+        }
+        fprintf(yyout, "lr}\n");
+    }*/
+
+    // Allocate stack space for local variables (adjust as needed)
+    fprintf(yyout, "\tsub sp, sp, #114514\n");
     
     // Traverse all the block in block_list to print assembly code.
     for(auto iter : block_list)
         iter->output();
 }
+
+
+
+PushMInstrcuton::PushMInstrcuton(MachineBlock * p, std::vector<MachineOperand*> params)
+{
+    this->parent = p;
+    this->def_list = params;
+}
+PushMInstrcuton::PushMInstrcuton(MachineBlock* p, MachineOperand* dst)
+{
+    this->parent = p;
+    this->def_list.push_back(dst);
+}
+PushMInstrcuton::PushMInstrcuton(MachineBlock* p)
+{
+    this->parent = p;
+    lr = 1;
+}
+void PushMInstrcuton::output() 
+{
+    if (lr)
+    {
+        fprintf(yyout, "\tpush {lr} \n");
+    }
+    fprintf(yyout, "\tpush {");
+    for (unsigned i = 0; i < (unsigned)def_list.size(); i++)
+    {
+        def_list[i]->output();
+    }
+    fprintf(yyout, "}\n");
+}
+
+
 
 void MachineUnit::PrintGlobalDecl()
 {

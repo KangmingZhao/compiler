@@ -4,6 +4,7 @@
 #include <list>
 #include "Ast.h"
 #include "Operand.h"
+#include "Instruction.h"
 
 extern FILE* yyout;
 
@@ -98,8 +99,17 @@ void Function::output() const
 void Function::genMachineCode(AsmBuilder* builder) 
 {
     auto cur_unit = builder->getUnit();
-    auto cur_func = new MachineFunction(cur_unit, this->sym_ptr);
+    MachineFunction* cur_func;
+    if ((unsigned)para_list.size())
+    {
+        cur_func = new MachineFunction(cur_unit, this->sym_ptr, para_list);
+    }
+    else
+    {
+        cur_func = new MachineFunction(cur_unit, this->sym_ptr);
+    }
     builder->setFunction(cur_func);
+
     std::map<BasicBlock*, MachineBlock*> map;
     for(auto block : block_list)
     {

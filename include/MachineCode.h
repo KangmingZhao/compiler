@@ -22,6 +22,7 @@ class MachineUnit;
 class MachineFunction;
 class MachineBlock;
 class MachineInstruction;
+class Operand;
 
 class MachineOperand
 {
@@ -159,11 +160,20 @@ public:
 class MachineFunctCall : public MachineInstruction
 {
 public:
-    std::vector<Operand*> params;
-    MachineFunctCall(MachineBlock* p, MachineOperand* dst, std::vector<Operand*> params,
-        int cond = MachineInstruction::NONE);
+    std::vector<MachineOperand*> params;
+    MachineFunctCall(MachineBlock* p, MachineOperand* dst, int cond = MachineInstruction::NONE);
     void output();
 
+};
+
+class PushMInstrcuton : public MachineInstruction
+{
+    bool lr = 0;
+public:
+    PushMInstrcuton(MachineBlock* p, std::vector<MachineOperand*> params);
+    PushMInstrcuton(MachineBlock* p, MachineOperand* dst);
+    PushMInstrcuton(MachineBlock* p);
+    void output();
 };
 
 class MachineBlock
@@ -198,19 +208,24 @@ private:
     MachineUnit* parent;
     std::vector<MachineBlock*> block_list;
     int stack_size;
+    int stack_size_4_funct = 0;
     std::set<int> saved_regs;
     SymbolEntry* sym_ptr;
+
+    std::vector<Operand*> params;
 public:
     std::vector<MachineBlock*>& getBlocks() {return block_list;};
     std::vector<MachineBlock*>::iterator begin() { return block_list.begin(); };
     std::vector<MachineBlock*>::iterator end() { return block_list.end(); };
     MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr);
+    MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr, std::vector<Operand*> params);
     /* HINT:
     * Alloc stack space for local variable;
     * return current frame offset ;
     * we store offset in symbol entry of this variable in function AllocInstruction::genMachineCode()
     * you can use this function in LinearScan::genSpillCode() */
     int AllocSpace(int size) { this->stack_size += size; return this->stack_size; };
+    int AllocParaSpace(int size) {this->stack_size_4_funct += size; return this->stack_size_4_funct;}
     void InsertBlock(MachineBlock* block) { this->block_list.push_back(block); };
     void addSavedRegs(int regno) {saved_regs.insert(regno);};
     void output();

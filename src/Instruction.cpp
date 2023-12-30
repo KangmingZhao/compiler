@@ -379,6 +379,16 @@ StoreInstruction::StoreInstruction(Operand *dst_addr, Operand *src, BasicBlock *
     src->addUse(this);
 }
 
+StoreInstruction::StoreInstruction(Operand* dst_addr, Operand* src, BasicBlock* insert_bb, bool whether_para) : Instruction(STORE, insert_bb) {
+
+    this->whether_para = whether_para;
+    operands.push_back(dst_addr);
+    operands.push_back(src);
+    dst_addr->addUse(this);
+    src->addUse(this);
+}
+
+
 StoreInstruction::~StoreInstruction()
 {
     operands[0]->removeUse(this);
@@ -441,9 +451,18 @@ void AllocaInstruction::genMachineCode(AsmBuilder* builder)
     /* HINT:
     * Allocate stack space for local variabel
     * Store frame offset in symbol entry */
-    auto cur_func = builder->getFunction();
-    int offset = cur_func->AllocSpace(4);
-    dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(-offset);
+    if (funct)
+    {
+        auto cur_func = builder->getFunction();
+        int offset = cur_func->AllocParaSpace(4);
+        dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(offset);
+    }
+    else
+    {
+        auto cur_func = builder->getFunction();
+        int offset = cur_func->AllocSpace(4);
+        dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(-offset);
+    }
 }
 
 void LoadInstruction::genMachineCode(AsmBuilder* builder)
@@ -492,6 +511,8 @@ void LoadInstruction::genMachineCode(AsmBuilder* builder)
 void StoreInstruction::genMachineCode(AsmBuilder* builder)
 {
     // TODO
+    if (whether_para)
+        return;
     auto cur_block = builder->getBlock();
     MachineInstruction* cur_inst = nullptr;
     MachineOperand* dst = genMachineOperand(operands[0]);
@@ -638,6 +659,7 @@ CallInstruction::CallInstruction(Operand* dst,
     if (dst_)
         dst_->setDef(this);
     //std::cout<<dst->getType()->toStr();
+
     for (auto param : params)
     {
         operands.push_back(param);
@@ -670,10 +692,70 @@ void CallInstruction::genMachineCode(AsmBuilder* builder)
     //operands[0]是dst，后面的一大坨全是参数。
     auto cur_block = builder->getBlock();
     auto dst = genMachineOperand(new Operand(func));
-    std::vector<Operand*> paras = std::vector<Operand*>(operands.begin() + 1, operands.end());
+
+    //在bl之前，得先把这些够吧参数全部存入。但是现在寄存器还没有实现所以先鸽一会儿。到时候传入的参数
+    //也许应该是点Operand以外的别的东西。
+    /*
+    这里是push各自参数
+    */
+
+    //好吧因为我们的函数的para乱写所以现在只能反着来了。
+    for (unsigned p = 1; p < (unsigned)operands.size() ; p++)
+    {
+        MachineOperand* now = genMachineOperand(operands[p]);
+        MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
+        if (now->isImm() || now->isLabel())
+            cur_block->InsertInst(
+                (new LoadMInstruction(cur_block, r0, now))
+            );
+        else
+        {
+            //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
+            cur_block->InsertInst(
+                (new MovMInstruction(cur_block, MovMInstruction::MOV, r0, now))
+            );
+        }
+        cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
+    }
+
+    //for (unsigned p = (unsigned)operands.size() - 1; p >= 1; p--)
+    //{
+    //    MachineOperand* now = genMachineOperand(operands[p]);
+    //    MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
+    //    if (now->isImm() || now->isLabel())
+    //        cur_block->InsertInst(
+    //            (new LoadMInstruction(cur_block, r0, now))
+    //        );
+    //    else
+    //    {
+    //        //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
+    //        cur_block->InsertInst(
+    //            (new MovMInstruction(cur_block, MovMInstruction::MOV, r0, now))
+    //        );
+    //    }
+    //    cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
+    //}
+    //我们的函数调用默认是从#-4开始取数据，所以如果使用r0-r3的话会不太好搞
+    //for (unsigned i = 0; i < (unsigned)operands.size() - 1 && i < 4; i++)
+    //{
+    //    //高贵的寄存器里只能放0~3。
+    //    //这里如果是立即数或者是在内存中的变量才load
+    //    MachineOperand * now = genMachineOperand(operands[i + 1]);
+    //    if (now->isImm() || now->isLabel())
+    //        cur_block->InsertInst(
+    //            (new LoadMInstruction(cur_block, new MachineOperand(MachineOperand::REG, i), now))
+    //        );
+    //    else
+    //    {
+    //        //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
+    //        cur_block->InsertInst(
+    //            (new MovMInstruction(cur_block, MovMInstruction::MOV, new MachineOperand(MachineOperand::REG, i), now))
+    //        );
+    //    }
+    //}
 
     MachineInstruction* cur_inst = nullptr;
-    cur_inst = new MachineFunctCall(cur_block, dst, paras, MachineInstruction::NONE);
+    cur_inst = new MachineFunctCall(cur_block, dst, MachineInstruction::NONE);
     cur_block->InsertInst(cur_inst);
 }
 
