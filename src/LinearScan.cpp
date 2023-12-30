@@ -29,6 +29,25 @@ void LinearScan::allocateRegisters()
     }
 }
 
+void LinearScan::insertToActive(Interval *handled_interval)
+{
+     if (active.size() == 0)
+    {
+        active.push_back(handled_interval);
+        return;
+    }
+    for (auto it = active.begin(); it != active.end(); it++)
+    {
+        if ((*it)->end > handled_interval->end)
+        {
+            active.insert(it, 1, handled_interval);
+            return;
+        }
+    }
+    active.push_back(handled_interval);
+    return;
+}
+
 void LinearScan::makeDuChains()
 {
     LiveVariableAnalysis lva;
@@ -172,8 +191,35 @@ bool LinearScan::linearScanRegisterAllocation()
                 register[i] ← a register removed from pool of free registers
                 add i to active, sorted by increasing end point
     */
+    bool success = true;
+    active.clear();
+    regs.clear();
 
-    return true;
+    for (int i = 4; i < 11; i++)
+        regs.push_back(i);
+    // for each intervals we begin the register allocation
+    for (auto &i : intervals)
+    {
+         /*
+        遍历active 列表，
+        看该列表中是否存在结束时间早于unhandled interval 的interval，
+        若有，则回收其寄存器
+        */
+        expireOldIntervals(i);
+        
+        if (regs.empty())
+        {
+            spillAtInterval(i);
+            success = false;
+        }
+        else
+        {
+            i->rreg = regs.front();
+            regs.erase(regs.begin());
+            insertToActive(i);
+        }
+    }
+    return success;
 }
 
 void LinearScan::modifyCode()
@@ -190,16 +236,45 @@ void LinearScan::modifyCode()
 
 void LinearScan::genSpillCode()
 {
-    for(auto &interval:intervals)
+  for (auto &interval : intervals)
     {
-        if(!interval->spill)
+        if (!interval->spill)
             continue;
-        // TODO
-        /* HINT:
-         * The vreg should be spilled to memory.
-         * 1. insert ldr inst before the use of vreg
-         * 2. insert str inst after the def of vreg
-         */ 
+        auto cur_func = func;
+        MachineInstruction *cur_inst = 0;
+        MachineBlock *cur_block;
+        int offset = cur_func->AllocSpace(4);
+        for (auto use : interval->uses)
+        {
+            auto reg = new MachineOperand(*use);
+            cur_block = use->getParent()->getParent();
+            auto useinst = use->getParent();
+            cur_inst = new LoadMInstruction(cur_block, reg, new MachineOperand(MachineOperand::REG, 11), new MachineOperand(MachineOperand::IMM, -offset));
+            for (auto i = cur_block->getInsts().begin(); i != cur_block->getInsts().end(); i++)
+            {
+                if (*i == useinst)
+                {
+                    cur_block->getInsts().insert(i, 1, cur_inst);
+                    break;
+                }
+            }
+        }
+        for (auto def : interval->defs)
+        {
+            auto reg = new MachineOperand(*def);
+            cur_block = def->getParent()->getParent();
+            auto definst = def->getParent();
+            cur_inst = new StoreMInstruction(cur_block, reg, new MachineOperand(MachineOperand::REG, 11), new MachineOperand(MachineOperand::IMM, -offset));
+            for (auto i = cur_block->getInsts().begin(); i != cur_block->getInsts().end(); i++)
+            {
+                if (*i == definst)
+                {
+                    i++;
+                    cur_block->getInsts().insert(i, 1, cur_inst);
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -213,8 +288,24 @@ void LinearScan::expireOldIntervals(Interval *interval)
             remove j from active
             add register[j] to pool of free registers
     */
+   /*remove the intervals that are not active
+   */
+    auto it = active.begin();
+    while (it != active.end())
+    {
+        if ((*it)->end >= interval->start)
+            return;
+        // add register to free pool
+        regs.push_back((*it)->rreg);
+        it = active.erase(find(active.begin(), active.end(), *it));
+        sort(regs.begin(), regs.end());
+    }
 }
-
+/*
+具体为，
+选择策略就是看谁的活跃区间结束时间更晚，
+，
+*/
 void LinearScan::spillAtInterval(Interval *interval)
 {
     // Todo
@@ -229,6 +320,23 @@ void LinearScan::spillAtInterval(Interval *interval)
             location[i] ← new stack location
 
     */
+   //在active列表中最后一个interval 和当前unhandled interval 中选择一个interval 将其溢出到栈中
+    auto spill = active.back();
+    if (spill->end > interval->end)
+    {
+        
+        /*如果是active 列表中的interval 结束时间更晚，需要置位
+其spill 标志位，并将其占用的寄存器分配给unhandled interval，再按照unhandled interval
+活跃区间结束位置，将其插入到active 列表中。*/
+        spill->spill = true;
+        interval->rreg = spill->rreg;
+        insertToActive(interval);
+    }
+    else
+    {
+        //如果是unhandled interval 的结束时间更晚，只需要置位其spill 标志位即可
+        interval->spill = true;
+    }
 }
 
 bool LinearScan::compareStart(Interval *a, Interval *b)
