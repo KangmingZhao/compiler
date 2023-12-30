@@ -127,6 +127,6 @@ int main(int argc, char *argv[])
     LinearScan linearScan(&mUnit);
     linearScan.allocateRegisters();
     if(dump_type == ASM)
-         mUnit.output();
+        mUnit.output();
     return 0;
 }
