@@ -699,26 +699,9 @@ void CallInstruction::genMachineCode(AsmBuilder* builder)
     这里是push各自参数
     */
 
-    //好吧因为我们的函数的para乱写所以现在只能反着来了。
-    for (unsigned p = 1; p < (unsigned)operands.size() ; p++)
-    {
-        MachineOperand* now = genMachineOperand(operands[p]);
-        MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
-        if (now->isImm() || now->isLabel())
-            cur_block->InsertInst(
-                (new LoadMInstruction(cur_block, r0, now))
-            );
-        else
-        {
-            //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
-            cur_block->InsertInst(
-                (new MovMInstruction(cur_block, MovMInstruction::MOV, r0, now))
-            );
-        }
-        cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
-    }
-
-    //for (unsigned p = (unsigned)operands.size() - 1; p >= 1; p--)
+    //好吧听说不能破罐破摔，非得前四个r0-r3
+    ////好吧因为我们的函数的para乱写所以现在只能反着来了。
+    //for (unsigned p = 1; p < (unsigned)operands.size() ; p++)
     //{
     //    MachineOperand* now = genMachineOperand(operands[p]);
     //    MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
@@ -735,24 +718,42 @@ void CallInstruction::genMachineCode(AsmBuilder* builder)
     //    }
     //    cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
     //}
+
+    for (unsigned p = (unsigned)operands.size() - 1; p >= 1; p--)
+    {
+        MachineOperand* now = genMachineOperand(operands[p]);
+        MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
+        if (now->isImm() || now->isLabel())
+            cur_block->InsertInst(
+                (new LoadMInstruction(cur_block, r0, now))
+            );
+        else
+        {
+            //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
+            cur_block->InsertInst(
+                (new MovMInstruction(cur_block, MovMInstruction::MOV, r0, now))
+            );
+        }
+        cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
+    }
     //我们的函数调用默认是从#-4开始取数据，所以如果使用r0-r3的话会不太好搞
-    //for (unsigned i = 0; i < (unsigned)operands.size() - 1 && i < 4; i++)
-    //{
-    //    //高贵的寄存器里只能放0~3。
-    //    //这里如果是立即数或者是在内存中的变量才load
-    //    MachineOperand * now = genMachineOperand(operands[i + 1]);
-    //    if (now->isImm() || now->isLabel())
-    //        cur_block->InsertInst(
-    //            (new LoadMInstruction(cur_block, new MachineOperand(MachineOperand::REG, i), now))
-    //        );
-    //    else
-    //    {
-    //        //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
-    //        cur_block->InsertInst(
-    //            (new MovMInstruction(cur_block, MovMInstruction::MOV, new MachineOperand(MachineOperand::REG, i), now))
-    //        );
-    //    }
-    //}
+    for (unsigned i = 0; i < (unsigned)operands.size() - 1 && i < 4; i++)
+    {
+        //高贵的寄存器里只能放0~3。
+        //这里如果是立即数或者是在内存中的变量才load
+        MachineOperand * now = genMachineOperand(operands[i + 1]);
+        if (now->isImm() || now->isLabel())
+            cur_block->InsertInst(
+                (new LoadMInstruction(cur_block, new MachineOperand(MachineOperand::REG, i), now))
+            );
+        else
+        {
+            //如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
+            cur_block->InsertInst(
+                (new MovMInstruction(cur_block, MovMInstruction::MOV, new MachineOperand(MachineOperand::REG, i), now))
+            );
+        }
+    }
 
     MachineInstruction* cur_inst = nullptr;
     cur_inst = new MachineFunctCall(cur_block, dst, MachineInstruction::NONE);
