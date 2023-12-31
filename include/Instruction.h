@@ -54,8 +54,11 @@ public:
 class AllocaInstruction : public Instruction
 {
     bool funct = 0;
+
+    //-1 means need no need for reg, 0-3 means the index of reg.
+    int need_register = -1;
 public:
-    void set_funct() { funct = 1; };
+    void set_funct(int need_register = -1) { funct = 1; this->need_register = need_register; };
     AllocaInstruction(Operand *dst, SymbolEntry *se, BasicBlock *insert_bb = nullptr);
     ~AllocaInstruction();
     void output() const;

@@ -408,7 +408,9 @@ void MachineFunction::output()
     *  3. Save callee saved register
     *  4. Allocate stack space for local variable */
 
-    fprintf(yyout, "\tstr fp, [sp, #%d]!\n", (int)params.size() * 4 + 4);
+    fprintf(yyout, "\tstr fp, [sp, #%d]!\n", 
+        (int)params.size() > 4 ?  ((int)params.size() - 4)* 4 + 4 : 4
+    );
 
     fprintf(yyout, "\tmov fp, sp\n");
 

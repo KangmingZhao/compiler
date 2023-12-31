@@ -17,6 +17,15 @@ std::vector<Type*> paramVector;
 std::vector<Operand *> para_operands;// 闂傚倸鍊搁崐鎼佸磹閹间礁纾圭€瑰嫭鍣磋ぐ鎺戠倞妞ゆ帒顦伴弲顏堟偡濠婂啰绠婚柛鈹惧亾濡炪倖甯婇懗鍫曞煝閹剧粯鐓涢柛娑卞枤缁犳﹢鏌涢幒鎾崇瑨闁宠閰ｉ獮妯虹暦閸ヨ泛鏁藉┑鐘茬棄閺夊簱鍋撻幘缁樺€块柨鏇楀亾闁宠绉瑰顕€宕奸悢鍙夊闂備胶枪閺堫剟鎮疯瀹曟繂顓兼径瀣幍濡炪倖妫侀崑鎰板春閿濆洠鍋撶憴鍕闁告梹娲熼崺鐐哄箣閿曗偓閻愬﹪鏌嶉崫鍕舵敾闂佽￥鍊濆娲嚒閵堝憛顒佷繆濡炵厧濡块柟宄板暣閺佸啴宕掑顒佸劒闂備礁鎼ú銊╁窗閸℃顩叉繝濠傜墛閻撴瑩鏌℃径濠勪虎妞わ絾濞婇弻锝夋晲閸粌鎯堢紓浣介哺鐢繝骞冮鍫濈劦妞ゆ帒瀚崹鍌炴煙閹増顥夐柣鎺戠仛閵囧嫰骞掗崱妞惧闂備礁鎲¤摫缂侇喗鎸搁悾鐑藉箣閿曗偓缁犺崵绱撴担璇＄劷闁告ɑ鎹囬幃宄扳堪閸曨厾鐓夐悗瑙勬礃缁矂鍩㈡惔銊ョ鐎规洖娲ら獮鎺楁⒒娴ｇ瓔娼愮€规洘锕㈤、姘愁樄闁哄苯顑夊畷鍫曨敆娴ｅ搫骞愰梻浣规偠閸庮噣寮插☉銏犲嚑闁哄啫鐗婇悡鏇熶繆椤栨碍璐￠柣顓熺懄閹便劍绻濋崘鈹夸虎闂佸搫鑻幊姗€骞冨▎鎾村殤閻犺桨璀︽导鍐ㄢ攽閻橆偅濯伴悘鐐跺Г閻忓牓姊虹€圭媭娼愰柛銊ユ健瀹曟椽宕熼姘鳖槰濡炪値鍘介崹闈涒枔濠靛牏纾介柛灞剧懆閸忓瞼绱掗鍛仸闁诡垰瀚伴、娑橆潩鏉堛劍顔曞┑鐘绘涧閸婃悂骞夐敓鐘茬；闁告洦鍋掑〒濠氭倵閿濆簼绨介柛鎴濇贡缁辨帗娼忛妸褏鐤勯梺鍝勭焿缁查箖骞嗛弮鍫澪ч幖娣灮缁夐攱绻濋悽闈涗沪缂佷焦鎸冲鎻掆攽閸噥娼熼梺缁樺姇閻°劍鍒婇幘顔界厱婵犻潧瀚崝婊勭箾閸儳鐣烘慨濠冩そ瀹曠兘顢橀悙鎻掝瀱闂備焦鎮堕崝搴ㄥ窗鎼粹€崇カ闂備礁澹婇崑鍡涘窗閹惧墎涓嶅Δ锝呭暞閻撴洟鏌嶉埡浣稿箻妞ゅ繐鎳忛崣蹇涙煥閺囩偛鈧綊鎮￠弴銏＄厽闁哄啠鍋撶憸鏉垮暞缁傚秵銈ｉ崘鈹炬嫽闂佺ǹ鏈懝楣冨焵椤掍焦鍊愮€规洘鍔欓幃婊堟嚍閵夈儮鍋撻崸妤佺叆闁哄洨鍋涢埀顒€缍婂畷鏇㈠箣閻樺啿鏋戦梺缁橆殔閻楀棛绮幒鏃傜＜闁逞屽墯瀵板嫮浠︾粙澶稿闂佺ǹ绻愰ˇ顖涚妤ｅ啯鈷戦柛娑橈攻婢跺嫰鏌涚€ｎ亜顏柟顔筋殜椤㈡﹢鎮╅悽纰夌闯濠电偠鎻徊鎸庣仚闂佺厧鎽滈幊鎾烩€﹂懗顖ｆ闂佺懓鍤栭幏锟�
 
 std::vector<std::vector<Operand*>>para_operands_stack;
+class temp_data_bag
+{
+public:
+    Instruction* insn;
+    Operand* addr;
+    Operand* temp_src;
+};
+std::vector<std::vector<temp_data_bag>>ParaNodeStack;//这个鬼东西是设置来做那个参数的。
+
 
 LoopManager loop_manager;
 BasicBlock* temp_end_bb;
@@ -151,11 +160,25 @@ void FunctionDef::genCode()
     builder->set_cfg(entry);
 
     now_is_def_funct = 1;
+    ParaNodeStack.push_back(std::vector<temp_data_bag>());
     if (paraStmt != nullptr)
     {
         if (paraStmt != nullptr)
             paraStmt->genCode();
     }
+
+    for (int i = (int)ParaNodeStack[ParaNodeStack.size() - 1].size() - 1; i > 0; i--)
+    {
+        Operand* addr = ParaNodeStack[ParaNodeStack.size() - 1][i].addr;
+        Operand* temp_src = ParaNodeStack[ParaNodeStack.size() - 1][i].temp_src;
+
+        entry->insertFront(ParaNodeStack[ParaNodeStack.size() - 1][i].insn);       // allocate instructions should be inserted into the begin of the entry block.
+        new StoreInstruction(addr, temp_src, entry, 1);
+        func->add_para(temp_src);
+    }
+
+
+    ParaNodeStack.pop_back();
     now_is_def_funct = 0;
 
     stmt->genCode();
@@ -1231,27 +1254,48 @@ void ParaNode::genCode()
     {
         if (now_is_def_funct)
         {
-            Function* func = builder->getInsertBB()->getParent();
-            BasicBlock* entry = func->getEntry();
+            /*Function* func = builder->getInsertBB()->getParent();
+            BasicBlock* entry = func->getEntry();*/
             Instruction* alloca;
             Operand* addr;
             SymbolEntry* addr_se;
             Type* type;
             type = new PointerType(para_expr->getSymPtr()->getType());
             addr_se = new TemporarySymbolEntry(type, SymbolTable::getLabel());
+            if (ParaNodeStack[ParaNodeStack.size() - 1].size() < 4)
+                addr_se->set_use_r0_r3(ParaNodeStack[ParaNodeStack.size() - 1].size());
+            else
+                addr_se->set_use_r0_r3(-1);
             addr = new Operand(addr_se);
             alloca = new AllocaInstruction(addr, para_expr->getSymPtr());                   // allocate space for local id in function stack.
-            ((AllocaInstruction*)alloca)->set_funct();
-            entry->insertFront(alloca);                                 // allocate instructions should be inserted into the begin of the entry block.
+
+            if (ParaNodeStack[ParaNodeStack.size() - 1].size() < 4)
+            {
+                //说明现在参数还不够4个。
+                //这里要做点特别的。要做的不是在占上开辟空间，而是把这个变量和rx寄存器关联起来。
+                ((AllocaInstruction*)alloca)->set_funct(ParaNodeStack[ParaNodeStack.size() - 1].size());
+            }
+            else
+            {
+                ((AllocaInstruction*)alloca)->set_funct(-1);
+            }
+            //最后把这个玩意push进去
+            temp_data_bag temp_bg;
+
+
+
             dynamic_cast<IdentifierSymbolEntry*>(para_expr->getSymPtr())->setAddr(addr);
-
-
-
-            SymbolEntry * temp_src_addr = new TemporarySymbolEntry(para_expr->getSymPtr()->getType(), SymbolTable::getLabel());
+            SymbolEntry* temp_src_addr = new TemporarySymbolEntry(para_expr->getSymPtr()->getType(), SymbolTable::getLabel());
             Operand* temp_src = new Operand(temp_src_addr);
-            new StoreInstruction(addr, temp_src, entry, 1);
 
-            func->add_para(temp_src);
+
+            temp_bg.addr = addr;
+            temp_bg.insn = alloca;
+            temp_bg.temp_src = temp_src;
+
+            ParaNodeStack[ParaNodeStack.size() - 1].push_back(temp_bg);
+
+
         }
         else 
         {

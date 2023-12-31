@@ -18,7 +18,13 @@ protected:
 
     int arr_dimension_recorder = 0;
 
+    //-1 means it do not use 
+    int use_r0_r3 = -1;
+
+
 public:
+    void set_use_r0_r3(int use_r0_r3) { this->use_r0_r3 = use_r0_r3; };
+    int get_use_r0_r3() { return use_r0_r3; };
     SymbolEntry(Type *type, int kind);
     virtual ~SymbolEntry() {};
     bool isConstant() const {return kind == CONSTANT;};

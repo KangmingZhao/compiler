@@ -453,9 +453,20 @@ void AllocaInstruction::genMachineCode(AsmBuilder* builder)
     * Store frame offset in symbol entry */
     if (funct)
     {
-        auto cur_func = builder->getFunction();
-        int offset = cur_func->AllocParaSpace(4);
-        dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(offset);
+        if (need_register == -1)
+        {
+            //alloc the stack like
+            auto cur_func = builder->getFunction();
+            int offset = cur_func->AllocParaSpace(4);
+            dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(offset);
+            //std::cout << offset << std::endl;
+            //std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->toStr() << std::endl;
+        }
+        else
+        {
+            //do nothing here, r0 - r3 have been alloc in the ParaNode gencode.
+            //std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getLabel() << std::endl;
+        }
     }
     else
     {
@@ -467,6 +478,52 @@ void AllocaInstruction::genMachineCode(AsmBuilder* builder)
 
 void LoadInstruction::genMachineCode(AsmBuilder* builder)
 {
+    if (operands[0]->get_se()->get_use_r0_r3() != -1 && operands[1]->get_se()->get_use_r0_r3() == -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineOperand(operands[1]);
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() == -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineOperand(operands[0]);
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() != -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+    /*if (operands[0]->get_se()->get_use_r0_r3() != -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineOperand(operands[1]);
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, dst);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }*/
+
+    //std::cout << operands[0]->get_se()->get_use_r0_r3() << std::endl;
     auto cur_block = builder->getBlock();
     MachineInstruction* cur_inst = nullptr;
     // Load global operand
@@ -513,6 +570,41 @@ void StoreInstruction::genMachineCode(AsmBuilder* builder)
     // TODO
     if (whether_para)
         return;
+    if (operands[0]->get_se()->get_use_r0_r3() != -1 && operands[1]->get_se()->get_use_r0_r3() == -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineOperand(operands[1]);
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() == -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineOperand(operands[0]);
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+    else if(operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() != -1)
+    {
+        MachineInstruction* cur_inst = nullptr;
+        auto cur_block = builder->getBlock();
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+
+
     auto cur_block = builder->getBlock();
     MachineInstruction* cur_inst = nullptr;
     MachineOperand* dst = genMachineOperand(operands[0]);
@@ -719,7 +811,7 @@ void CallInstruction::genMachineCode(AsmBuilder* builder)
     //    cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
     //}
 
-    for (unsigned p = (unsigned)operands.size() - 1; p >= 1; p--)
+    for (unsigned p = (unsigned)operands.size() - 1; p > 4; p--)
     {
         MachineOperand* now = genMachineOperand(operands[p]);
         MachineOperand* r0 = new MachineOperand(MachineOperand::REG, 0);
