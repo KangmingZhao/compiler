@@ -231,16 +231,31 @@ public:
     void output();
 };
 
+class Global_init_bag
+{
+public:
+    Global_init_bag()
+    {
+        init_value = nullptr;
+        op = nullptr;
+    }
+    Operand* op;
+    Operand* init_value;
+    ~Global_init_bag()
+    {}
+};
 class MachineUnit
 {
 private:
     std::vector<MachineFunction*> func_list;
+    std::vector<Global_init_bag*> global_list;
     void PrintGlobalDecl();
 public:
     std::vector<MachineFunction*>& getFuncs() {return func_list;};
     std::vector<MachineFunction*>::iterator begin() { return func_list.begin(); };
     std::vector<MachineFunction*>::iterator end() { return func_list.end(); };
     void InsertFunc(MachineFunction* func) { func_list.push_back(func);};
+    void InsertGlobal(Global_init_bag *global_i) { global_list.push_back(global_i); };
     void output();
 };
 

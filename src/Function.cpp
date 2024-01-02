@@ -32,6 +32,8 @@ void Function::remove(BasicBlock *bb)
 
 void Function::output() const
 {
+    if (sym_ptr == nullptr)
+        return;
     FunctionType* funcType = dynamic_cast<FunctionType*>(sym_ptr->getType());
     Type *retType = funcType->getRetType();
     if (para_list.size() == 0)
@@ -108,7 +110,7 @@ void Function::genMachineCode(AsmBuilder* builder)
     {
         cur_func = new MachineFunction(cur_unit, this->sym_ptr);
     }
-    builder->setFunction(cur_func);
+    builder->setFunction(cur_func);    
 
     std::map<BasicBlock*, MachineBlock*> map;
     for(auto block : block_list)

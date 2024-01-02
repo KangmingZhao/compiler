@@ -1,3 +1,4 @@
+int shityou;
 void fuck(int a, int b,int c,int d,int e, int f)
 {
     int fuck = 0;
@@ -9,6 +10,8 @@ void fuck(int a, int b,int c,int d,int e, int f)
     e = 5;
     f = 6;
 }
+int shitfuck = 10;
+const int shitconst = 114514;
 int main () {
     fuck(1,2,3,4,5, 6);
     return 0;

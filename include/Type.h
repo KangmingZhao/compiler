@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+
+#define TYPE_ERROR -114514
 class Type
 {
 private:
@@ -43,6 +45,16 @@ public:
 
 
     int getKindValue() { return kind; };
+    int getKindSize() 
+    {
+        return
+            kind == INT ? 4 :
+            kind == FLOAT ? 4 :
+            kind == BOOL ? 1 :
+            TYPE_ERROR;
+    }
+
+
     int get_range()
     {
         if (kind < from_now_on_is_array)

@@ -708,6 +708,7 @@ void RetInstruction::genMachineCode(AsmBuilder* builder)
 GlobalInstruction::GlobalInstruction(Operand *dst, Operand *expr, SymbolEntry *se, BasicBlock *insertBB): Instruction(GLOBAL, insertBB)
 {
     //std::cout<<"globalInstruction iniitial"<<std::endl;
+    
     operands.push_back(dst);
     operands.push_back(expr);
     dst->setDef(this);
@@ -735,8 +736,14 @@ void GlobalInstruction::output() const
    }
 }
 
-void GlobalInstruction::genMachineCode(AsmBuilder *)
+void GlobalInstruction::genMachineCode(AsmBuilder *builder)
 {
+    Global_init_bag*temp = new Global_init_bag();
+    temp->op = operands[0];
+    if (operands[1] != nullptr)
+        temp->init_value = operands[1];
+
+    builder->getUnit()->InsertGlobal(temp);
 }
 
 CallInstruction::CallInstruction(Operand* dst,

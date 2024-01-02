@@ -560,6 +560,12 @@ void DeclStmt::genCode()
     IdentifierSymbolEntry *se = dynamic_cast<IdentifierSymbolEntry *>(id->getSymPtr());
     if(se->isGlobal())
     {
+        //只好把全局变量当一个函数块看待了。
+        Unit* unit = builder->getUnit();
+        Function* func = new Function(unit, nullptr);
+        BasicBlock* entry = func->getEntry();
+
+
         //std::cout << id->getSymPtr()->toStr() << std::endl;
         //std::cout << "fuck" << std::endl;
         Operand *addr;
@@ -568,10 +574,14 @@ void DeclStmt::genCode()
         addr_se->setType(new PointerType(se->getType()));
         addr = new Operand(addr_se);
         se->setAddr(addr);
-        Instruction *g;
         //initVal->genCode();
-        g = new GlobalInstruction(new Operand(id->getSymPtr()), nullptr, se);
-        g->output();
+
+        new GlobalInstruction(new Operand(id->getSymPtr()), nullptr, se, entry);
+
+
+        //Instruction* g;
+        //g = new GlobalInstruction(new Operand(id->getSymPtr()), nullptr, se);
+        //g->output();
      
     }
     else if(se->isLocal())
@@ -1082,7 +1092,11 @@ void ConstDeclInitStmt::typeCheck()
 }
 void ConstDeclInitStmt::genCode()
 {
-    
+    Unit* unit = builder->getUnit();
+    Function* func = new Function(unit, nullptr);
+    BasicBlock* entry = func->getEntry();
+
+
     Operand* addr;
     SymbolEntry* addr_se;
     addr_se = new IdentifierSymbolEntry(*dynamic_cast<IdentifierSymbolEntry*>(id->getSymPtr()));
@@ -1091,7 +1105,7 @@ void ConstDeclInitStmt::genCode()
     dynamic_cast<IdentifierSymbolEntry*>(id->getSymPtr())->setAddr(addr);
     Instruction* g;
     //initVal->genCode();
-    g = new GlobalInstruction(new Operand(id->getSymPtr()), new Operand(initVal->getSymPtr()), id->getSymPtr());
+    g = new GlobalInstruction(new Operand(id->getSymPtr()), new Operand(initVal->getSymPtr()), id->getSymPtr(), entry);
     if (initVal != nullptr)
         initVal->genCode();
     g->output();
@@ -1109,6 +1123,10 @@ void DeclInitStmt::genCode()
     IdentifierSymbolEntry *se = dynamic_cast<IdentifierSymbolEntry *>(id->getSymPtr());
     if(se->isGlobal())
     {
+        Unit* unit = builder->getUnit();
+        Function* func = new Function(unit, nullptr);
+        BasicBlock* entry = func->getEntry();
+
         //std::cout << "fuck" << std::endl;
         Operand *addr;
         SymbolEntry *addr_se;
@@ -1119,7 +1137,7 @@ void DeclInitStmt::genCode()
         Instruction *g;
         initVal->genCode();
         new StoreInstruction(addr, initVal->getOperand(), builder->getInsertBB());
-        g = new GlobalInstruction(new Operand(id->getSymPtr()), initVal->getOperand(), se);
+        g = new GlobalInstruction(new Operand(id->getSymPtr()), initVal->getOperand(), se, entry);
         g->output();
     }
     else if(se->isLocal())

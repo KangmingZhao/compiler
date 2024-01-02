@@ -1,6 +1,8 @@
 #include "MachineCode.h"
 extern FILE* yyout;
+#include<Type.h>
 #include "Operand.h"
+#include<iostream>
 
 MachineOperand::MachineOperand(int tp, int val)
 {
@@ -397,6 +399,8 @@ void MachineBlock::output()
 
 void MachineFunction::output()
 {
+    if (this->sym_ptr == nullptr)
+        return;
     const char *func_name = this->sym_ptr->toStr().c_str() + 1;
     fprintf(yyout, "\t.global %s\n", func_name);
     fprintf(yyout, "\t.type %s , %%function\n", func_name);
@@ -470,6 +474,25 @@ void MachineUnit::PrintGlobalDecl()
 {
     // TODO:
     // You need to print global variable/const declarition code;
+    for (auto global_i : global_list)
+    {
+        const char* i_name = global_i->op->toStr().c_str() + 1;
+        fprintf(yyout, ".global %s\n%s:\n", i_name, i_name);
+        //如果没有初始值
+        if (global_i->init_value == nullptr)
+        {
+            int kind_size = global_i->op->getType()->getKindValue();
+            if(kind_size != TYPE_ERROR)
+                fprintf(yyout, "\t.space %d\n", kind_size);
+            else
+                fprintf(yyout, "\tsomething wrong man!" );
+        }
+        else
+        {
+            //std::cout << global_i.init_value->get_se()->toStr() << std::endl;;
+            fprintf(yyout, "\t.word %s\n", global_i->init_value->toStr().c_str());
+        }
+    }
 }
 
 void MachineUnit::output()
