@@ -103,6 +103,21 @@ void MachineInstruction::PrintCond()
     case LT:
         fprintf(yyout, "lt");
         break;
+    case GT:
+        fprintf(yyout, "gt");
+        break;
+    case EQ:
+        fprintf(yyout, "eq");
+        break;
+    case NE:
+        fprintf(yyout, "ne");
+        break;
+    case LE:
+        fprintf(yyout, "le");
+        break;
+    case GE:
+        fprintf(yyout, "ge");
+        break;
     default:
         break;
     }
@@ -293,6 +308,7 @@ MovMInstruction::MovMInstruction(MachineBlock* p, int op,
     if (op == MovMInstruction::MOV)
     {
         this->parent = p;
+        this->op=op;
         this->type = MovMInstruction::MOV;
         this->def_list.push_back(dst);
         this->use_list.push_back(src);
@@ -305,6 +321,8 @@ void MovMInstruction::output()
 {
     // TODO
     fprintf(yyout, "\tmov ");
+    PrintCond();
+    fprintf(yyout, " ");
     def_list[0]->output();
     fprintf(yyout, ", ");
     use_list[0]->output();
@@ -318,6 +336,7 @@ BranchMInstruction::BranchMInstruction(MachineBlock* p, int op,
     int cond)
 {
     // TODO
+    
 }
 
 void BranchMInstruction::output()
@@ -330,6 +349,14 @@ CmpMInstruction::CmpMInstruction(MachineBlock* p,
     int cond)
 {
     // TODO
+     this->parent = p;
+    this->type = MachineInstruction::CMP;
+    this->op = -1;
+    this->cond = cond;
+    this->use_list.push_back(src1);
+    this->use_list.push_back(src2);
+    src1->setParent(this);
+    src2->setParent(this);
 }
 
 void CmpMInstruction::output()
@@ -337,6 +364,11 @@ void CmpMInstruction::output()
     // TODO
     // Jsut for reg alloca test
     // delete it after test
+    fprintf(yyout, "\tcmp ");
+    this->use_list[0]->output();
+    fprintf(yyout, ", ");
+    this->use_list[1]->output();
+    fprintf(yyout, "\n");
 }
 
 StackMInstrcuton::StackMInstrcuton(MachineBlock* p, int op, 
