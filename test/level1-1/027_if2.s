@@ -17,8 +17,30 @@ main:
 	mov fp, sp
 	sub sp, sp, #114514
 .L5:
-	mov r0, r0
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	cmp v0, #0
+	mov  r4, #1
+	mov  r4, #0
+	bgt .L6
+	b .L7
 .L6:
+	mov  r0, #0
+	add sp, sp, #0
+	POP {pc} 
+	POP { }
+	bx lr
+	b .L8
 .L7:
+	mov  r0, #0
+	add sp, sp, #0
+	POP {pc} 
+	POP { }
+	bx lr
+	b .L8
 .L8:
+	mov  r0, #0
+	add sp, sp, #0
+	POP {pc} 
+	POP { }
+	bx lr

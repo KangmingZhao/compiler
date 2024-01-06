@@ -18,3 +18,8 @@ main:
 	mov fp, sp
 	sub sp, sp, #114514
 .L4:
+	mov  r0, #0
+	add sp, sp, #0
+	POP {pc} 
+	POP { }
+	bx lr

@@ -22,3 +22,8 @@ main:
 	mov fp, sp
 	sub sp, sp, #114514
 .L5:
+	mov  r0, #0
+	add sp, sp, #0
+	POP {pc} 
+	POP { }
+	bx lr

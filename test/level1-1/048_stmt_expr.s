@@ -21,22 +21,34 @@ main:
 	mov fp, sp
 	sub sp, sp, #114514
 .L22:
-	mov r0, r0
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	b .L24
 .L24:
-	mov r0, r0
+	mov  r0, r0
+	cmp r4, #0
+	mov  r5, #1
+	mov  r5, #0
+	bge .L25
+	b .L26
 .L25:
-	mov r0, r0
-	add r5, r4, #0
-	mov r0, r0
-	mov r0, r0
+	mov  r0, r0
 	add r6, r5, #0
-	mov r0, r0
-	mov r0, r0
-	add r4, r6, r6
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	add r7, r6, #0
+	mov  r0, r0
+	mov  r0, r0
+	add r4, r7, r7
+	mov  r0, r0
+	b .L24
 .L26:
-	mov r0, r0
-	mov r0, r4
+	mov  r0, r0
+	mov  r0, r5
 	bl putint
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r5
+	add sp, sp, #4
+	POP {pc} 
+	POP { }
+	bx lr

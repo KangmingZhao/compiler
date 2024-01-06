@@ -175,6 +175,17 @@ public:
     PushMInstrcuton(MachineBlock* p);
     void output();
 };
+class PopMInstruction : public MachineInstruction {
+    bool pc = 0; // 表示是否应当将程序计数器（PC）也从堆栈中弹出，这在函数返回时使用。
+
+public:
+    // 构造函数，适用于不同情况：包括有参数列表、单个目标操作数，或没有操作数。
+    PopMInstruction(MachineBlock* p, std::vector<MachineOperand*> params);
+    PopMInstruction(MachineBlock* p, MachineOperand* dst);
+    PopMInstruction(MachineBlock* p);
+    // 生成此指令的汇编代码输出的方法。
+    void output();
+};
 
 class MachineBlock
 {
@@ -199,6 +210,7 @@ public:
     std::set<MachineOperand*>& getLiveOut() {return live_out;};
     std::vector<MachineBlock*>& getPreds() {return pred;};
     std::vector<MachineBlock*>& getSuccs() {return succ;};
+    MachineFunction* getParent() { return parent;}
     void output();
 };
 
@@ -228,6 +240,7 @@ public:
     int AllocParaSpace(int size) {this->stack_size_4_funct += size; return this->stack_size_4_funct;}
     void InsertBlock(MachineBlock* block) { this->block_list.push_back(block); };
     void addSavedRegs(int regno) {saved_regs.insert(regno);};
+    std::vector<MachineOperand*> getSavedRegs();
     void output();
 };
 

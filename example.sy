@@ -13,6 +13,10 @@ void fuck(int a, int b,int c,int d,int e, int f)
 int shitfuck = 10;
 const int shitconst = 114514;
 int main () {
-    fuck(1,2,3,4,5, 6);
+    int a=2;
+    if(a>0)
+    {
+        fuck(1,2,3,4,5, 6);
+    }
     return 0;
 }

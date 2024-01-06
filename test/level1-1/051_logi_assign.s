@@ -21,16 +21,33 @@ main:
 	sub sp, sp, #114514
 .L18:
 	bl getint
-	mov r0, r0
+	mov  r0, r0
 	bl getint
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	cmp v0, v0
+	mov  r4, #1
+	mov  r4, #0
+	beq .L23
+	b .L21
 .L20:
-	mov r0, r0
+	mov  r0, r0
+	b .L22
 .L21:
-	mov r0, r0
+	mov  r0, r0
+	b .L22
 .L22:
-	mov r0, r0
+	mov  r0, r0
+	mov  r0, r4
+	add sp, sp, #4
+	POP {pc} 
+	POP { }
+	bx lr
 .L23:
-	mov r0, r0
+	mov  r0, r0
+	cmp r4, #0
+	mov  r4, #1
+	mov  r4, #0
+	bne .L20
+	b .L21

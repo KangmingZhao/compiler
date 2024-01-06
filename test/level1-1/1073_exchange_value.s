@@ -18,26 +18,31 @@ main:
 	sub sp, sp, #114514
 .L25:
 	bl getint
-	mov r0, r0
+	mov  r0, r0
 	bl getint
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, r0
-	mov r0, v0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, v0
 	bl putint
-	mov r0, r0
-	mov r0, r0
-	mov r0, v0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, v0
 	bl putch
-	mov r0, r0
-	mov r0, v0
+	mov  r0, r0
+	mov  r0, v0
 	bl putint
-	mov r0, r0
-	mov r0, r0
-	mov r0, v0
+	mov  r0, r0
+	mov  r0, r0
+	mov  r0, v0
 	bl putch
+	mov  r0, #0
+	add sp, sp, #12
+	POP {pc} 
+	POP { }
+	bx lr
