@@ -3,8 +3,9 @@
     "",
     "\\include",
     "\\src",
-    "\\test"
+    "\\test",
+    "\\test\\level1-1"
   ],
-  "SelectedNode": "\\example.sy",
+  "SelectedNode": "\\test\\level1-1\\025_rem.sy",
   "PreviewInSolutionExplorer": false
 }

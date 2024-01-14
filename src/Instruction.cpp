@@ -677,11 +677,42 @@ void BinaryInstruction::genMachineCode(AsmBuilder *builder)
         break;
 
     case DIV:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, src2);
+        //要亲命了，sdiv不支持立即数作为最后一个操作数。所以这里不能大家用一样的。
+        //你这个小坏蛋，让我单独给你点颜色看看
+        if (src2->isImm())
+        {
+            auto tempReg = genMachineVReg();
+            cur_block->InsertInst(
+                new LoadMInstruction(cur_block, tempReg, src2)
+            );
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, tempReg);
+        }
+        else
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, src2);
         break;
 
     case MOD:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MOD, dst, src1, src2);
+        //你更是个坏蛋！arm汇编没有取模，只能自己手动div然后sub
+        if (src2->isImm())
+        {
+            auto tempReg = genMachineVReg();
+            cur_block->InsertInst(
+                new LoadMInstruction(cur_block, tempReg, src2)
+            );
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, tempReg);
+        }
+        else
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, src2);
+        cur_block->InsertInst(cur_inst);
+        //先求出除法。dst的结果是src1//src2
+        
+
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, dst, src2);
+        cur_block->InsertInst(cur_inst);
+        //然后得到dst是src2 * 刚刚求的除法的结果。
+
+        //最后拿src1减去刚刚的dst就是答案了。这里还手动寄存器优化了消暑
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, src1, dst);
         break;
 
     case AND:

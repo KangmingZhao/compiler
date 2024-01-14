@@ -1,6 +1,6 @@
-//test sub
-const int a = 10;
+//test rem
 int main(){
-    int b;
-    return  a - b;
+    int a;
+    a = 10;
+    return a % 3;
 }
