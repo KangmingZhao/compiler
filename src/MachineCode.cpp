@@ -505,13 +505,24 @@ void MachineFunction::output()
      *  3. Save callee saved register
      *  4. Allocate stack space for local variable */
 
-    auto r4 = new MachineOperand(MachineOperand::REG, 4); //fp
+
+    /*for (unsigned i = 0; i < stack_size / 4 - (unsigned)params.size(); i++)
+    {
+        Mparams.push_back(
+            new MachineOperand(MachineOperand::REG, i + 4)
+        );
+    }*/
+
+    //好吧需要的是用了多少个reg就push多少个
+    for (auto reg_used : saved_regs)
+    {
+        Mparams.push_back(new MachineOperand(MachineOperand::REG, reg_used));
+    }
 
     auto fp = new MachineOperand(MachineOperand::REG, 11); //fp
 
     auto lr = new MachineOperand(MachineOperand::REG, 14); //lr
 
-    Mparams.push_back(r4);
     Mparams.push_back(fp);
     Mparams.push_back(lr);
 
