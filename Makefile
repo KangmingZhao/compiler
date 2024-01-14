@@ -51,7 +51,6 @@ $(BINARY):$(OBJ)
 app:$(LEXER) $(PARSER) $(BINARY)
 
 run:app
-	@$(BINARY) -o example.ll -i example.sy
 	@$(BINARY) -o example.s -S example.sy
 
 gdb:app

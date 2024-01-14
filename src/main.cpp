@@ -130,7 +130,6 @@ int main(int argc, char *argv[])
     ast.genCode(&unit);
 
 
-
     if(dump_type == IR)
         unit.output();
 

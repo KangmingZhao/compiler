@@ -408,6 +408,14 @@ MachineOperand *Instruction::genMachineOperand(Operand *ope)
         else
             exit(0);
     }
+    else if (se->isConstIdentifer())
+    {
+        auto id_se = dynamic_cast<IdentifierSymbolEntry*>(se);
+        if (id_se->isGlobal())
+            mope = new MachineOperand(id_se->toStr().c_str());
+        else
+            exit(0);
+    }
     return mope;
 }
 
@@ -515,7 +523,9 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
     auto cur_block = builder->getBlock();
     MachineInstruction *cur_inst = nullptr;
     // Load global operand
-    if (operands[1]->getEntry()->isVariable() && dynamic_cast<IdentifierSymbolEntry *>(operands[1]->getEntry())->isGlobal())
+    if (
+        (operands[1]->getEntry()->isVariable() || operands[1]->getEntry()->isConstIdentifer())
+        && dynamic_cast<IdentifierSymbolEntry *>(operands[1]->getEntry())->isGlobal())
     {
         auto dst = genMachineOperand(operands[0]);
         auto internal_reg1 = genMachineVReg();
@@ -523,6 +533,7 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
         auto src = genMachineOperand(operands[1]);
         // example: load r0, addr_a
         cur_inst = new LoadMInstruction(cur_block, internal_reg1, src);
+
         cur_block->InsertInst(cur_inst);
         // example: load r1, [r0]
         cur_inst = new LoadMInstruction(cur_block, dst, internal_reg2);
@@ -541,10 +552,13 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
     // Load operand from temporary variable
     else
     {
+        //问题出这了。
         // example: load r1, [r0]
         auto dst = genMachineOperand(operands[0]);
         auto src = genMachineOperand(operands[1]);
         cur_inst = new LoadMInstruction(cur_block, dst, src);
+
+
         cur_block->InsertInst(cur_inst);
     }
 }
