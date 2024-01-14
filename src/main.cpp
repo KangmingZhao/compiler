@@ -105,6 +105,10 @@ int main(int argc, char *argv[])
         st = st->getPrev();
     se = new IdentifierSymbolEntry(funcType, "putf", 0);
     st->install("putf", se);
+
+
+
+
     yyparse();
     if (dump_type == AST)
     {
@@ -112,18 +116,26 @@ int main(int argc, char *argv[])
     }
 
 
- 
 
     //ast.output();
 
     ast.typeCheck();    
     //std::cout << "fuck\n";
+
+
     ast.mergeConstExp();
+
+
     //ast.output();
     ast.genCode(&unit);
+
+
+
     if(dump_type == IR)
         unit.output();
+
     unit.genMachineCode(&mUnit);
+
 
     LinearScan linearScan(&mUnit);
     linearScan.allocateRegisters();

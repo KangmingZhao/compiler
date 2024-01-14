@@ -1,6 +1,7 @@
 #include "LiveVariableAnalysis.h"
 #include "MachineCode.h"
 #include <algorithm>
+#include<iostream>
 
 void LiveVariableAnalysis::pass(MachineUnit *unit)
 {
@@ -67,9 +68,15 @@ void LiveVariableAnalysis::computeUsePos(MachineFunction *func)
     {
         for (auto &inst : block->getInsts())
         {
-            auto uses = inst->getUse();
-            for (auto &use : uses)
-                all_uses[*use].insert(use);
+            //std::cout << (inst == nullptr) << " fuck\n";
+            if (inst != nullptr)
+            {
+                auto uses = inst->getUse();
+                for (auto& use : uses)
+                {
+                    all_uses[*use].insert(use);
+                }
+            }
         }
     }
 }

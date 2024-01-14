@@ -476,6 +476,20 @@ std::vector<MachineOperand *> MachineFunction::getSavedRegs()
     return regs;
 }
 
+
+std::vector<MachineBlock*>& MachineFunction::getBlocks() {
+    for (auto &b : block_list)
+    {
+        for (auto& inst : b->getInsts())
+        {
+            if (inst == nullptr)
+            {
+                inst = new NullErrorPlaceHolder();
+            }
+        }
+    }
+    return block_list;
+};
 void MachineFunction::output()
 {
     if (this->sym_ptr == nullptr)

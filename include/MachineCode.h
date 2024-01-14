@@ -187,6 +187,13 @@ public:
     void output();
 };
 
+class NullErrorPlaceHolder : public MachineInstruction {
+public:
+    NullErrorPlaceHolder() {};
+    void output() {};
+};
+
+
 class MachineBlock
 {
 private:
@@ -227,7 +234,7 @@ private:
     std::vector<Operand*> params;
     std::vector<MachineOperand*> Mparams;
 public:
-    std::vector<MachineBlock*>& getBlocks() {return block_list;};
+    std::vector<MachineBlock*>& getBlocks();
     std::vector<MachineBlock*>::iterator begin() { return block_list.begin(); };
     std::vector<MachineBlock*>::iterator end() { return block_list.end(); };
     MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr);

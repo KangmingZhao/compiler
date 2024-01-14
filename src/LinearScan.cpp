@@ -2,6 +2,7 @@
 #include "LinearScan.h"
 #include "MachineCode.h"
 #include "LiveVariableAnalysis.h"
+#include<iostream>
 
 LinearScan::LinearScan(MachineUnit *unit)
 {
@@ -19,13 +20,16 @@ void LinearScan::allocateRegisters()
         success = false;
         while (!success)        // repeat until all vregs can be mapped
         {
+
             computeLiveIntervals();
             success = linearScanRegisterAllocation();
+
             if (success)        // all vregs can be mapped to real regs
                 modifyCode();
             else                // spill vregs that can't be mapped to real regs
                 genSpillCode();
         }
+
     }
 }
 
@@ -60,8 +64,10 @@ void LinearScan::makeDuChains()
         liveVar.clear();
         for (auto &t : bb->getLiveOut())
             liveVar[*t].insert(t);
+
         int no;
         no = i = bb->getInsts().size() + i;
+
         for (auto inst = bb->getInsts().rbegin(); inst != bb->getInsts().rend(); inst++)
         {
             (*inst)->setNo(no--);
@@ -89,6 +95,7 @@ void LinearScan::makeDuChains()
 void LinearScan::computeLiveIntervals()
 {
     makeDuChains();
+
     intervals.clear();
     for (auto &du_chain : du_chains)
     {

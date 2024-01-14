@@ -163,7 +163,6 @@ line_commentend \n
     dump_tokens("SUB\t%s\n", yytext);
     return SUB;
     
-
 }
 
 "*" {

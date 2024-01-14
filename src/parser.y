@@ -296,7 +296,8 @@ ReturnStmt
 
 Exp
     :
-    AddExp {$$ = $1;}
+    AddExp {$$ = $1;
+    }
     ;
 Cond
     :

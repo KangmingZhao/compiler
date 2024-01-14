@@ -190,12 +190,16 @@ void FunctionDef::genCode()
     for (auto bb = func->begin(); bb != func->end(); bb++){
     Instruction *last = (*bb)->rbegin();
     Instruction *first = (*bb)->begin();
+
+
+
     while (first != last) {
       if (first->isCond() || first->isUncond()) {
         (*bb)->remove(first);
       }
       first = first->getNext();
     }
+
 
     if (last->isCond()){
       BasicBlock *trueBranch = ((CondBrInstruction *)last)->getTrueBranch();
@@ -219,8 +223,8 @@ void FunctionDef::genCode()
         new RetInstruction(nullptr, (*bb));
       }
     }
+
   }
-   
    // builder->build_link();
 }
 

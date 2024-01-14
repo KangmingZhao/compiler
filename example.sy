@@ -1,5 +1,5 @@
-int a = 0;
-int main()
-{
-	return a;
+//test sub
+int main(){
+    int a;
+    return a - 1; 
 }
