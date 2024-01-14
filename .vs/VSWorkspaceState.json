@@ -3,8 +3,9 @@
     "",
     "\\include",
     "\\src",
-    "\\test"
+    "\\test",
+    "\\test\\level1-1"
   ],
-  "SelectedNode": "\\src\\parser.y",
+  "SelectedNode": "\\test\\level1-1\\045_op_priority3.sy",
   "PreviewInSolutionExplorer": false
 }

@@ -1076,6 +1076,7 @@ void UnaryInstruction::genMachineCode(AsmBuilder * builder)
     auto cur_block = builder->getBlock();
     auto dst = genMachineOperand(operands[0]);
     auto src = genMachineOperand(operands[1]);
+    auto tempReg = genMachineVReg();
     auto zero = genMachineImm(0);
     auto all_one = genMachineImm(0xFFFFFFFF);
 
@@ -1084,13 +1085,19 @@ void UnaryInstruction::genMachineCode(AsmBuilder * builder)
     switch (opcode)
     {
     case ADD:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::ADD, dst, zero, src);
+        cur_inst = new LoadMInstruction(cur_block, tempReg, zero);
+        cur_block->InsertInst(cur_inst);
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::ADD, dst, tempReg, src);
         break;
     case SUB:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, zero, src);
+        cur_inst = new LoadMInstruction(cur_block, tempReg, zero);
+        cur_block->InsertInst(cur_inst);
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, tempReg, src);
         break;
     case NOT:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::EOR, dst, src, all_one);
+        cur_inst = new LoadMInstruction(cur_block, tempReg, all_one);
+        cur_block->InsertInst(cur_inst);
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::EOR, dst, src, tempReg);
         break;
     default:
         break;
