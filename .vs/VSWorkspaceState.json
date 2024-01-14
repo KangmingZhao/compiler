@@ -3,8 +3,9 @@
     "",
     "\\include",
     "\\src",
-    "\\test"
+    "\\test",
+    "\\test\\level1-1"
   ],
-  "SelectedNode": "\\src\\Ast.cpp",
+  "SelectedNode": "\\example.sy",
   "PreviewInSolutionExplorer": false
 }

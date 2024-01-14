@@ -675,7 +675,16 @@ void BinaryInstruction::genMachineCode(AsmBuilder *builder)
         break;
 
     case MUL:
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, src1, src2);
+        if (src2->isImm())
+        {
+            auto tempReg = genMachineVReg();
+            cur_block->InsertInst(
+                new LoadMInstruction(cur_block, tempReg, src2)
+            );
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, src1, tempReg);
+        }
+        else
+            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, src1, src2);
         break;
 
     case DIV:

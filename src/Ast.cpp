@@ -1372,36 +1372,38 @@ void UnaryExpr::genCode()
     }
     else if( op==NOT)
     {
-        Operand* src2 = expr->getOperand();
+        /*Operand* src2 = expr->getOperand();
         Operand* temp = src2;
         int opcode = UnaryInstruction::NOT;
-        new UnaryInstruction(opcode, dst, temp, builder->getInsertBB());
+        new UnaryInstruction(opcode, dst, temp, builder->getInsertBB());*/
+
+
         // if(闂傚倷鐒︾€笛囧礃婵犳艾绠柨鐕傛嫹2)
         // !(bool)
-        //if(expr->need_2_be_bool)
-        //{
-        //     new NotInstruction(this->dst,expr->getOperand(), builder->getInsertBB());
-        //}
-        //else
-        //{
-        //    need_2_be_bool = 1;
-        //    int opcode = CmpInstruction::E;
-        //    Operand *src = expr->getOperand();
-        //    SymbolEntry *se_const0 = new ConstantSymbolEntry(TypeSystem::intType, 0);
-        //    ExprNode *temp_const0 = new Constant(se_const0);
-        //    Operand *src0_const0 = temp_const0->getOperand();
-        //    Operand *src0 = src0_const0;
-        //    SymbolEntry *s = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
-        //    Operand *n = new Operand(s);
-        //    if (dst->getType() != src->getType())
-        //    {
-        //        //std::cout<<"fuck"<<std::endl;
-        //       // std::cout<<dst->toStr()<<std::endl;
-        //        //std::cout<<src->toStr()<<std::endl;
-        //        new ZextInstruction(n,dst,builder->getInsertBB());
-        //    }    
-        //    new CmpInstruction(opcode, this->dst, src, src0, builder->getInsertBB());
-        //}
+        if(expr->need_2_be_bool)
+        {
+             new NotInstruction(this->dst,expr->getOperand(), builder->getInsertBB());
+        }
+        else
+        {
+            need_2_be_bool = 1;
+            int opcode = CmpInstruction::E;
+            Operand *src = expr->getOperand();
+            SymbolEntry *se_const0 = new ConstantSymbolEntry(TypeSystem::intType, 0);
+            ExprNode *temp_const0 = new Constant(se_const0);
+            Operand *src0_const0 = temp_const0->getOperand();
+            Operand *src0 = src0_const0;
+            SymbolEntry *s = new TemporarySymbolEntry(TypeSystem::intType, SymbolTable::getLabel());
+            Operand *n = new Operand(s);
+            if (dst->getType() != src->getType())
+            {
+                //std::cout<<"fuck"<<std::endl;
+               // std::cout<<dst->toStr()<<std::endl;
+                //std::cout<<src->toStr()<<std::endl;
+                new ZextInstruction(n,dst,builder->getInsertBB());
+            }    
+            new CmpInstruction(opcode, this->dst, src, src0, builder->getInsertBB());
+        }
     }
     if (need_2_be_bool)
     {
