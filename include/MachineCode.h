@@ -69,7 +69,7 @@ protected:
     void PrintCond();
     enum instType { BINARY, LOAD, STORE, MOV, BRANCH, CMP, STACK };
 public:
-    enum condType { EQ, NE, LT, LE , GT, GE, NONE };
+    enum condType { EQ, NE, LT, GE, GT, LE ,   NONE };
     virtual void output() = 0;
     void setNo(int no) {this->no = no;};
     int getNo() {return no;};

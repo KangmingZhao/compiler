@@ -322,6 +322,7 @@ MovMInstruction::MovMInstruction(MachineBlock *p, int op,
         this->type = MovMInstruction::MOV;
         this->def_list.push_back(dst);
         this->use_list.push_back(src);
+        this->cond = cond;
         dst->setParent(this);
         src->setParent(this);
     }
@@ -330,7 +331,7 @@ MovMInstruction::MovMInstruction(MachineBlock *p, int op,
 void MovMInstruction::output()
 {
     // TODO
-    fprintf(yyout, "\tmov ");
+    fprintf(yyout, "\tmov");
     PrintCond();
     fprintf(yyout, " ");
     def_list[0]->output();
