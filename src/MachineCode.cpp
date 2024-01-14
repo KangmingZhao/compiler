@@ -608,6 +608,10 @@ void MachineUnit::PrintGlobalDecl()
 {
     // TODO:
     // You need to print global variable/const declarition code;
+    if ((unsigned)global_list.size() != 0)
+    {
+        fprintf(yyout, ".data\n");
+    }
     for (auto global_i : global_list)
     {
         const char *i_name = global_i->op->toStr().c_str() + 1;
@@ -640,6 +644,7 @@ void MachineUnit::output()
     fprintf(yyout, "\t.arch_extension crc\n");
     fprintf(yyout, "\t.arm\n");
     PrintGlobalDecl();
+    fprintf(yyout, "\t.text\n");
     for (auto iter : func_list)
         iter->output();
 }

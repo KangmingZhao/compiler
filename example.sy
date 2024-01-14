@@ -1,3 +1,4 @@
+int shit = 0;
 int main(int a, int c, int d, int e, int jj)
 {
 	int b =0 ;
