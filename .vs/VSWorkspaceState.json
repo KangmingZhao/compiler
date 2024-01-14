@@ -3,9 +3,8 @@
     "",
     "\\include",
     "\\src",
-    "\\test",
-    "\\test\\level1-1"
+    "\\test"
   ],
-  "SelectedNode": "\\test\\level1-1\\045_op_priority3.sy",
+  "SelectedNode": "\\src\\Ast.cpp",
   "PreviewInSolutionExplorer": false
 }

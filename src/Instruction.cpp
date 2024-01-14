@@ -1078,7 +1078,7 @@ void UnaryInstruction::genMachineCode(AsmBuilder * builder)
     auto src = genMachineOperand(operands[1]);
     auto tempReg = genMachineVReg();
     auto zero = genMachineImm(0);
-    auto all_one = genMachineImm(0xFFFFFFFF);
+    auto all_one = genMachineImm((unsigned)0xFFFFFFFF);
 
     MachineInstruction* cur_inst = nullptr;
 
@@ -1123,8 +1123,19 @@ NotInstruction::~NotInstruction()
     operands[1]->removeUse(this);
 }
 
-void NotInstruction::genMachineCode(AsmBuilder *)
+void NotInstruction::genMachineCode(AsmBuilder * builder)
 {
+    auto cur_block = builder->getBlock();
+    auto dst = genMachineOperand(operands[0]);
+    auto src = genMachineOperand(operands[1]);
+    auto tempReg = genMachineVReg();
+    auto all_one = genMachineImm(0xFFFFFFFF);
+    MachineInstruction* cur_inst = nullptr;
+
+    cur_inst = new LoadMInstruction(cur_block, tempReg, all_one);
+    cur_block->InsertInst(cur_inst);
+    cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::EOR, dst, src, tempReg);
+    cur_block->InsertInst(cur_inst);
 }
 
 void NotInstruction::output() const
