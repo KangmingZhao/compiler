@@ -1,8 +1,5 @@
-int shit = 0;
-int main(int a, int c, int d, int e, int jj)
+int a = 0;
+int main()
 {
-	int b =0 ;
-	int fuck = 1;
-	a = b;
-	return b;
+	return a;
 }
