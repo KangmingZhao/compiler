@@ -1,5 +1,7 @@
 //test sub
 int main(){
-    int a;
-    return a - 1; 
+    int a, b;
+    a = 10;
+    b = 2;
+    return a - b;
 }

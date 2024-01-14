@@ -653,6 +653,31 @@ void BinaryInstruction::genMachineCode(AsmBuilder *builder)
     case ADD:
         cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::ADD, dst, src1, src2);
         break;
+
+    case SUB:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, src1, src2);
+        break;
+
+    case MUL:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, src1, src2);
+        break;
+
+    case DIV:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, src2);
+        break;
+
+    case MOD:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MOD, dst, src1, src2);
+        break;
+
+    case AND:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::AND, dst, src1, src2);
+        break;
+
+    case OR:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::OR, dst, src1, src2);
+        break;
+
     default:
         break;
     }

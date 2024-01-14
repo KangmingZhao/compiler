@@ -175,7 +175,7 @@ void BinaryMInstruction::output()
             fprintf(yyout, "\tsdiv ");
             break;
         case BinaryMInstruction::MOD:
-            fprintf(yyout, "\tadd ");
+            //fprintf(yyout, "\tadd ");
             break;
         default:
             break;
