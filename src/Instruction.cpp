@@ -655,6 +655,8 @@ void BinaryInstruction::genMachineCode(AsmBuilder *builder)
      * So you need to insert LOAD/MOV instrucrion to load immediate num into register.
      * As to other instructions, such as MUL, CMP, you need to deal with this situation, too.*/
     MachineInstruction *cur_inst = nullptr;
+    auto DivResult = genMachineVReg();
+    auto MulResult = genMachineVReg();
     if (src1->isImm())
     {
         auto internal_reg = genMachineVReg();
@@ -699,20 +701,20 @@ void BinaryInstruction::genMachineCode(AsmBuilder *builder)
             cur_block->InsertInst(
                 new LoadMInstruction(cur_block, tempReg, src2)
             );
-            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, tempReg);
+            src2 = tempReg;
         }
-        else
-            cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, dst, src1, src2);
+
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::DIV, DivResult, src1, src2);
         cur_block->InsertInst(cur_inst);
         //先求出除法。dst的结果是src1//src2
         
 
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, dst, dst, src2);
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::MUL, MulResult, DivResult, src2);
         cur_block->InsertInst(cur_inst);
         //然后得到dst是src2 * 刚刚求的除法的结果。
 
         //最后拿src1减去刚刚的dst就是答案了。这里还手动寄存器优化了消暑
-        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, src1, dst);
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, src1, MulResult);
         break;
 
     case AND:
