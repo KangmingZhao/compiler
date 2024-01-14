@@ -225,12 +225,15 @@ private:
     SymbolEntry* sym_ptr;
 
     std::vector<Operand*> params;
+    std::vector<MachineOperand*> Mparams;
 public:
     std::vector<MachineBlock*>& getBlocks() {return block_list;};
     std::vector<MachineBlock*>::iterator begin() { return block_list.begin(); };
     std::vector<MachineBlock*>::iterator end() { return block_list.end(); };
     MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr);
     MachineFunction(MachineUnit* p, SymbolEntry* sym_ptr, std::vector<Operand*> params);
+    std::vector<MachineOperand*> get_Mparams() { return Mparams; };
+
     /* HINT:
     * Alloc stack space for local variable;
     * return current frame offset ;

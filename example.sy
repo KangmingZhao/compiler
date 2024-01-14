@@ -1,22 +1,7 @@
-int shityou;
-void fuck(int a, int b,int c,int d,int e, int f)
+int main(int a, int c, int d, int e, int jj)
 {
-    int fuck = 0;
-    fuck = a;
-    a = 1;
-    b= 2;
-    c= 3;
-    d = 4;
-    e = 5;
-    f = 6;
-}
-int shitfuck = 10;
-const int shitconst = 114514;
-int main () {
-    int a=2;
-    if(a>0)
-    {
-        fuck(1,2,3,4,5, 6);
-    }
-    return 0;
+	int b =0 ;
+	int fuck = 1;
+	a = b;
+	return b;
 }

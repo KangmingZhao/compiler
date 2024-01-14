@@ -41,7 +41,16 @@ public:
     bool isFLOAT_ARRAY() const { return kind == FLOAT_ARRAY; };
     bool isBTR() const { return kind == PTR; };
 
-
+    unsigned get_size()
+    {
+        switch (kind)
+        {
+        case INT:case FLOAT:
+            return 4;
+        case BOOL:
+            return 1;
+        }
+    }
 
 
     int getKindValue() { return kind; };

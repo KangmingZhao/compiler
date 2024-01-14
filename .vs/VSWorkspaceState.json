@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\include",
-    "\\src"
+    "\\src",
+    "\\test"
   ],
-  "SelectedNode": "\\src\\Function.cpp",
+  "SelectedNode": "\\example.sy",
   "PreviewInSolutionExplorer": false
 }

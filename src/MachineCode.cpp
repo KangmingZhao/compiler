@@ -350,9 +350,13 @@ void BranchMInstruction::output()
         break;
     case BX:
     {
-        //
-        auto cur_inst=new PopMInstruction(this->parent);
-        cur_inst->output();
+
+        
+        //返回前先把栈清了
+        (new PopMInstruction(nullptr, parent->getParent()->get_Mparams()))->output();
+
+        //auto cur_inst=new PopMInstruction(this->parent);
+        //cur_inst->output();
         fprintf(yyout, "\tbx");
         break;
     }
@@ -477,9 +481,19 @@ void MachineFunction::output()
      *  3. Save callee saved register
      *  4. Allocate stack space for local variable */
 
-    fprintf(yyout, "\tstr fp, [sp, #%d]!\n",
-            (int)params.size() > 4 ? ((int)params.size() - 4) * 4 + 4 : 4);
+    auto r4 = new MachineOperand(MachineOperand::REG, 4); //fp
 
+    auto fp = new MachineOperand(MachineOperand::REG, 11); //fp
+
+    auto lr = new MachineOperand(MachineOperand::REG, 14); //lr
+
+    Mparams.push_back(r4);
+    Mparams.push_back(fp);
+    Mparams.push_back(lr);
+
+
+    (new PushMInstrcuton(nullptr, Mparams))->output();
+    
     fprintf(yyout, "\tmov fp, sp\n");
 
     /* if ((unsigned)params.size())
@@ -494,11 +508,23 @@ void MachineFunction::output()
      }*/
 
     // Allocate stack space for local variables (adjust as needed)
-    fprintf(yyout, "\tsub sp, sp, #114514\n");
+
+     /*
+    要亲命了一开始理解错了。
+    现在只需要知道有多少个参数就抬多高就好了
+    */
+
+
+
+
+    fprintf(yyout, "\tsub sp, sp, #%u\n", stack_size);
 
     // Traverse all the block in block_list to print assembly code.
     for (auto iter : block_list)
         iter->output();
+
+    //(new PopMInstruction(nullptr, Mparams))->output();
+    //这玩意应该交给return来做
 }
 
 PushMInstrcuton::PushMInstrcuton(MachineBlock *p, std::vector<MachineOperand *> params)
@@ -529,6 +555,8 @@ void PushMInstrcuton::output()
     for (unsigned i = 0; i < (unsigned)def_list.size(); i++)
     {
         def_list[i]->output();
+        if (i != (unsigned)def_list.size() - 1)
+            fprintf(yyout, ", ");
     }
     fprintf(yyout, "}\n");
 }
@@ -560,11 +588,14 @@ PopMInstruction::PopMInstruction(MachineBlock* p)
 // 为pop指令输出汇编代码的方法。
 void PopMInstruction::output() {
     // 此函数应输出pop指令的汇编代码。
-   
+    if (!def_list.size())
+        return;
     fprintf(yyout, "\tpop {");
      for (unsigned i = 0; i < (unsigned)def_list.size(); i++)
     {
         def_list[i]->output();
+        if (i != (unsigned)def_list.size() - 1)
+            fprintf(yyout, ", ");
     }
    
     fprintf(yyout, " }\n");

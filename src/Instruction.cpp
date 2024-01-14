@@ -254,6 +254,7 @@ BasicBlock *CondBrInstruction::getTrueBranch()
 
 RetInstruction::RetInstruction(Operand *src, BasicBlock *insert_bb) : Instruction(RET, insert_bb)
 {
+
     if (src != nullptr)
     {
         operands.push_back(src);
@@ -269,6 +270,11 @@ RetInstruction::~RetInstruction()
 
 void RetInstruction::output() const
 {
+
+
+
+
+
     if (operands.empty())
     {
         fprintf(yyout, "  ret void\n");
@@ -439,7 +445,7 @@ void AllocaInstruction::genMachineCode(AsmBuilder *builder)
         {
             // alloc the stack like
             auto cur_func = builder->getFunction();
-            int offset = cur_func->AllocParaSpace(4);
+            int offset = cur_func->AllocSpace(4);
             dynamic_cast<TemporarySymbolEntry *>(operands[0]->getEntry())->setOffset(offset);
             // std::cout << offset << std::endl;
             // std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->toStr() << std::endl;
@@ -785,6 +791,9 @@ void RetInstruction::genMachineCode(AsmBuilder *builder)
      * 2. Restore callee saved registers and sp, fp
      * 3. Generate bx instruction */
     auto cur_block = builder->getBlock();
+    
+
+
     //mov保存返回值到r0
     if(!operands.empty()){//有返回值
         auto dst = new MachineOperand(MachineOperand::REG,0);
@@ -824,11 +833,11 @@ void GlobalInstruction::output() const
     if (operands[1] == nullptr)
     {
         // std::cout<<"non initial"<<std::endl;
-        fprintf(yyout, "%s = global %s 0, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str());
+        //fprintf(yyout, "%s = global %s 0, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str());
     }
     else
     {
-        fprintf(yyout, "%s = global %s %s, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str(), operands[1]->toStr().c_str());
+        //fprintf(yyout, "%s = global %s %s, align 4 \n", operands[0]->toStr().c_str(), operands[0]->getType()->toStr().c_str(), operands[1]->toStr().c_str());
     }
 }
 

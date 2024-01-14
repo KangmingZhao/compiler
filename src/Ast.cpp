@@ -125,11 +125,11 @@ void Ast::genCode(Unit *unit)
     Node::setIRBuilder(builder);
     root->genCode();
     // 闂傚倸鍊搁崐鎼佸磹閹间礁纾归柟闂寸绾剧懓顪冪€ｎ亝鎹ｉ柣顓炴闇夐柨婵嗩槹娴溿倝鏌ら弶鎸庡仴鐎殿喖鐖煎畷鐓庮潩椤撶喓褰呴梻浣规偠閸斿秶鎹㈤崘顔嘉﹂柛鏇ㄥ灠閸愨偓濡炪倖鍔﹀鈧紒顔煎缁辨挻鎷呴幓鎺嶅濠电姰鍨奸崺鏍礉閺嶎厽鍋傛繛鎴欏灪閻撴洟鏌曟径鍫濈仾婵炲懎鎳橀弻锛勨偓锝庡亜閻忥妇绱掔紒妯兼创鐎规洏鍔戦、娑橆潩閿濆棛鈧即姊绘担鍛婃儓闁活厼顦卞濠囧磹閻旇桨鑸梻鍌欑劍閸庡磭鎹㈤幒鎴旀瀺闁靛繈鍨洪～鏇㈡煟閹邦喖鍔嬮柍閿嬪灩缁辨挻鎷呯拠锛勫姺缂備胶濮甸幑鍥蓟閿濆鍐€鐟滃宕戦姀鈶╁亾濞堝灝鏋涙い顓犲厴瀵偊骞囬弶鍨獩闂佺ǹ鏈粙鎺椝夐崼銉︾厱闁宠鍎虫禍鐐繆閻愵亜鈧牜鏁幒鏂哄亾濮樼厧寮€规洘鍨归埀顒婄秵娴滄牠寮ㄦ禒瀣厽婵☆垰鎼痪褏绱掓笟鍥т簽缂佽鲸鎸搁濂稿幢濞嗗繆鎷伴梻浣告惈鐞氼偊宕濋幋锕€绠栭柕鍫濐槸绾惧吋绻涢幋鐑囦緵濞寸》鎷�
-    fprintf(yyout, "declare i32 @getint()\n");
+    /*fprintf(yyout, "declare i32 @getint()\n");
     fprintf(yyout, "declare void @putint(i32)\n");
     fprintf(yyout, "declare i32 @getch()\n");
     fprintf(yyout, "declare void @putch(i32)\n");
-    fprintf(yyout, "declare void @putf(i32)\n\n");
+    fprintf(yyout, "declare void @putf(i32)\n\n");*/
 }
 
 
