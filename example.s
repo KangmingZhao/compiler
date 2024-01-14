@@ -5,18 +5,16 @@
 	.global main
 	.type main , %function
 main:
-	push {r4, r5, r6, fp, lr}
+	push {r4, fp, lr}
 	mov fp, sp
-	sub sp, sp, #4
-.L4:
-	ldr r4, =10
-	str r4, [fp, #-4]
+	sub sp, sp, #8
+.L5:
 	ldr r4, [fp, #-4]
-	ldr r6, =3
-	sdiv r5, r4, r6
-	mul r6, r5, r6
-	sub r5, r4, r6
-	mov  r0, r5
-	add sp, sp, #4
-	pop {r4, r5, r6, fp, lr }
+	cmp r4, #0
+	mov  r4, #1
+	mov  r4, #0
+	str r4, [fp, #-8]
+	mov  r0, #0
+	add sp, sp, #8
+	pop {r4, fp, lr }
 	bx lr

@@ -1071,8 +1071,31 @@ void UnaryInstruction::output() const
     }
 }
 
-void UnaryInstruction::genMachineCode(AsmBuilder *)
+void UnaryInstruction::genMachineCode(AsmBuilder * builder)
 {
+    auto cur_block = builder->getBlock();
+    auto dst = genMachineOperand(operands[0]);
+    auto src = genMachineOperand(operands[1]);
+    auto zero = genMachineImm(0);
+    auto all_one = genMachineImm(0xFFFFFFFF);
+
+    MachineInstruction* cur_inst = nullptr;
+
+    switch (opcode)
+    {
+    case ADD:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::ADD, dst, zero, src);
+        break;
+    case SUB:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::SUB, dst, zero, src);
+        break;
+    case NOT:
+        cur_inst = new BinaryMInstruction(cur_block, BinaryMInstruction::EOR, dst, src, all_one);
+        break;
+    default:
+        break;
+    }
+    cur_block->InsertInst(cur_inst);
 }
 
 NotInstruction::NotInstruction(Operand *dst, Operand *src, BasicBlock *insert_bb) : Instruction(NOT, insert_bb)

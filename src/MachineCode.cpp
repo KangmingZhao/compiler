@@ -198,6 +198,9 @@ void BinaryMInstruction::output()
         case BinaryMInstruction::OR:
             fprintf(yyout, "\torr ");
             break;
+        case BinaryMInstruction::EOR:
+            fprintf(yyout, "\teor ");
+            break;
         default:
             break;
         }

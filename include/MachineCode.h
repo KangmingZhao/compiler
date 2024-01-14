@@ -88,7 +88,7 @@ public:
         arithmetic_end,
 
 
-        AND, OR,
+        AND, OR, EOR,
         logical_end
 
     };
