@@ -3,9 +3,10 @@
     "",
     "\\include",
     "\\src",
+    "\\sysyruntimelibrary",
     "\\test",
     "\\test\\level1-1"
   ],
-  "SelectedNode": "\\example.sy",
+  "SelectedNode": "\\example.s",
   "PreviewInSolutionExplorer": false
 }

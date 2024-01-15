@@ -270,8 +270,8 @@ StoreMInstruction::StoreMInstruction(MachineBlock *p,
     this->type = MachineInstruction::STORE;
     this->op = -1;
     this->cond = cond;
-    this->def_list.push_back(src1);
-    this->use_list.push_back(src2);
+    this->use_list.push_back(src1); 
+    this->def_list.push_back(src2);
     if (src3)
         this->use_list.push_back(src3);
     src1->setParent(this);
@@ -285,11 +285,11 @@ void StoreMInstruction::output()
     // TODO
 
     fprintf(yyout, "\tstr ");
-    this->def_list[0]->output();
+    this->use_list[0]->output();
     fprintf(yyout, ", ");
 
     // Load immediate num, eg: str r1, =8
-    if (this->use_list[0]->isImm())
+    if (this->def_list[0]->isImm())
     {
         // 我们不可能到达这里。
 
@@ -299,7 +299,7 @@ void StoreMInstruction::output()
 
     fprintf(yyout, "[");
 
-    this->use_list[0]->output();
+    this->def_list[0]->output();
     if (this->use_list.size() > 1)
     {
         fprintf(yyout, ", ");
@@ -660,7 +660,7 @@ void MachineUnit::PrintGlobalDecl()
         {
             int kind_size = global_i->op->getType()->getKindValue();
             if (kind_size != TYPE_ERROR)
-                fprintf(yyout, "\t.space %d\n", kind_size);
+                fprintf(yyout, "\t.word 0\n");
             else
                 fprintf(yyout, "\tsomething wrong man!");
         }
@@ -669,6 +669,8 @@ void MachineUnit::PrintGlobalDecl()
             // std::cout << global_i.init_value->get_se()->toStr() << std::endl;;
             fprintf(yyout, "\t.word %s\n", global_i->init_value->toStr().c_str());
         }
+        fprintf(yyout, "\t.size %s, 4\n", i_name);
+
     }
 }
 

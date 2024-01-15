@@ -613,13 +613,14 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
         auto dst1 = genMachineVReg();
         cur_inst = new LoadMInstruction(cur_block, dst1, src);
         cur_block->InsertInst(cur_inst);
-        src = new MachineOperand(*dst1);
+        src = dst1;
     }
 
     // store global operand
     if (operands[0]->getEntry()->isVariable() && dynamic_cast<IdentifierSymbolEntry *>(operands[0]->getEntry())->isGlobal())
     {
-        MachineOperand *internal_reg1 = genMachineVReg();
+        MachineOperand* internal_reg1 = genMachineVReg();
+
         // store r1, [r0]
         cur_inst = new LoadMInstruction(cur_block, internal_reg1, dst);
         cur_block->InsertInst(cur_inst);
