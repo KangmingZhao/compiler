@@ -526,6 +526,8 @@ void MachineFunction::output()
     
     fprintf(yyout, "\tmov fp, sp\n");
 
+
+
     /* if ((unsigned)params.size())
      {
 
@@ -548,6 +550,13 @@ void MachineFunction::output()
 
 
     fprintf(yyout, "\tsub sp, sp, #%u\n", stack_size);
+
+
+    for (unsigned i = 0; i < (unsigned)params.size() && i < 4; i++)
+    {
+        fprintf(yyout, "\tstr r%u, [sp, #-%u]\n", i, stack_size - i * 4);
+    }
+
 
     // Traverse all the block in block_list to print assembly code.
     for (auto iter : block_list)

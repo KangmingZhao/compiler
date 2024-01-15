@@ -1,8 +1,9 @@
-int fuck(int a)
+void fuck(int a, int b, int c, int d, int e)
 {
-	return 0;
-}
-int main() {
-  const int k0 = -2147483648;
-  return fuck(k0);
+	a = 0;
+	b = 1;
+	c = 2;
+	d = 3;
+	e = 4;
+	
 }
