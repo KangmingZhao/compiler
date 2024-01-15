@@ -956,6 +956,10 @@ void RetInstruction::genMachineCode(AsmBuilder *builder)
     if(!operands.empty()){//有返回值
         auto dst = new MachineOperand(MachineOperand::REG,0);
         auto src = genMachineOperand(operands[0]);
+        if (operands[0]->get_se()->get_use_r0_r3() != -1)
+        {
+            src = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        }
         auto cur_inst =new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
         cur_block->InsertInst(cur_inst);
     }
