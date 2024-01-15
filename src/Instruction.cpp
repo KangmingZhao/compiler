@@ -566,6 +566,14 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     // store local operand
     else if (operands[0]->getEntry()->isTemporary() && operands[0]->getDef() && operands[0]->getDef()->isAlloc())
     {
+        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        {
+            auto* nowSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, nowSrc);
+            cur_block->InsertInst(cur_inst);
+            //咱就是说，函数调用是不能做左值（operands[0]的）
+        }
         auto src1 = genMachineReg(11);
         int offset = dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getOffset();
         auto src2 = genMachineImm(offset);

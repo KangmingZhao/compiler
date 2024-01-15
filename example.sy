@@ -1,5 +1,7 @@
-int a;
+int n;
 int main()
 {
-	a=getint();
+    int i;
+    i=getint();
+    return 0;
 }
