@@ -1,9 +1,11 @@
-void fuck(int a, int b, int c, int d, int e)
-{
-	a = 0;
-	b = 1;
-	c = 2;
-	d = 3;
-	e = 4;
-	
+int a;
+int func(int p){
+	p = p - 1;
+	return p;
+}
+int main(){
+	int b;
+	a = 10;
+	b = func(a);
+	return b;
 }
