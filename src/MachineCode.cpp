@@ -669,7 +669,6 @@ void MachineUnit::PrintGlobalDecl()
             // std::cout << global_i.init_value->get_se()->toStr() << std::endl;;
             fprintf(yyout, "\t.word %s\n", global_i->init_value->toStr().c_str());
         }
-        fprintf(yyout, "\t.size %s, 4\n", i_name);
 
     }
 }
