@@ -411,10 +411,8 @@ MachineOperand *Instruction::genMachineOperand(Operand *ope)
     else if (se->isConstIdentifer())
     {
         auto id_se = dynamic_cast<IdentifierSymbolEntry*>(se);
-        if (id_se->isGlobal())
-            mope = new MachineOperand(id_se->toStr().c_str());
-        else
-            exit(0);
+        mope = new MachineOperand(id_se->toStr().c_str());
+
     }
     return mope;
 }
