@@ -1107,6 +1107,13 @@ void CallInstruction::genMachineCode(AsmBuilder *builder)
                 (new LoadMInstruction(cur_block, new MachineOperand(MachineOperand::REG, i), now)));
         else
         {
+            if (operands[i + 1]->get_se()->get_use_r0_r3() != -1)
+            {
+                now = genMachineReg(operands[i + 1]->get_se()->get_use_r0_r3());
+                cur_block->InsertInst(
+                (new MovMInstruction(cur_block, MovMInstruction::MOV, new MachineOperand(MachineOperand::REG, i), now)));
+            }
+            else
             // 如果在寄存器里就直接倒腾寄存器。虽然好像可以直接把当前寄存器给传过去来着？
             cur_block->InsertInst(
                 (new MovMInstruction(cur_block, MovMInstruction::MOV, new MachineOperand(MachineOperand::REG, i), now)));

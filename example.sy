@@ -1,7 +1,7 @@
-void fuck(int p)
-{
-    p = p + 1;
+int ifElse(int p) {
+	p = p + p;
+	return p;
 }
-int main()
-{
+int main() {
+  ifElse (ifElse(0));
 }

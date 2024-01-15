@@ -2,18 +2,21 @@
 	.arch_extension crc
 	.arm
 	.text
-	.global fuck
-	.type fuck , %function
-fuck:
-	push {r4, r5, fp, lr}
+	.global ifElse
+	.type ifElse , %function
+ifElse:
+	push {r4, r5, r6, fp, lr}
 	mov fp, sp
 	sub sp, sp, #0
-.L4:
+.L8:
 	mov r4, r0
-	add r5, r4, #1
-	mov r0, r5
+	mov r5, r0
+	add r6, r4, r5
+	mov r0, r6
+	mov r4, r0
+	mov r0, r4
 	add sp, sp, #0
-	pop {r4, r5, fp, lr }
+	pop {r4, r5, r6, fp, lr }
 	bx lr
 	.global main
 	.type main , %function
@@ -21,7 +24,11 @@ main:
 	push {fp, lr}
 	mov fp, sp
 	sub sp, sp, #0
-.L7:
+.L11:
+	ldr r0, =0
+	bl ifElse
+	mov r0, r0
+	bl ifElse
 	mov r0, #0
 	add sp, sp, #0
 	pop {fp, lr }
