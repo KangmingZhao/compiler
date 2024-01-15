@@ -1215,6 +1215,8 @@ void FunctCall::genCode()
     //std::cout<<"functcall_gencode"<<std::endl;
 
     dst->get_se()->set_use_r0_r3(0);
+    dst->get_se()->set_return();
+
     if(para_node!=nullptr)
     {
         //para_operands.clear();

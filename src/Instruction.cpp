@@ -477,6 +477,74 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
     // std::cout << operands[0]->get_se()->get_use_r0_r3() << std::endl;
     auto cur_block = builder->getBlock();
     MachineInstruction *cur_inst = nullptr;
+
+
+
+    if (
+        operands[0]->get_se()->get_use_r0_r3() != -1 &&
+        operands[1]->get_se()->get_use_r0_r3() == -1
+        )
+    {
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        MachineOperand* src = genMachineOperand(operands[1]);
+        auto* nowSrc = genMachineVReg();
+
+        if (src->isVReg() || src->isReg())
+        {
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+        else
+        {
+            cur_inst = new LoadMInstruction(cur_block, nowSrc, src);
+            cur_block->InsertInst(cur_inst);
+
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, nowSrc);
+            cur_block->InsertInst(cur_inst);
+        }
+        return;
+    }
+    else if (
+        operands[0]->get_se()->get_use_r0_r3() == -1 &&
+        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+        )
+    {
+        MachineOperand* dst = genMachineOperand(operands[0]);
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+        auto* nowDst = genMachineVReg();
+
+
+        if (dst->isVReg() || dst->isReg())
+        {
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+        else
+        {
+            cur_inst = new LoadMInstruction(cur_block, nowDst, dst);
+            cur_block->InsertInst(cur_inst);
+
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, nowDst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+
+        return;
+    }
+    else if (
+        operands[0]->get_se()->get_use_r0_r3() != -1 &&
+        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+        )
+    {
+
+        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+
+
     // Load global operand
     if (
         (operands[1]->getEntry()->isVariable() || operands[1]->getEntry()->isConstIdentifer())
@@ -534,6 +602,70 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     MachineOperand *dst = genMachineOperand(operands[0]);
     MachineOperand *src = genMachineOperand(operands[1]);
 
+
+    if (
+        operands[0]->get_se()->get_use_r0_r3() != -1 &&
+        operands[1]->get_se()->get_use_r0_r3() == -1 
+        ) 
+    {
+        dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+        auto* nowSrc = genMachineVReg();
+
+        if (src->isVReg() || src->isReg())
+        {
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+        else
+        {
+            cur_inst = new LoadMInstruction(cur_block, nowSrc, src);
+            cur_block->InsertInst(cur_inst);
+
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, nowSrc);
+            cur_block->InsertInst(cur_inst);
+        }
+        return;
+    }
+    else if (
+        operands[0]->get_se()->get_use_r0_r3() == -1 &&
+        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+        )
+    {
+
+        src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+        auto* nowDst = genMachineVReg();
+
+        if (dst->isVReg() || dst->isReg())
+        {
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+        else
+        {
+            cur_inst = new LoadMInstruction(cur_block, nowDst, dst);
+            cur_block->InsertInst(cur_inst);
+
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, nowDst, src);
+            cur_block->InsertInst(cur_inst);
+        }
+
+        return;
+    }
+    else if (
+        operands[0]->get_se()->get_use_r0_r3() != -1 &&
+        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+        )
+    {
+
+        src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+        dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+
+        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+        cur_block->InsertInst(cur_inst);
+        return;
+    }
+
+
     // store immediate
     if (operands[1]->getEntry()->isConstant())
     {
@@ -543,7 +675,6 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
         src = dst1;
     }
 
-    
     // store global operand
     if (operands[0]->getEntry()->isVariable() && dynamic_cast<IdentifierSymbolEntry *>(operands[0]->getEntry())->isGlobal())
     {
