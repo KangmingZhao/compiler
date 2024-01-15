@@ -474,51 +474,6 @@ void AllocaInstruction::genMachineCode(AsmBuilder *builder)
 
 void LoadInstruction::genMachineCode(AsmBuilder *builder)
 {
-    if (operands[0]->get_se()->get_use_r0_r3() != -1 && operands[1]->get_se()->get_use_r0_r3() == -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand *src = genMachineOperand(operands[1]);
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() == -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineOperand(operands[0]);
-        MachineOperand *src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() != -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand *src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-    /*if (operands[0]->get_se()->get_use_r0_r3() != -1)
-    {
-        MachineInstruction* cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand* src = genMachineOperand(operands[1]);
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, dst);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }*/
-
     // std::cout << operands[0]->get_se()->get_use_r0_r3() << std::endl;
     auto cur_block = builder->getBlock();
     MachineInstruction *cur_inst = nullptr;
@@ -527,6 +482,7 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
         (operands[1]->getEntry()->isVariable() || operands[1]->getEntry()->isConstIdentifer())
         && dynamic_cast<IdentifierSymbolEntry *>(operands[1]->getEntry())->isGlobal())
     {
+        //首先函数不可能是左值，也就是不会是operands[0].而这里说了operands[1]是变量，所以这个地方没函数调用啥事了
         auto dst = genMachineOperand(operands[0]);
         auto internal_reg1 = genMachineVReg();
         auto internal_reg2 = new MachineOperand(*internal_reg1);
@@ -552,13 +508,17 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
     // Load operand from temporary variable
     else
     {
-        //问题出这了。
-        // example: load r1, [r0]
         auto dst = genMachineOperand(operands[0]);
         auto src = genMachineOperand(operands[1]);
+        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        {
+            auto tempSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, tempSrc);
+            cur_block->InsertInst(cur_inst);
+        }
+        //问题出这了。
+        // example: load r1, [r0]
         cur_inst = new LoadMInstruction(cur_block, dst, src);
-
-
         cur_block->InsertInst(cur_inst);
     }
 }
@@ -568,40 +528,7 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     // TODO
     if (whether_para)
         return;
-    if (operands[0]->get_se()->get_use_r0_r3() != -1 && operands[1]->get_se()->get_use_r0_r3() == -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand *src = genMachineOperand(operands[1]);
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() == -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineOperand(operands[0]);
-        MachineOperand *src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-    else if (operands[1]->get_se()->get_use_r0_r3() != -1 && operands[0]->get_se()->get_use_r0_r3() != -1)
-    {
-        MachineInstruction *cur_inst = nullptr;
-        auto cur_block = builder->getBlock();
-        MachineOperand *dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand *src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
-
+    
     auto cur_block = builder->getBlock();
     MachineInstruction *cur_inst = nullptr;
     MachineOperand *dst = genMachineOperand(operands[0]);
@@ -616,29 +543,39 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
         src = dst1;
     }
 
+    
     // store global operand
     if (operands[0]->getEntry()->isVariable() && dynamic_cast<IdentifierSymbolEntry *>(operands[0]->getEntry())->isGlobal())
     {
-        MachineOperand* internal_reg1 = genMachineVReg();
+        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        {
+            auto* nowSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
 
+            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, nowSrc);
+            cur_block->InsertInst(cur_inst);
+            //咱就是说，函数调用是不能做左值（operands[0]的）
+        }
+        MachineOperand* internal_reg1 = genMachineVReg();
         // store r1, [r0]
         cur_inst = new LoadMInstruction(cur_block, internal_reg1, dst);
         cur_block->InsertInst(cur_inst);
         cur_inst = new StoreMInstruction(cur_block, src, internal_reg1);
         cur_block->InsertInst(cur_inst);
+
     }
     // store local operand
     else if (operands[0]->getEntry()->isTemporary() && operands[0]->getDef() && operands[0]->getDef()->isAlloc())
     {
-        //  store r1, [r0, #4]
         auto src1 = genMachineReg(11);
-        int offset = dynamic_cast<TemporarySymbolEntry *>(operands[0]->getEntry())->getOffset();
+        int offset = dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getOffset();
         auto src2 = genMachineImm(offset);
 
         // 如果参数数量大于3 那么需要到栈里去算偏移量 尚未完善！！
 
         cur_inst = new StoreMInstruction(cur_block, src, src1, src2);
         cur_block->InsertInst(cur_inst);
+        
+        
     }
 }
 

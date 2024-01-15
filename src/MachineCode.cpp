@@ -288,14 +288,6 @@ void StoreMInstruction::output()
     this->use_list[0]->output();
     fprintf(yyout, ", ");
 
-    // Load immediate num, eg: str r1, =8
-    if (this->def_list[0]->isImm())
-    {
-        // 我们不可能到达这里。
-
-        fprintf(yyout, "what happen bro? :(");
-        // return;
-    }
 
     fprintf(yyout, "[");
 
@@ -431,13 +423,12 @@ MachineFunctCall::MachineFunctCall(MachineBlock *p, MachineOperand *dst,
 {
     this->parent = p;
     dst->setParent(this);
-    this->def_list.push_back(dst);
+    this->use_list.push_back(dst);
 }
 void MachineFunctCall::output()
 {
-
     // 然后润到函数
-    const char *func_name = def_list[0]->getLabel().c_str() + 1;
+    const char *func_name = use_list[0]->getLabel().c_str() + 1;
     fprintf(yyout, "\tbl %s\n", func_name);
 }
 
