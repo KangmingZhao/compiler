@@ -23,6 +23,8 @@ public:
     Instruction* insn;
     Operand* addr;
     Operand* temp_src;
+    SymbolEntry* se;
+    ~temp_data_bag() {};
 };
 std::vector<std::vector<temp_data_bag>>ParaNodeStack;//这个鬼东西是设置来做那个参数的。
 
@@ -167,14 +169,17 @@ void FunctionDef::genCode()
             paraStmt->genCode();
     }
 
-    for (int i = (int)ParaNodeStack[ParaNodeStack.size() - 1].size() - 1; i > 0; i--)
+    //for (int i = (int)ParaNodeStack[ParaNodeStack.size() - 1].size() - 1; i >= 0; i--)
+    for (int i = 0; i < (int)ParaNodeStack[ParaNodeStack.size() - 1].size(); i++)
     {
+        //std::cout << ParaNodeStack[ParaNodeStack.size() - 1][i].se->toStr() << std::endl;
         Operand* addr = ParaNodeStack[ParaNodeStack.size() - 1][i].addr;
         Operand* temp_src = ParaNodeStack[ParaNodeStack.size() - 1][i].temp_src;
 
-        entry->insertFront(ParaNodeStack[ParaNodeStack.size() - 1][i].insn);       // allocate instructions should be inserted into the begin of the entry block.
+        entry->insertFront(new AllocaInstruction(addr, ParaNodeStack[ParaNodeStack.size() - 1][i].se));       // allocate instructions should be inserted into the begin of the entry block.
         new StoreInstruction(addr, temp_src, entry, 1);
-        func->add_para(temp_src);
+        //std::cout << dynamic_cast<TemporarySymbolEntry*>(temp_src->getEntry())->getOffset()<<std::endl;
+        func->add_para(addr);
     }
 
 
@@ -1283,7 +1288,7 @@ void ParaNode::genCode()
         {
             /*Function* func = builder->getInsertBB()->getParent();
             BasicBlock* entry = func->getEntry();*/
-            Instruction* alloca;
+            //Instruction* alloca;
             Operand* addr;
             SymbolEntry* addr_se;
             Type* type;
@@ -1294,19 +1299,22 @@ void ParaNode::genCode()
             else
                 addr_se->set_use_r0_r3(-1);
             addr = new Operand(addr_se);
-            alloca = new AllocaInstruction(addr, para_expr->getSymPtr());                   // allocate space for local id in function stack.
 
-            if (ParaNodeStack[ParaNodeStack.size() - 1].size() < 4)
-            {
-                //说明现在参数还不够4个。
-                //这里要做点特别的。要做的不是在占上开辟空间，而是把这个变量和rx寄存器关联起来。
-                ((AllocaInstruction*)alloca)->set_funct(ParaNodeStack[ParaNodeStack.size() - 1].size());
-            }
-            else
-            {
-                ((AllocaInstruction*)alloca)->set_funct(-1);
-            }
-            //最后把这个玩意push进去
+
+
+            //alloca = new AllocaInstruction(addr, para_expr->getSymPtr());                   // allocate space for local id in function stack.
+
+            //if (ParaNodeStack[ParaNodeStack.size() - 1].size() < 4)
+            //{
+            //    //说明现在参数还不够4个。
+            //    //这里要做点特别的。要做的不是在占上开辟空间，而是把这个变量和rx寄存器关联起来。
+            //    ((AllocaInstruction*)alloca)->set_funct(-1); // (ParaNodeStack[ParaNodeStack.size() - 1].size());
+            //}
+            //else
+            //{
+            //    ((AllocaInstruction*)alloca)->set_funct(-1);
+            //}
+            ////最后把这个玩意push进去
             temp_data_bag temp_bg;
 
 
@@ -1315,10 +1323,11 @@ void ParaNode::genCode()
             SymbolEntry* temp_src_addr = new TemporarySymbolEntry(para_expr->getSymPtr()->getType(), SymbolTable::getLabel());
             Operand* temp_src = new Operand(temp_src_addr);
 
-
+            temp_bg.se = para_expr->getSymPtr();
             temp_bg.addr = addr;
-            temp_bg.insn = alloca;
+            //temp_bg.insn = alloca;
             temp_bg.temp_src = temp_src;
+
 
             ParaNodeStack[ParaNodeStack.size() - 1].push_back(temp_bg);
 

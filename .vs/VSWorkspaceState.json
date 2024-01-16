@@ -4,8 +4,9 @@
     "\\include",
     "\\src",
     "\\sysyruntimelibrary",
-    "\\test"
+    "\\test",
+    "\\test\\level1-2"
   ],
-  "SelectedNode": "\\Makefile",
+  "SelectedNode": "\\example.s",
   "PreviewInSolutionExplorer": false
 }

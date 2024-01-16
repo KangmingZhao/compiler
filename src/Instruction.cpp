@@ -5,6 +5,7 @@
 #include "Type.h"
 #include <string>
 extern FILE *yyout;
+#include"Ast.h"
 
 Instruction::Instruction(unsigned instType, BasicBlock *insert_bb)
 {
@@ -411,8 +412,12 @@ MachineOperand *Instruction::genMachineOperand(Operand *ope)
     else if (se->isConstIdentifer())
     {
         auto id_se = dynamic_cast<IdentifierSymbolEntry*>(se);
-        mope = new MachineOperand(id_se->toStr().c_str());
-
+        if (id_se->isGlobal())
+            mope = new MachineOperand(id_se->toStr().c_str());
+        else
+        {
+            mope = genMachineImm((int)id_se->getValueExpr()->cal_expr_val());
+        }
     }
     return mope;
 }
@@ -447,20 +452,21 @@ void AllocaInstruction::genMachineCode(AsmBuilder *builder)
      * Store frame offset in symbol entry */
     if (funct)
     {
-        if (need_register == -1)
-        {
-            // alloc the stack like
-            auto cur_func = builder->getFunction();
-            int offset = cur_func->AllocSpace(4);
-            dynamic_cast<TemporarySymbolEntry *>(operands[0]->getEntry())->setOffset(offset);
-            // std::cout << offset << std::endl;
-            // std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->toStr() << std::endl;
-        }
-        else
-        {
-            // do nothing here, r0 - r3 have been alloc in the ParaNode gencode.
-            // std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getLabel() << std::endl;
-        }
+        auto cur_func = builder->getFunction();
+        int offset = cur_func->AllocSpace(4);
+        dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->setOffset(-offset);
+        //if (need_register == -1)
+        //{
+        //    // alloc the stack like
+        //    
+        //    // std::cout << offset << std::endl;
+        //    // std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->toStr() << std::endl;
+        //}
+        //else
+        //{
+        //    // do nothing here, r0 - r3 have been alloc in the ParaNode gencode.
+        //    // std::cout << dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getLabel() << std::endl;
+        //}
     }
     else
     {
@@ -478,69 +484,69 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
 
 
 
-    if (
-        operands[0]->get_se()->get_use_r0_r3() != -1 &&
-        operands[1]->get_se()->get_use_r0_r3() == -1
-        )
-    {
-        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
-        MachineOperand* src = genMachineOperand(operands[1]);
-        auto* nowSrc = genMachineVReg();
+    //if (
+    //    operands[0]->get_se()->get_use_r0_r3() != -1 &&
+    //    operands[1]->get_se()->get_use_r0_r3() == -1
+    //    )
+    //{
+    //    MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+    //    MachineOperand* src = genMachineOperand(operands[1]);
+    //    auto* nowSrc = genMachineVReg();
 
-        if (src->isVReg() || src->isReg())
-        {
-            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-            cur_block->InsertInst(cur_inst);
-        }
-        else
-        {
-            cur_inst = new LoadMInstruction(cur_block, nowSrc, src);
-            cur_block->InsertInst(cur_inst);
+    //    if (src->isVReg() || src->isReg())
+    //    {
+    //        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+    //        cur_block->InsertInst(cur_inst);
+    //    }
+    //    else
+    //    {
+    //        cur_inst = new LoadMInstruction(cur_block, nowSrc, src);
+    //        cur_block->InsertInst(cur_inst);
 
-            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, nowSrc);
-            cur_block->InsertInst(cur_inst);
-        }
-        return;
-    }
-    else if (
-        operands[0]->get_se()->get_use_r0_r3() == -1 &&
-        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
-        )
-    {
-        MachineOperand* dst = genMachineOperand(operands[0]);
-        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-        auto* nowDst = genMachineVReg();
+    //        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, nowSrc);
+    //        cur_block->InsertInst(cur_inst);
+    //    }
+    //    return;
+    //}
+    //else if (
+    //    operands[0]->get_se()->get_use_r0_r3() == -1 &&
+    //    (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+    //    )
+    //{
+    //    MachineOperand* dst = genMachineOperand(operands[0]);
+    //    MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+    //    auto* nowDst = genMachineVReg();
 
 
-        if (dst->isVReg() || dst->isReg())
-        {
-            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-            cur_block->InsertInst(cur_inst);
-        }
-        else
-        {
-            cur_inst = new LoadMInstruction(cur_block, nowDst, dst);
-            cur_block->InsertInst(cur_inst);
+    //    if (dst->isVReg() || dst->isReg())
+    //    {
+    //        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+    //        cur_block->InsertInst(cur_inst);
+    //    }
+    //    else
+    //    {
+    //        cur_inst = new LoadMInstruction(cur_block, nowDst, dst);
+    //        cur_block->InsertInst(cur_inst);
 
-            cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, nowDst, src);
-            cur_block->InsertInst(cur_inst);
-        }
+    //        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, nowDst, src);
+    //        cur_block->InsertInst(cur_inst);
+    //    }
 
-        return;
-    }
-    else if (
-        operands[0]->get_se()->get_use_r0_r3() != -1 &&
-        (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
-        )
-    {
+    //    return;
+    //}
+    //else if (
+    //    operands[0]->get_se()->get_use_r0_r3() != -1 &&
+    //    (operands[1]->get_se()->get_use_r0_r3() != -1 && !operands[1]->get_se()->is_return())
+    //    )
+    //{
 
-        MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
-        MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
+    //    MachineOperand* src = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
+    //    MachineOperand* dst = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
 
-        cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
-        cur_block->InsertInst(cur_inst);
-        return;
-    }
+    //    cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
+    //    cur_block->InsertInst(cur_inst);
+    //    return;
+    //}
 
 
     // Load global operand
@@ -576,7 +582,7 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
     {
         auto dst = genMachineOperand(operands[0]);
         auto src = genMachineOperand(operands[1]);
-        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        if (operands[1]->get_se()->is_return())
         {
             auto tempSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
             cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, tempSrc);
@@ -601,7 +607,7 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     MachineOperand *src = genMachineOperand(operands[1]);
 
 
-    if (
+    /*if (
         operands[0]->get_se()->get_use_r0_r3() != -1 &&
         operands[1]->get_se()->get_use_r0_r3() == -1 
         ) 
@@ -661,7 +667,7 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
         cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, dst, src);
         cur_block->InsertInst(cur_inst);
         return;
-    }
+    }*/
 
 
     // store immediate
@@ -676,7 +682,7 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     // store global operand
     if (operands[0]->getEntry()->isVariable() && dynamic_cast<IdentifierSymbolEntry *>(operands[0]->getEntry())->isGlobal())
     {
-        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        if (operands[1]->get_se()->is_return())
         {
             auto* nowSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
 
@@ -695,7 +701,7 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     // store local operand
     else if (operands[0]->getEntry()->isTemporary() && operands[0]->getDef() && operands[0]->getDef()->isAlloc())
     {
-        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        if (operands[1]->get_se()->is_return())
         {
             auto* nowSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
 
@@ -954,7 +960,7 @@ void RetInstruction::genMachineCode(AsmBuilder *builder)
     if(!operands.empty()){//有返回值
         auto dst = new MachineOperand(MachineOperand::REG,0);
         auto src = genMachineOperand(operands[0]);
-        if (operands[0]->get_se()->get_use_r0_r3() != -1)
+        if (operands[0]->get_se()->is_return())
         {
             src = genMachineReg(operands[0]->get_se()->get_use_r0_r3());
         }
@@ -1109,7 +1115,7 @@ void CallInstruction::genMachineCode(AsmBuilder *builder)
                 (new LoadMInstruction(cur_block, new MachineOperand(MachineOperand::REG, i), now)));
         else
         {
-            if (operands[i + 1]->get_se()->get_use_r0_r3() != -1)
+            if (operands[i + 1]->get_se()->is_return())
             {
                 now = genMachineReg(operands[i + 1]->get_se()->get_use_r0_r3());
                 cur_block->InsertInst(
