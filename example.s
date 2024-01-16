@@ -33,11 +33,13 @@ main:
 	str r4, [r5]
 	ldr r4, =a
 	ldr r5, [r4]
-	STMFD sp!, { r0, r1, r2, r3 }
+	psuh { r0, r1, r2, r3 }
+	sub sp, sp, #16
 	mov r0, r5
 	bl func
 	mov r4, r0
-	LDMFD sp!, { r0, r1, r2, r3 }
+	add sp, sp, #16
+	pop { r0, r1, r2, r3 }
 	str r4, [fp, #-4]
 	ldr r4, [fp, #-4]
 	mov r0, r4

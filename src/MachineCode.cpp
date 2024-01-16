@@ -683,9 +683,13 @@ void MachineUnit::output()
 
 void SaveParaRegWhenFunctCall::output()
 {
-    fprintf(yyout, "\tSTMFD sp!, { r0, r1, r2, r3 }\n");
+    fprintf(yyout, "\tpsuh { r0, r1, r2, r3 }\n");
+    //fprintf(yyout, "\tsub sp, sp, #16\n");
+    
+    //fprintf(yyout, "\tSTMFD sp!, { r0, r1, r2, r3 }\n");
 }
 void RecoverParaRegWhenFunctCall::output()
 {
-    fprintf(yyout, "\tLDMFD sp!, { r0, r1, r2, r3 }\n");
+    //fprintf(yyout, "\tadd sp, sp, #16\n");
+    fprintf(yyout, "\tpop { r0, r1, r2, r3 }\n");
 }
