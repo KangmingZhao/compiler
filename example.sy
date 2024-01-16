@@ -1,8 +1,11 @@
-int fuck(int a)
-{
-	return 0;
+int a;
+int func(int p){
+	p = p - 1;
+	return p;
 }
-int main() {
-  const int k0 = -2147483648;
-  return fuck(k0);
+int main(){
+	int b;
+	a = 10;
+	b = func(a);
+	return b;
 }

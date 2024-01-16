@@ -4,8 +4,9 @@
     "\\include",
     "\\src",
     "\\sysyruntimelibrary",
-    "\\test"
+    "\\test",
+    "\\test\\level1-2"
   ],
-  "SelectedNode": "\\Makefile",
+  "SelectedNode": "\\test\\level1-2\\012_func_defn.sy",
   "PreviewInSolutionExplorer": false
 }

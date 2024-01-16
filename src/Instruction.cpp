@@ -581,11 +581,14 @@ void LoadInstruction::genMachineCode(AsmBuilder *builder)
             auto tempSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
             cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, tempSrc);
             cur_block->InsertInst(cur_inst);
+
+            cur_block->InsertInst(new RecoverParaRegWhenFunctCall(cur_block));
         }
         //问题出这了。
         // example: load r1, [r0]
         cur_inst = new LoadMInstruction(cur_block, dst, src);
         cur_block->InsertInst(cur_inst);
+
     }
 }
 
@@ -683,6 +686,8 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
             cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, nowSrc);
             cur_block->InsertInst(cur_inst);
             //咱就是说，函数调用是不能做左值（operands[0]的）
+
+            cur_block->InsertInst(new RecoverParaRegWhenFunctCall(cur_block));
         }
         MachineOperand* internal_reg1 = genMachineVReg();
         // store r1, [r0]
@@ -695,13 +700,24 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
     // store local operand
     else if (operands[0]->getEntry()->isTemporary() && operands[0]->getDef() && operands[0]->getDef()->isAlloc())
     {
-        if (operands[1]->get_se()->get_use_r0_r3() != -1)
+        if (operands[1]->get_se()->is_return())
         {
             auto* nowSrc = genMachineReg(operands[1]->get_se()->get_use_r0_r3());
 
             cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, src, nowSrc);
             cur_block->InsertInst(cur_inst);
             //咱就是说，函数调用是不能做左值（operands[0]的）
+            
+            //这里已经拿到返回值了。可以直接恢复寄存器了。
+            cur_block->InsertInst(new RecoverParaRegWhenFunctCall(cur_block));
+
+
+            if (operands[0]->get_se()->get_use_r0_r3() != -1)
+            {
+                cur_inst = new MovMInstruction(cur_block, MovMInstruction::MOV, genMachineReg(operands[0]->get_se()->get_use_r0_r3()), nowSrc);
+                cur_block->InsertInst(cur_inst);
+                return;
+            }
         }
         auto src1 = genMachineReg(11);
         int offset = dynamic_cast<TemporarySymbolEntry*>(operands[0]->getEntry())->getOffset();
@@ -711,8 +727,6 @@ void StoreInstruction::genMachineCode(AsmBuilder *builder)
 
         cur_inst = new StoreMInstruction(cur_block, src, src1, src2);
         cur_block->InsertInst(cur_inst);
-        
-        
     }
 }
 
@@ -1083,6 +1097,12 @@ void CallInstruction::genMachineCode(AsmBuilder *builder)
     //     cur_block->InsertInst(new PushMInstrcuton(cur_block, r0));
     // }
 
+
+
+
+    //极霸的来了哦。还有挽救的机会！
+    cur_block->InsertInst(new SaveParaRegWhenFunctCall(cur_block));
+
     for (unsigned p = (unsigned)operands.size() - 1; p > 4; p--)
     {
         MachineOperand *now = genMachineOperand(operands[p]);
@@ -1125,6 +1145,9 @@ void CallInstruction::genMachineCode(AsmBuilder *builder)
     MachineInstruction *cur_inst = nullptr;
     cur_inst = new MachineFunctCall(cur_block, dst, MachineInstruction::NONE);
     cur_block->InsertInst(cur_inst);
+
+
+    //cur_block->InsertInst(new RecoverParaRegWhenFunctCall(cur_block));
 }
 
 UnaryInstruction::UnaryInstruction(unsigned opcode, Operand *dst, Operand *src, BasicBlock *insert_bb) : Instruction(UNARY, insert_bb)

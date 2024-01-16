@@ -193,6 +193,17 @@ public:
     void output() {};
 };
 
+class SaveParaRegWhenFunctCall : public MachineInstruction {
+public:
+    SaveParaRegWhenFunctCall(MachineBlock* p) {};
+    void output();
+};
+class RecoverParaRegWhenFunctCall : public MachineInstruction {
+public:
+    RecoverParaRegWhenFunctCall(MachineBlock* p) {};
+    void output();
+};
+
 
 class MachineBlock
 {

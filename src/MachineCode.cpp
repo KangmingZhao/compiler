@@ -679,3 +679,13 @@ void MachineUnit::output()
     for (auto iter : func_list)
         iter->output();
 }
+
+
+void SaveParaRegWhenFunctCall::output()
+{
+    fprintf(yyout, "\tSTMFD sp!, { r0, r1, r2, r3 }\n");
+}
+void RecoverParaRegWhenFunctCall::output()
+{
+    fprintf(yyout, "\tLDMFD sp!, { r0, r1, r2, r3 }\n");
+}

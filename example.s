@@ -2,32 +2,45 @@
 	.arch_extension crc
 	.arm
 .data
-.global k0
-k0:
-	.word -2147483648
+.global a
+a:
+	.word 0
 	.text
-	.global fuck
-	.type fuck , %function
-fuck:
-	push {fp, lr}
+	.global func
+	.type func , %function
+func:
+	push {r4, r5, fp, lr}
 	mov fp, sp
 	sub sp, sp, #0
-.L5:
-	mov r0, #0
+.L13:
+	mov r4, r0
+	sub r5, r4, #1
+	mov r0, r5
+	mov r4, r0
+	mov r0, r4
 	add sp, sp, #0
-	pop {fp, lr }
+	pop {r4, r5, fp, lr }
 	bx lr
 	.global main
 	.type main , %function
 main:
-	push {r4, fp, lr}
+	push {r4, r5, fp, lr}
 	mov fp, sp
-	sub sp, sp, #0
-.L8:
-	ldr r4, =k0
+	sub sp, sp, #4
+.L16:
+	ldr r4, =10
+	ldr r5, =a
+	str r4, [r5]
+	ldr r4, =a
+	ldr r5, [r4]
+	STMFD sp!, { r0, r1, r2, r3 }
+	mov r0, r5
+	bl func
+	mov r4, r0
+	LDMFD sp!, { r0, r1, r2, r3 }
+	str r4, [fp, #-4]
+	ldr r4, [fp, #-4]
 	mov r0, r4
-	bl fuck
-	mov r0, r0
-	add sp, sp, #0
-	pop {r4, fp, lr }
+	add sp, sp, #4
+	pop {r4, r5, fp, lr }
 	bx lr
