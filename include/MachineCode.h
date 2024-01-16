@@ -210,6 +210,8 @@ public:
     std::vector<MachineInstruction*>::reverse_iterator rend() { return inst_list.rend(); };
     std::vector<MachineInstruction*>::iterator end() { return inst_list.end(); };
     MachineBlock(MachineFunction* p, int no) { this->parent = p; this->no = no; };
+
+    void insertFront(MachineInstruction* inst) { this->inst_list.insert(this->inst_list.begin(), inst); };
     void InsertInst(MachineInstruction* inst) { this->inst_list.push_back(inst); };
     void addPred(MachineBlock* p) { this->pred.push_back(p); };
     void addSucc(MachineBlock* s) { this->succ.push_back(s); };

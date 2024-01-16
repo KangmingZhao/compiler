@@ -24,6 +24,7 @@ public:
     Operand* addr;
     Operand* temp_src;
     SymbolEntry* se;
+    ~temp_data_bag() {};
 };
 std::vector<std::vector<temp_data_bag>>ParaNodeStack;//这个鬼东西是设置来做那个参数的。
 
@@ -177,7 +178,8 @@ void FunctionDef::genCode()
 
         entry->insertFront(new AllocaInstruction(addr, ParaNodeStack[ParaNodeStack.size() - 1][i].se));       // allocate instructions should be inserted into the begin of the entry block.
         new StoreInstruction(addr, temp_src, entry, 1);
-        func->add_para(temp_src);
+        //std::cout << dynamic_cast<TemporarySymbolEntry*>(temp_src->getEntry())->getOffset()<<std::endl;
+        func->add_para(addr);
     }
 
 

@@ -9,18 +9,20 @@ a:
 	.global func
 	.type func , %function
 func:
-	push {r4, r5, fp, lr}
+	push {r4, fp, lr}
 	mov fp, sp
-	sub sp, sp, #4
-	str r0, [sp, #-4]
+	sub sp, sp, #8
 .L13:
-	ldr r4, [fp, #-4]
-	sub r5, r4, #1
-	str r5, [fp, #-4]
-	ldr r4, [fp, #-4]
+	str r1, [fp, #-4]
+	str r0, [fp, #-8]
+	ldr r4, =1
+	str r4, [fp, #-8]
+	ldr r4, =2
+	str r4, [fp, #-4]
+	ldr r4, [fp, #-8]
 	mov r0, r4
-	add sp, sp, #4
-	pop {r4, r5, fp, lr }
+	add sp, sp, #8
+	pop {r4, fp, lr }
 	bx lr
 	.global main
 	.type main , %function
@@ -28,7 +30,7 @@ main:
 	push {r4, r5, fp, lr}
 	mov fp, sp
 	sub sp, sp, #4
-.L16:
+.L18:
 	ldr r4, =10
 	ldr r5, =a
 	str r4, [r5]

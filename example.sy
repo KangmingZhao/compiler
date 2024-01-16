@@ -1,6 +1,7 @@
 int a;
-int func(int p){
-	p = p - 1;
+int func(int p, int b){
+	p = 1;
+	b = 2;
 	return p;
 }
 int main(){

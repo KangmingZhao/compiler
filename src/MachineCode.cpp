@@ -552,15 +552,33 @@ void MachineFunction::output()
     fprintf(yyout, "\tsub sp, sp, #%u\n", stack_size);
 
 
-    for (unsigned i = 0; i < (unsigned)params.size() && i < 4; i++)
-    {
-        fprintf(yyout, "\tstr r%u, [sp, #-%u]\n", i, stack_size - i * 4);
-    }
+    
 
 
     // Traverse all the block in block_list to print assembly code.
+    bool ok = 0;
     for (auto iter : block_list)
+    {
+        if (!ok && iter != nullptr)
+        {
+            for (unsigned i = 0; i < (unsigned)params.size() && i < 4; i++)
+            {
+                auto se = dynamic_cast<TemporarySymbolEntry*>(params[i]->get_se());
+                
+                //std::cout << se->getOffset() << std::endl;
+                iter->insertFront(new StoreMInstruction(
+                    iter,
+                    new MachineOperand(MachineOperand::REG, i),
+                    new MachineOperand(MachineOperand::REG, 11),
+                    new MachineOperand(MachineOperand::IMM, se->getOffset()),
+                    6
+                ));
+                //fprintf(yyout, "\tstr r%u, [sp, #-%u]\n", i, stack_size - i * 4);
+            }
+            ok = 1;
+        }
         iter->output();
+    }
 
     //(new PopMInstruction(nullptr, Mparams))->output();
     //这玩意应该交给return来做
