@@ -1212,7 +1212,7 @@ void FunctCall::typeCheck()
 }
 void FunctCall::genCode()
 {
-    //std::cout<<"functcall_gencode"<<std::endl;
+
 
     dst->get_se()->set_use_r0_r3(0);
     dst->get_se()->set_return();
@@ -1256,6 +1256,7 @@ void FunctCall::genCode()
         i_true_list.emplace_back(temp_cb);
         i_false_list.emplace_back(temp_cb);
     }
+
 }
 
 void ParaNode::typeCheck()
